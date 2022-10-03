@@ -20,18 +20,30 @@ r_speler = np.array([1 / math.sqrt(2), -1 / math.sqrt(2)])
 
 # cameravlak
 r_cameravlak = np.array([-1 / math.sqrt(2), -1 / math.sqrt(2)])
-
+""" [3.70710678 3.29289322]  = p_speler
+    [ 0.70710678 -0.70710678]  = r_speler
+    [-0.70710678 -0.70710678]  = r_cameravlak """
 # wordt op True gezet als het spel afgesloten moet worden
 moet_afsluiten = False
 
 # de "wereldkaart". Dit is een 2d matrix waarin elke cel een type van muur voorstelt
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
-world_map = np.array(
+"""world_map = np.array( #zoals in vb
     [[0, 0, 1, 0],
      [0, 0, 0, 1],
      [0, 0, 0, 0],
      [0, 0, 0, 0],
      ]
+)"""
+
+world_map = np.array( #zoals in gegeven code
+    [[2, 2, 2, 2, 2, 2, 2],
+     [2, 0, 0, 0, 1, 2, 2],
+     [2, 0, 0, 0, 0, 1, 2],
+     [2, 0, 0, 0, 0, 0, 2],
+     [2, 0, 0, 0, 0, 0, 2],
+     [2, 0, 0, 0, 0, 0, 2],
+     [2, 2, 2, 2, 2, 2, 2]]
 )
 
 # Vooraf gedefinieerde kleuren
@@ -115,15 +127,20 @@ def bereken_r_straal(r_speler, kolom):
 
 def raycast(p_speler, r_straal):
     d_muur = 0
-    k_muur = kleuren[0]
+    for row in world_map:
+        for column in row:
+             k_muur = kleuren[column] #vergelijkt waarde van world_map met kleurencodes en steekt deze in k_muur
     return (d_muur, k_muur)
 
 
+
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
-    renderer.draw_line((kolom, 0, kolom, window.size[1]), kleuren[1])
+    for i in world_map:
+        for j in i:
+            rc = raycast(p_speler, bereken_r_straal(r_speler, kolom)) #r_straal = richting straal
+            #print(rc[1], "\"kleur\"", j, end=" | | ") #rc[1] geeft k_muur en j is de kleurcode (0-7)
+            renderer.draw_line((kolom, 0, kolom, window.size[1]), rc[1]) #parameters: x1, y1, x2, y2, kleur
     return
-
-
 # Initialiseer font voor de fps counter
 fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
 
@@ -131,7 +148,7 @@ fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
 def render_fps(fps, renderer, window):
     message = f'{fps:.2f} fps'
     text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
-    renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20,
+    renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 16), 20,
                                  text.size[0], text.size[1]))
 
 
@@ -162,7 +179,7 @@ def main():
         renderer.clear()
 
         # Render de huidige frame
-        for kolom in range(0, window.size[0]):
+        for kolom in range(0, window.size[0]): #window.size[0] = 800
             r_straal = bereken_r_straal(r_speler, kolom)
             (d_muur, k_muur) = raycast(p_speler, r_straal)
             render_kolom(renderer, window, kolom, d_muur, k_muur)
