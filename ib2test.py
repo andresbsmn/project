@@ -11,12 +11,14 @@ HOOGTE = 600
 #
 # Globale variabelen
 #
-
+d_camera = 1
+fov = 90
+# afstand tot de camera, typisch 1 voor fov van 90°
 # positie van de speler
-p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
+p_speler = np.array([1, 1])
 
 # richting waarin de speler kijkt
-r_speler = np.array([1 / math.sqrt(2), -1 / math.sqrt(2)])
+r_speler = np.array([1, 1])
 
 # cameravlak
 r_cameravlak = np.array([-1 / math.sqrt(2), -1 / math.sqrt(2)])
@@ -34,8 +36,8 @@ moet_afsluiten = False
      [0, 0, 0, 0],
      [0, 0, 0, 0],
      ]
-)"""
-
+)
+"""
 world_map = np.array( #zoals in gegeven code
     [[2, 2, 2, 2, 2, 2, 2],
      [2, 0, 0, 0, 1, 2, 2],
@@ -122,24 +124,27 @@ def verwerk_input(delta):
 
 def bereken_r_straal(r_speler, kolom):
     r_straal = np.zeros(2)
+
+    """stapbreedte = fov/BREEDTE
+
+    angle = -fov/2 + stapbreedte*kolom
+    if kolom == 799:
+        exit()
+    print(kolom, angle)"""
     return r_straal
 
 
 def raycast(p_speler, r_straal):
-    d_muur = 0
-    for row in world_map:
-        for column in row:
-             k_muur = kleuren[column] #vergelijkt waarde van world_map met kleurencodes en steekt deze in k_muur
+    d_muur, k_muur = 0, 2
+    #print("row = ", row, "column = ", column, "waarde = ", world_map[row][column], end=' ')
+    #k_muur = kleuren[world_map[row][column]] #vergelijkt waarde van world_map met kleurencodes en steekt deze in k_muur
     return (d_muur, k_muur)
 
 
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
-    for i in world_map:
-        for j in i:
-            rc = raycast(p_speler, bereken_r_straal(r_speler, kolom)) #r_straal = richting straal
-            #print(rc[1], "\"kleur\"", j, end=" | | ") #rc[1] geeft k_muur en j is de kleurcode (0-7)
-            renderer.draw_line((kolom, 0, kolom, window.size[1]), rc[1]) #parameters: x1, y1, x2, y2, kleur
+    (d_muur, k_muur) = raycast(p_speler, 0)
+    renderer.draw_line((kolom, 0 , kolom, window.size[1]), k_muur) #parameters: x1, y1, x2, y2, kleur
     return
 # Initialiseer font voor de fps counter
 fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])

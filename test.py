@@ -46,6 +46,14 @@ world_map = np.array( #zoals in gegeven code
      [2, 2, 2, 2, 2, 2, 2]]
 )
 
+
+for row in range(world_map.shape[0]):
+    for column in world_map[row]:
+        print(column, end=" ")
+    print()
+print("___---___")
+
+
 # Vooraf gedefinieerde kleuren
 kleuren = [
     sdl2.ext.Color(0, 0, 0),  # 0 = Zwart
@@ -58,7 +66,7 @@ kleuren = [
     sdl2.ext.Color(255, 255, 255),  # 7 = Wit
 ]
 
-
+"""
 #
 # Verwerkt alle input van het toetsenbord en de muis
 #
@@ -206,3 +214,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+"""
