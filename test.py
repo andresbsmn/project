@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 import sdl2.ext
-eeee
+
 # Constanten
 BREEDTE = 800
 HOOGTE = 600
@@ -11,7 +11,7 @@ HOOGTE = 600
 #
 # Globale variabelen
 #
-
+#eeeee
 # positie van de speler
 p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
 
