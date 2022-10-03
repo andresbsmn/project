@@ -11,7 +11,7 @@ HOOGTE = 600
 #
 # Globale variabelen
 #
-#eeeee
+#aaaaaa
 # positie van de speler
 p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
 
