@@ -22,7 +22,8 @@ p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
 r_speler = np.array([1 / math.sqrt(2), -1 / math.sqrt(2)])
 
 # cameravlak
-r_cameravlak = np.array([-1 / math.sqrt(2), -1 / math.sqrt(2)])
+rot90 = [-1, 1] #rotatie matrix voor 90°, al vereenvoudigt
+r_cameravlak = rot90*r_speler #d_camera*r_speler+p_speler als nulpunt
 
 # wordt op True gezet als het spel afgesloten moet worden
 moet_afsluiten = False
@@ -147,16 +148,24 @@ def raycast(p_speler, r_straal):
 
     # stap 4:
     if test() == True:
-        ihorizontaalx = p_speler + (d_horizontaal + x * delta_h) * r_straal
-        ihorizontaalx = ihorizontaalx + x
+        i_horizontaal_x = int(p_speler[x] + (d_horizontaal + x * delta_h) * r_straal[x])
+        i_horizontaal_x = int(i_horizontaal_x + x)
+
     else:
-        iverticaalx = p_speler + (d_verticaal + x * delta_v) * r_straal
-        iverticaalx = iverticaalx + y
+        i_verticaal_x = int(p_speler[y] + (d_verticaal + x * delta_v) * r_straal[y])
+        i_verticaal_x = int(i_verticaal_x + y)
+
+    print(p_speler)
+    print(d_horizontaal)
+    print(i_verticaal_x)
+    print(delta_h)
+    print(r_straal)
     # stap 5:
-    if test() == True and (world_map[ihorizontaalx] == 2):
+    if test() == True and (world_map[i_horizontaal_x] == 2):
         raise ValueError
-    elif test() == False and (world_map[iverticaalx] == 2):
+    elif test() == False and (world_map[i_verticaal_x] == 2):
         raise ValueError
+
     # stap 6:
     if test() == True and r_straal[y] >= 0:
         check(world_map[math.ceil(r_straal[x])])
