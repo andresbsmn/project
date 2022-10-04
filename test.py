@@ -11,32 +11,30 @@ HOOGTE = 600
 #
 # Globale variabelen
 #
-#aaaaaa
+
+
+
+
+#d_camera
+fov=90
+d_camera=1/(math.tan(math.radians(fov)/2))
 # positie van de speler
 p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
 
 # richting waarin de speler kijkt
-r_speler = np.array([1 / math.sqrt(2), -1 / math.sqrt(2)])
+r_speler = np.array([1 / math.sqrt(2), -1 / math.sqrt(2)]) #speler als nulpunt
 
 # cameravlak
-r_cameravlak = np.array([-1 / math.sqrt(2), -1 / math.sqrt(2)])
-""" [3.70710678 3.29289322]  = p_speler
-    [ 0.70710678 -0.70710678]  = r_speler
-    [-0.70710678 -0.70710678]  = r_cameravlak """
+rot90 = [-1, 1] #rotatie matrix voor 90°, al vereenvoudigt
+r_cameravlak = rot90*r_speler #d_camera*r_speler+p_speler als nulpunt
+
+
 # wordt op True gezet als het spel afgesloten moet worden
 moet_afsluiten = False
 
 # de "wereldkaart". Dit is een 2d matrix waarin elke cel een type van muur voorstelt
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
-"""world_map = np.array( #zoals in vb
-    [[0, 0, 1, 0],
-     [0, 0, 0, 1],
-     [0, 0, 0, 0],
-     [0, 0, 0, 0],
-     ]
-)"""
-
-world_map = np.array( #zoals in gegeven code
+world_map = np.array(
     [[2, 2, 2, 2, 2, 2, 2],
      [2, 0, 0, 0, 1, 2, 2],
      [2, 0, 0, 0, 0, 1, 2],
@@ -45,14 +43,6 @@ world_map = np.array( #zoals in gegeven code
      [2, 0, 0, 0, 0, 0, 2],
      [2, 2, 2, 2, 2, 2, 2]]
 )
-
-
-for row in range(world_map.shape[0]):
-    for column in world_map[row]:
-        print(column, end=" ")
-    print()
-print("___---___")
-
 
 # Vooraf gedefinieerde kleuren
 kleuren = [
@@ -66,7 +56,7 @@ kleuren = [
     sdl2.ext.Color(255, 255, 255),  # 7 = Wit
 ]
 
-"""
+
 #
 # Verwerkt alle input van het toetsenbord en de muis
 #
@@ -130,25 +120,26 @@ def verwerk_input(delta):
 
 def bereken_r_straal(r_speler, kolom):
     r_straal = np.zeros(2)
+    r_straal_kolom=d_camera*r_speler+(-1+(2*kolom)/BREEDTE)*r_cameravlak
+    r_straal_kolom_norm=np.linalg.norm(r_straal_kolom)
+    r_straal = r_straal_kolom/r_straal_kolom_norm
+    print(r_straal, kolom)
+    if kolom == 799:
+        quit()
     return r_straal
 
 
 def raycast(p_speler, r_straal):
     d_muur = 0
-    for row in world_map:
-        for column in row:
-             k_muur = kleuren[column] #vergelijkt waarde van world_map met kleurencodes en steekt deze in k_muur
+    k_muur = kleuren[0]
     return (d_muur, k_muur)
 
 
-
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
-    for i in world_map:
-        for j in i:
-            rc = raycast(p_speler, bereken_r_straal(r_speler, kolom)) #r_straal = richting straal
-            #print(rc[1], "\"kleur\"", j, end=" | | ") #rc[1] geeft k_muur en j is de kleurcode (0-7)
-            renderer.draw_line((kolom, 0, kolom, window.size[1]), rc[1]) #parameters: x1, y1, x2, y2, kleur
+    renderer.draw_line((kolom, 0, kolom, window.size[1]), kleuren[1])
     return
+
+
 # Initialiseer font voor de fps counter
 fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
 
@@ -156,7 +147,7 @@ fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
 def render_fps(fps, renderer, window):
     message = f'{fps:.2f} fps'
     text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
-    renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 16), 20,
+    renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20,
                                  text.size[0], text.size[1]))
 
 
@@ -187,7 +178,7 @@ def main():
         renderer.clear()
 
         # Render de huidige frame
-        for kolom in range(0, window.size[0]): #window.size[0] = 800
+        for kolom in range(0, window.size[0]):
             r_straal = bereken_r_straal(r_speler, kolom)
             (d_muur, k_muur) = raycast(p_speler, r_straal)
             render_kolom(renderer, window, kolom, d_muur, k_muur)
@@ -214,4 +205,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-"""

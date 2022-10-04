@@ -118,7 +118,6 @@ def bereken_r_straal(r_speler, kolom):
     r_straal_kolom=d_camera*r_speler+(-1+(2*kolom)/BREEDTE)*r_cameravlak
     r_straal_kolom_norm=np.linalg.norm(r_straal_kolom)
     r_straal = r_straal_kolom/r_straal_kolom_norm
-    return r_straal
 
 
 def raycast(p_speler, r_straal):
