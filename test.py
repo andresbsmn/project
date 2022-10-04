@@ -130,8 +130,22 @@ def bereken_r_straal(r_speler, kolom):
 
 
 def raycast(p_speler, r_straal):
+    delta_v = 1 / (math.fabs(r_straal[0]))
+    delta_h = 1 / (math.fabs(r_straal[1]))
+
+    if r_straal[1] < 0:
+        d_horizontaal = (p_speler[1] - math.floor(p_speler[1])) * delta_h
+    elif r_straal[1] >= 0:
+        d_horizontaal = (1 - p_speler[1] + math.floor(p_speler[1])) * delta_h
+
+    if r_straal[0] < 0:
+        d_verticaal = (p_speler[0] - math.floor(p_speler[0])) * delta_v
+    elif r_straal[0] >= 0:
+        d_verticaal = (1 - p_speler[0] + math.floor(p_speler[0])) * delta_v
+
+    # HIER BEZIG NET iHORIZONTAAL EN VERTICAAL ONDER PUTTING IT ALL TOGETHER in pwp
     d_muur = 0
-    k_muur = kleuren[0]
+    k_muur = kleuren[1]
     return (d_muur, k_muur)
 
 
