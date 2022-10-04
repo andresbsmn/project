@@ -153,13 +153,14 @@ def raycast(p_speler, r_straal):
             return True
         else:
             return False
+
     # stap 4:
     if test() == True:
-        i_horizontaalx = p_speler + (d_horizontaal + x * delta_h) * r_straal
-        i_horizontaalx = i_horizontaalx + x
+        i_horizontaalx = p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0]
+        x += 1
     else:
-        i_verticaalx = p_speler + (d_verticaal + x * delta_v) * r_straal
-        i_verticaalx = i_verticaalx + y
+        i_verticaalx = p_speler[1] + (d_verticaal + x * delta_v) * r_straal[1]
+        y+=1
     # stap 5:
     if test() == True and (world_map[i_horizontaalx] == 2):
         raise ValueError
