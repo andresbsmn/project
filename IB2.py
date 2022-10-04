@@ -7,7 +7,7 @@ import sdl2.ext
 # Constanten
 BREEDTE = 800
 HOOGTE = 600
-
+test op lijn tien
 #
 # Globale variabelen
 #
