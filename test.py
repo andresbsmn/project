@@ -130,9 +130,14 @@ def bereken_r_straal(r_speler, kolom):
 
 
 def raycast(p_speler, r_straal):
+# DDA algoritme:
+    # stap 0:
+    x = 0
+    y = 0
+    #stap 1:
     delta_v = 1 / (math.fabs(r_straal[0]))
     delta_h = 1 / (math.fabs(r_straal[1]))
-
+    #stap 2:
     if r_straal[1] < 0:
         d_horizontaal = (p_speler[1] - math.floor(p_speler[1])) * delta_h
     elif r_straal[1] >= 0:
@@ -142,12 +147,37 @@ def raycast(p_speler, r_straal):
         d_verticaal = (p_speler[0] - math.floor(p_speler[0])) * delta_v
     elif r_straal[0] >= 0:
         d_verticaal = (1 - p_speler[0] + math.floor(p_speler[0])) * delta_v
-
+    # stap 3:
+    def test():
+        if dhorizontaal + (x * deltah) <= dvert + (y * deltav):
+            return True
+        else:
+            return False
+    # stap 4:
+    if test() == True:
+        ihorizontaalx = p_speler + (dhorizontaal + x * deltah) * r_straal
+        ihorizontaalx = ihorizontaalx + x
+    else:
+        iverticaalx = p_speler + (dvert + x * deltav) * r_straal
+        iverticaalx = iverticaalx + y
+    # stap 5:
+    if test() == True and (world_map[ihorizontaalx] == 2):
+        raise ValueError
+    elif test() == False and (world_map[iverticaalx]== 2):
+        raise ValueError
+    # stap 6:
+    if test() == True and r_straal[y] >= 0:
+        check(world_map[math.ceil(r_straal[x])])
+    elif test() == True and r_straal[y] < 0:
+        check(world_map[math.floor(r_straal[x])])
+    elif test() == False and r_straal[x] < 0:
+        check(world_map[math.floor(r_straal[x])])
+    elif test() == False and r_straal[x] >= 0:
+        check(world_map[math.ceil(r_straal[x])])
     # HIER BEZIG NET iHORIZONTAAL EN VERTICAAL ONDER PUTTING IT ALL TOGETHER in pwp
     d_muur = 0
     k_muur = kleuren[1]
     return (d_muur, k_muur)
-
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
     renderer.draw_line((kolom, 0, kolom, window.size[1]), kleuren[1])
