@@ -8,6 +8,7 @@ import sdl2.ext
 BREEDTE = 800
 HOOGTE = 600
 test op lijn tien
+test op lijn elf
 #
 # Globale variabelen
 #
