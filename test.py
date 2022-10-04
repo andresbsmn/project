@@ -149,21 +149,21 @@ def raycast(p_speler, r_straal):
         d_verticaal = (1 - p_speler[0] + math.floor(p_speler[0])) * delta_v
     # stap 3:
     def test():
-        if dhorizontaal + (x * deltah) <= dvert + (y * deltav):
+        if d_horizontaal + (x * delta_h) <= d_verticaal + (y * delta_v):
             return True
         else:
             return False
     # stap 4:
     if test() == True:
-        ihorizontaalx = p_speler + (dhorizontaal + x * deltah) * r_straal
-        ihorizontaalx = ihorizontaalx + x
+        i_horizontaalx = p_speler + (d_horizontaal + x * delta_h) * r_straal
+        i_horizontaalx = i_horizontaalx + x
     else:
-        iverticaalx = p_speler + (dvert + x * deltav) * r_straal
-        iverticaalx = iverticaalx + y
+        i_verticaalx = p_speler + (d_verticaal + x * delta_v) * r_straal
+        i_verticaalx = i_verticaalx + y
     # stap 5:
-    if test() == True and (world_map[ihorizontaalx] == 2):
+    if test() == True and (world_map[i_horizontaalx] == 2):
         raise ValueError
-    elif test() == False and (world_map[iverticaalx]== 2):
+    elif test() == False and (world_map[i_verticaalx]== 2):
         raise ValueError
     # stap 6:
     if test() == True and r_straal[y] >= 0:
@@ -174,7 +174,6 @@ def raycast(p_speler, r_straal):
         check(world_map[math.floor(r_straal[x])])
     elif test() == False and r_straal[x] >= 0:
         check(world_map[math.ceil(r_straal[x])])
-    # HIER BEZIG NET iHORIZONTAAL EN VERTICAAL ONDER PUTTING IT ALL TOGETHER in pwp
     d_muur = 0
     k_muur = kleuren[1]
     return (d_muur, k_muur)
