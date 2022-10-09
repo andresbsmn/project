@@ -161,19 +161,32 @@ def raycast(p_speler, r_straal):
         iverticaalx = p_speler + (dvert + x * deltav) * r_straal
         iverticaalx = iverticaalx + y
     # stap 5:
-    if test() == True and (world_map[ihorizontaalx] == 2):
-        raise ValueError
-    elif test() == False and (world_map[iverticaalx]== 2):
-        raise ValueError
+    if test() == True and r_straal[y] >= 0:
+        checkedge(world_map[math.ceil(r_straal[x])])
+    elif test() == True and r_straal[y] < 0:
+        checkedge(world_map[math.floor(r_straal[x])])
+    elif test() == False and r_straal[x] < 0:
+        checkedge(world_map[math.floor(r_straal[x])])
+    elif test() == False and r_straal[x] >= 0:
+        checkedge(world_map[math.ceil(r_straal[x])])
     # stap 6:
     if test() == True and r_straal[y] >= 0:
-        check(world_map[math.ceil(r_straal[x])])
+        checkwall(world_map[math.ceil(r_straal[x])])
     elif test() == True and r_straal[y] < 0:
-        check(world_map[math.floor(r_straal[x])])
+        checkwall(world_map[math.floor(r_straal[x])])
     elif test() == False and r_straal[x] < 0:
-        check(world_map[math.floor(r_straal[x])])
+        checkwall(world_map[math.floor(r_straal[x])])
     elif test() == False and r_straal[x] >= 0:
-        check(world_map[math.ceil(r_straal[x])])
+        checkwall(world_map[math.ceil(r_straal[x])])
+
+def checkedge (inp):
+    if inp == 2:
+        raise ValueError
+def checkwall (inp):
+    if inp == 1:
+        #verder proces als wall geraakt.
+    else:
+        #naar stap 3 terug gaan
     # HIER BEZIG NET iHORIZONTAAL EN VERTICAAL ONDER PUTTING IT ALL TOGETHER in pwp
     d_muur = 0
     k_muur = kleuren[1]
