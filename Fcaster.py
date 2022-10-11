@@ -136,8 +136,8 @@ def raycast(p_speler_x,p_speler_y,r_straal):
     x = 0
     y = 0
     # stap 1:
-    delta_v = 1 / (math.fabs(r_straal[1]))
-    delta_h = 1 / (math.fabs(r_straal[0]))
+    delta_v = 1 / abs(r_straal[1])
+    delta_h = 1 / abs(r_straal[0])
     # stap 2:
     if r_straal[1] < 0:
         d_horizontaal = (p_speler_y - math.floor(p_speler_y)) * delta_h
