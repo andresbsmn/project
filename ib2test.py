@@ -11,34 +11,31 @@ HOOGTE = 600
 #
 # Globale variabelen
 #
-d_camera = 1
+
+
+
+
+#d_camera
 fov = 90
-# afstand tot de camera, typisch 1 voor fov van 90°
+d_camera = 1/(math.tan(math.radians(fov)/2))
 # positie van de speler
-p_speler = np.array([1, 1])
+p_speler = np.array([400, 300])
 
 # richting waarin de speler kijkt
-r_speler = np.array([1, 1])
+r_speler = np.array([400, 300]) #speler als nulpunt
 
 # cameravlak
-r_cameravlak = np.array([-1 / math.sqrt(2), -1 / math.sqrt(2)])
-""" [3.70710678 3.29289322]  = p_speler
-    [ 0.70710678 -0.70710678]  = r_speler
-    [-0.70710678 -0.70710678]  = r_cameravlak """
+rot90 = [-1, 1] #rotatie matrix voor 90°, al vereenvoudigt
+r_cameravlak = rot90*r_speler #d_camera*r_speler+p_speler als nulpunt
+
+
 # wordt op True gezet als het spel afgesloten moet worden
 moet_afsluiten = False
 
 # de "wereldkaart". Dit is een 2d matrix waarin elke cel een type van muur voorstelt
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
-"""world_map = np.array( #zoals in vb
-    [[0, 0, 1, 0],
-     [0, 0, 0, 1],
-     [0, 0, 0, 0],
-     [0, 0, 0, 0],
-     ]
-)
-"""
-world_map = np.array( #zoals in gegeven code
+
+world_map = np.array(
     [[2, 2, 2, 2, 2, 2, 2],
      [2, 0, 0, 0, 1, 2, 2],
      [2, 0, 0, 0, 0, 1, 2],
@@ -123,32 +120,68 @@ def verwerk_input(delta):
 
 
 def bereken_r_straal(r_speler, kolom):
-    r_straal = np.zeros(2)
-
-    """stapbreedte = fov/BREEDTE
-
-    angle = -fov/2 + stapbreedte*kolom
-    if kolom == 799:
-        exit()
-    print(kolom, angle)"""
+    r_straal_kolom = d_camera*r_speler+(-1+(2*kolom)/BREEDTE)*r_cameravlak
+    r_straal_kolom_norm = np.linalg.norm(r_straal_kolom)
+    r_straal = r_straal_kolom/r_straal_kolom_norm
     return r_straal
 
 
 def raycast(p_speler, r_straal):
-    d_muur, k_muur = 0, 2
-    #print("row = ", row, "column = ", column, "waarde = ", world_map[row][column], end=' ')
-    #k_muur = kleuren[world_map[row][column]] #vergelijkt waarde van world_map met kleurencodes en steekt deze in k_muur
-    return (d_muur, k_muur)
+    # DDA algoritme:
+    # stap 0:
+    x = 0
+    y = 0
+    # stap 1:
+    delta_v = 1 / abs(r_straal[0])
+    delta_h = 1 / abs(r_straal[1])
+    # stap 2:
+    if r_straal[1] < 0:
+        d_horizontaal = (p_speler[1] - math.floor(p_speler[1])) * delta_h
+    elif r_straal[1] >= 0:
+        d_horizontaal = (1 - p_speler[1] + math.floor(p_speler[1])) * delta_h #volgens formules uit ppt
 
+    if r_straal[0] < 0:
+        d_verticaal = (p_speler[0] - math.floor(p_speler[0])) * delta_v
+    elif r_straal[0] >= 0:
+        d_verticaal = (1 - p_speler[0] + math.floor(p_speler[0])) * delta_v
 
+    # stap 3:
+    def test():
+        return d_horizontaal + (x * delta_h) <= d_verticaal + (y * delta_v)
+
+    def check(soortbotsing):
+        d_muur = math.sqrt(d_horizontaal*d_horizontaal + d_verticaal*d_verticaal)
+        k_muur = kleuren[soortbotsing]
+        return d_muur, k_muur
+    # stap 4:
+    if test():
+        ihorizontaal = p_speler + (d_horizontaal + x * delta_h) * r_straal
+        x += 1
+    else:
+        iverticaal = p_speler + (d_verticaal + x * delta_v) * r_straal
+        y += 1
+
+    # stap 6:
+    if test() and r_straal[1] >= 0: #snijlijn met horizontale
+        check = check(world_map[x][y])
+    elif test() and r_straal[1] < 0:
+        check = check(world_map[x][y])
+    elif not test() and r_straal[0] < 0: #snijlijn met verticale
+        check = check(world_map[x][y])
+    elif not test() and r_straal[0] >= 0:
+        check = check(world_map[x][y])
+
+    d_muur, k_muur = check[0], check[1]
+
+    return d_muur, k_muur
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
-    (d_muur, k_muur) = raycast(p_speler, 0)
-    renderer.draw_line((kolom, 0 , kolom, window.size[1]), k_muur) #parameters: x1, y1, x2, y2, kleur
+    cte = 5
+    afstand = cte * d_muur
+    renderer.draw_line((kolom, 0 + afstand, kolom, window.size[1] - afstand), k_muur) #parameters: x1, y1, x2, y2, kleur
     return
 # Initialiseer font voor de fps counter
 fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
-
 
 def render_fps(fps, renderer, window):
     message = f'{fps:.2f} fps'

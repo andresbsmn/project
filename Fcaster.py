@@ -16,15 +16,20 @@ HOOGTE = 600
 fov=90
 d_camera=1/(math.tan(math.radians(fov)/2))
 # positie van de speler
-p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
-
+#p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
+p_speler_x =3 + 1 / math.sqrt(2)
+p_speler_y = 4 - 1 / math.sqrt(2)
 # richting waarin de speler kijkt
-r_speler = np.array([1 / math.sqrt(2), -1 / math.sqrt(2)])
-
+#r_speler = np.array([1 / math.sqrt(2), -1 / math.sqrt(2)])
+r_speler_x= 1 / math.sqrt(2)
+r_speler_y= -1 / math.sqrt(2)
 # cameravlak
-rot90 = [-1, 1] #rotatie matrix voor 90°, al vereenvoudigt
-r_cameravlak = rot90*r_speler #d_camera*r_speler+p_speler als nulpunt
-
+#rot90 = [-1, 1] #rotatie matrix voor 90°, al vereenvoudigt
+rot90_x= -1
+rot90_y= 1
+#r_cameravlak = rot90*r_speler #d_camera*r_speler+p_speler als nulpunt
+r_cameravlak_x= rot90_x*r_speler_x
+r_cameravlak_y= rot90_y*r_speler_y
 # wordt op True gezet als het spel afgesloten moet worden
 moet_afsluiten = False
 
@@ -113,31 +118,36 @@ def verwerk_input(delta):
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
 
+#r_straal en dergelijk zijn geoptimaliseerd door in x en y coordinaten te rekenen.
+def bereken_r_straal(r_speler_x,r_speler_y, kolom):
+    #r_straal_kolom=d_camera*r_speler+(-1+(2*kolom)/BREEDTE)*r_cameravlak
+    r_straal_kolom_x = d_camera * r_speler_x + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak_x
+    r_straal_kolom_y = d_camera * r_speler_y + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak_y
+    r_straal_kolom_norm= math.sqrt(r_straal_kolom_x**2 + r_straal_kolom_y**2)
+    r_straal_x = r_straal_kolom_x/r_straal_kolom_norm
+    r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
+    return [r_straal_x,r_straal_y]
 
-def bereken_r_straal(r_speler, kolom):
-    r_straal_kolom=d_camera*r_speler+(-1+(2*kolom)/BREEDTE)*r_cameravlak
-    r_straal_kolom_norm=np.linalg.norm(r_straal_kolom)
-    r_straal = r_straal_kolom/r_straal_kolom_norm
-    return r_straal
 
-def raycast(p_speler, r_straal):
+
+def raycast(p_speler_x,p_speler_y,r_straal):
     # DDA algoritme:
     # stap 0:
     x = 0
     y = 0
     # stap 1:
-    delta_v = 1 / (math.fabs(r_straal[0]))
-    delta_h = 1 / (math.fabs(r_straal[1]))
+    delta_v = 1 / abs(r_straal[1])
+    delta_h = 1 / abs(r_straal[0])
     # stap 2:
     if r_straal[1] < 0:
-        d_horizontaal = (p_speler[1] - math.floor(p_speler[1])) * delta_h
+        d_horizontaal = (p_speler_y - math.floor(p_speler_y)) * delta_h
     elif r_straal[1] >= 0:
-        d_horizontaal = (1 - p_speler[1] + math.floor(p_speler[1])) * delta_h
+        d_horizontaal = (1 - p_speler_y + math.floor(p_speler_y)) * delta_h
 
     if r_straal[0] < 0:
-        d_verticaal = (p_speler[0] - math.floor(p_speler[0])) * delta_v
+        d_verticaal = (p_speler_x - math.floor(p_speler_x)) * delta_v
     elif r_straal[0] >= 0:
-        d_verticaal = (1 - p_speler[0] + math.floor(p_speler[0])) * delta_v
+        d_verticaal = (1 - p_speler_x + math.floor(p_speler_x)) * delta_v
 
     # stap 3:
     def test():
@@ -148,18 +158,14 @@ def raycast(p_speler, r_straal):
 
     # stap 4:
     if test() == True:
-        i_horizontaal_x = int(p_speler[x] + (d_horizontaal + x * delta_h) * r_straal[x])
+        i_horizontaal_x = int(p_speler_x + (d_horizontaal + x * delta_h) * r_straal[0])
         i_horizontaal_x = int(i_horizontaal_x + x)
 
     else:
-        i_verticaal_x = int(p_speler[y] + (d_verticaal + x * delta_v) * r_straal[y])
+        i_verticaal_x = int(p_speler_y + (d_verticaal + x * delta_v) * r_straal[1])
         i_verticaal_x = int(i_verticaal_x + y)
 
-    print(p_speler)
-    print(d_horizontaal)
-    print(i_verticaal_x)
-    print(delta_h)
-    print(r_straal)
+
     # stap 5:
     if test() == True and (world_map[i_horizontaal_x] == 2):
         raise ValueError
@@ -167,14 +173,14 @@ def raycast(p_speler, r_straal):
         raise ValueError
 
     # stap 6:
-    if test() == True and r_straal[y] >= 0:
-        check(world_map[math.ceil(r_straal[x])])
-    elif test() == True and r_straal[y] < 0:
-        check(world_map[math.floor(r_straal[x])])
-    elif test() == False and r_straal[x] < 0:
-        check(world_map[math.floor(r_straal[x])])
-    elif test() == False and r_straal[x] >= 0:
-        check(world_map[math.ceil(r_straal[x])])
+    if test() == True and r_straal[1] >= 0:
+        check(world_map[math.ceil(r_straal[0])])
+    elif test() == True and r_straal[1] < 0:
+        check(world_map[math.floor(r_straal[0])])
+    elif test() == False and r_straal[0] < 0:
+        check(world_map[math.floor(r_straal[0])])
+    elif test() == False and r_straal[0] >= 0:
+        check(world_map[math.ceil(r_straal[0])])
     return (d_muur, k_muur)
 
 
@@ -222,8 +228,8 @@ def main():
 
         # Render de huidige frame
         for kolom in range(0, window.size[0]):
-            r_straal = bereken_r_straal(r_speler, kolom)
-            (d_muur, k_muur) = raycast(p_speler, r_straal)
+            r_straal = bereken_r_straal(r_speler_x,r_speler_y, kolom)
+            (d_muur, k_muur) = raycast(p_speler_x,p_speler_y,r_straal)
             render_kolom(renderer, window, kolom, d_muur, k_muur)
 
         end_time = time.time()
