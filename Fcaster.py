@@ -118,7 +118,7 @@ def verwerk_input(delta):
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
 
-#r_straal en dergelijk zijn geoptimaliseerd.
+#r_straal en dergelijk zijn geoptimaliseerd door in x en y coordinaten te rekenen.
 def bereken_r_straal(r_speler_x,r_speler_y, kolom):
     #r_straal_kolom=d_camera*r_speler+(-1+(2*kolom)/BREEDTE)*r_cameravlak
     r_straal_kolom_x = d_camera * r_speler_x + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak_x
