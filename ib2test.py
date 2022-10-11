@@ -19,10 +19,10 @@ HOOGTE = 600
 fov = 90
 d_camera = 1/(math.tan(math.radians(fov)/2))
 # positie van de speler
-p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
+p_speler = np.array([1, 1])
 
 # richting waarin de speler kijkt
-r_speler = np.array([1 / math.sqrt(2), -1 / math.sqrt(2)]) #speler als nulpunt
+r_speler = np.array([2, 0.25]) #speler als nulpunt
 
 # cameravlak
 rot90 = [-1, 1] #rotatie matrix voor 90°, al vereenvoudigt
@@ -153,9 +153,7 @@ def raycast(p_speler, r_straal):
         d_muur = math.sqrt(d_horizontaal*d_horizontaal + d_verticaal*d_verticaal)
         k_muur = kleuren[soortbotsing]
         return d_muur, k_muur
-
     # stap 4:
-
     if test():
         ihorizontaal = p_speler + (d_horizontaal + x * delta_h) * r_straal
         x += 1
@@ -178,7 +176,7 @@ def raycast(p_speler, r_straal):
     return d_muur, k_muur
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
-    renderer.draw_line((kolom, 0 + d_muur, kolom, window.size[1] - d_muur), k_muur) #parameters: x1, y1, x2, y2, kleur
+    renderer.draw_line((kolom, 0 + 2*d_muur, kolom, window.size[1] - 2*d_muur), k_muur) #parameters: x1, y1, x2, y2, kleur
     return
 # Initialiseer font voor de fps counter
 fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
