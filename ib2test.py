@@ -15,7 +15,7 @@ HOOGTE = 600
 fov = 90
 d_camera = 1/(math.tan(math.radians(fov)/2))
 # positie van de speler
-p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
+p_speler = np.array([3, 3])
 
 # richting waarin de speler kijkt
 r_speler = np.array([1 / math.sqrt(2), 1 / math.sqrt(2)])
@@ -61,6 +61,8 @@ kleuren = [
 #
 def verwerk_input(delta):
     global moet_afsluiten
+    global r_speler
+    global r_cameravlak
 
     # Handelt alle input events af die zich voorgedaan hebben sinds de vorige
     # keer dat we de sdl2.ext.get_events() functie hebben opgeroepen
@@ -100,8 +102,16 @@ def verwerk_input(delta):
             # Aangezien we in onze game maar 1 as hebben waarover de camera
             # kan roteren zijn we enkel geinteresseerd in bewegingen over de
             # X-as
-            beweging = event.motion.xrel
-            continue
+            def rot(alfa, vector):
+                rotmatrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
+                return np.dot(rotmatrix, vector)
+            if event.motion.xrel > 1 or event.motion.xrel < -1:
+                beweging = event.motion.xrel
+                r_speler = rot(beweging/100, r_speler)
+                rot90 = [-1, 1]  # rotatie matrix voor 90°, al vereenvoudigt
+                r_cameravlak = rot90 * r_speler
+                print(r_speler)
+                continue
 
     # Polling-gebaseerde input. Dit gebruiken we bij voorkeur om bv het ingedrukt
     # houden van toetsen zo accuraat mogelijk te detecteren
@@ -122,18 +132,24 @@ def bereken_r_straal(r_speler, kolom):
 
 
 def raycast(p_speler, r_straal):
+
     # DDA algoritme:
     # stap 0:
     x = 0
     y = 0
     i_verticaal_x = 0
     i_horizontaal_x = 0
+    d_horizontaal = 0
+    d_verticaal = 0
     # stap 1:
+    if 1 - math.sqrt(r_straal[0]*r_straal[0] + r_straal[1]*r_straal[1]) > 0.01:
+        print("straalfout", r_straal, 'moet 1 zijn', math.sqrt(r_straal[0]*r_straal[0] + r_straal[1]*r_straal[1]))
     delta_v = 1 / abs(r_straal[0])
     delta_h = 1 / abs(r_straal[1])
     # stap 2:
     if r_straal[1] < 0:
         d_horizontaal = (p_speler[1] - math.floor(p_speler[1])) * delta_h
+
     elif r_straal[1] >= 0:
         d_horizontaal = (1 - p_speler[1] + math.floor(p_speler[1])) * delta_h
 
@@ -147,13 +163,13 @@ def raycast(p_speler, r_straal):
         return d_horizontaal + (x * delta_h) <= d_verticaal + (y * delta_v)
 
     # stap 4: while nog geen snijpunt doen
+
     while True:
         a = 0
         if test_punt_dicht():
             i_horizontaal_x_component = int(p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0])
             i_horizontaal_y_component = y
             x += 1
-
             if world_map[i_horizontaal_x_component, i_horizontaal_y_component] != 0:
                 d_muur = math.sqrt(i_horizontaal_x_component ** 2 + i_horizontaal_y_component ** 2)
                 k_muur = kleuren[world_map[i_horizontaal_x_component, i_horizontaal_y_component]]
@@ -163,11 +179,12 @@ def raycast(p_speler, r_straal):
             i_verticaal_x_component = x
             i_verticaal_y_component = int(p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1])
             y += 1
-
-            if (not test_punt_dicht()) and (world_map[i_verticaal_x_component, i_verticaal_y_component] != 0):
+            if not test_punt_dicht() and world_map[i_verticaal_x_component, i_verticaal_y_component] != 0:
                 d_muur = math.sqrt(i_verticaal_x_component ** 2 + i_verticaal_y_component ** 2)
                 k_muur = kleuren[world_map[i_verticaal_x_component, i_verticaal_y_component]]
                 break
+
+
 
         # als intersectie buiten grenzen van level ligt: error returnen
         # stap 5:
