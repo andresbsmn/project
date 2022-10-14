@@ -11,22 +11,17 @@ HOOGTE = 600
 #
 # Globale variabelen
 #
-
-
-
-
 #d_camera
 fov = 90
 d_camera = 1/(math.tan(math.radians(fov)/2))
 # positie van de speler
-p_speler = np.array([400, 300])
+p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
 
 # richting waarin de speler kijkt
-r_speler = np.array([400, 300]) #speler als nulpunt
-
+r_speler = np.array([1 / math.sqrt(2), 1 / math.sqrt(2)])
 # cameravlak
 rot90 = [-1, 1] #rotatie matrix voor 90°, al vereenvoudigt
-r_cameravlak = rot90*r_speler #d_camera*r_speler+p_speler als nulpunt
+r_cameravlak = rot90 * r_speler #d_camera*r_speler+p_speler als nulpunt
 
 
 # wordt op True gezet als het spel afgesloten moet worden
@@ -131,6 +126,8 @@ def raycast(p_speler, r_straal):
     # stap 0:
     x = 0
     y = 0
+    i_verticaal_x = 0
+    i_horizontaal_x = 0
     # stap 1:
     delta_v = 1 / abs(r_straal[0])
     delta_h = 1 / abs(r_straal[1])
@@ -138,7 +135,7 @@ def raycast(p_speler, r_straal):
     if r_straal[1] < 0:
         d_horizontaal = (p_speler[1] - math.floor(p_speler[1])) * delta_h
     elif r_straal[1] >= 0:
-        d_horizontaal = (1 - p_speler[1] + math.floor(p_speler[1])) * delta_h #volgens formules uit ppt
+        d_horizontaal = (1 - p_speler[1] + math.floor(p_speler[1])) * delta_h
 
     if r_straal[0] < 0:
         d_verticaal = (p_speler[0] - math.floor(p_speler[0])) * delta_v
@@ -146,39 +143,59 @@ def raycast(p_speler, r_straal):
         d_verticaal = (1 - p_speler[0] + math.floor(p_speler[0])) * delta_v
 
     # stap 3:
-    def test():
+    def test_punt_dicht():
         return d_horizontaal + (x * delta_h) <= d_verticaal + (y * delta_v)
 
-    def check(soortbotsing):
-        d_muur = math.sqrt(d_horizontaal*d_horizontaal + d_verticaal*d_verticaal)
-        k_muur = kleuren[soortbotsing]
-        return d_muur, k_muur
-    # stap 4:
-    if test():
-        ihorizontaal = p_speler + (d_horizontaal + x * delta_h) * r_straal
-        x += 1
-    else:
-        iverticaal = p_speler + (d_verticaal + x * delta_v) * r_straal
-        y += 1
+    # stap 4: while nog geen snijpunt doen
+    while True:
+        a = 0
+        if test_punt_dicht():
+            i_horizontaal_x_component = int(p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0])
+            i_horizontaal_y_component = y
+            x += 1
 
-    # stap 6:
-    if test() and r_straal[1] >= 0: #snijlijn met horizontale
-        check = check(world_map[x][y])
-    elif test() and r_straal[1] < 0:
-        check = check(world_map[x][y])
-    elif not test() and r_straal[0] < 0: #snijlijn met verticale
-        check = check(world_map[x][y])
-    elif not test() and r_straal[0] >= 0:
-        check = check(world_map[x][y])
+            if world_map[i_horizontaal_x_component, i_horizontaal_y_component] != 0:
+                d_muur = math.sqrt(i_horizontaal_x_component ** 2 + i_horizontaal_y_component ** 2)
+                k_muur = kleuren[world_map[i_horizontaal_x_component, i_horizontaal_y_component]]
+                break
 
-    d_muur, k_muur = check[0], check[1]
+        else:
+            i_verticaal_x_component = x
+            i_verticaal_y_component = int(p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1])
+            y += 1
 
-    return d_muur, k_muur
+            if (not test_punt_dicht()) and (world_map[i_verticaal_x_component, i_verticaal_y_component] != 0):
+                d_muur = math.sqrt(i_verticaal_x_component ** 2 + i_verticaal_y_component ** 2)
+                k_muur = kleuren[world_map[i_verticaal_x_component, i_verticaal_y_component]]
+                break
+
+        # als intersectie buiten grenzen van level ligt: error returnen
+        # stap 5:
+
+        # stap 6 kijken of muur geraakt, indien geraakt d_muur en k_muur returnen, anders terug naar stap 3:
+        # afstand dus pythagoras met coordinaten naar intersection die ook effectief muur snijdt
+        # if (test_punt_dicht()) and (world_map[i_horizontaal_x_component, i_horizontaal_y_component] != 0):
+        #    d_muur = math.sqrt(i_horizontaal_x_component ** 2 + i_horizontaal_y_component ** 2)
+        # elif not test_punt_dicht() and (world_map[i_verticaal_x_component, i_verticaal_y_component] != 0):
+        #    d_muur = math.sqrt(i_verticaal_x_component ** 2 + i_verticaal_y_component ** 2)
+    # if test() and r_straal[y] >= 0:
+    #    check(world_map[math.ceil(r_straal[x])])
+    # elif test() and r_straal[y] < 0:
+    #    check(world_map[math.floor(r_straal[x])])
+    # elif not test()  and r_straal[x] < 0:
+    #    check(world_map[math.floor(r_straal[x])])
+    # elif not test() and r_straal[x] >= 0:
+    #    check(world_map[math.ceil(r_straal[x])])
+    # als getal 1 dan kleur 1 rood
+    if a == 0:
+        return (d_muur, k_muur)
+    elif a == 1:
+        return ("Error", k_muur)
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
-    cte = 5
-    afstand = cte * d_muur
-    renderer.draw_line((kolom, 0 + afstand, kolom, window.size[1] - afstand), k_muur) #parameters: x1, y1, x2, y2, kleur
+    if d_muur != "Error":
+        y1 = int(window.size[1]/4 - 2*d_muur) #d_muur
+        renderer.draw_line((kolom, y1, kolom, window.size[1]-y1), k_muur)
     return
 # Initialiseer font voor de fps counter
 fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
