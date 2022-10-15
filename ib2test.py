@@ -11,7 +11,7 @@ HOOGTE = 600
 #
 # Globale variabelen
 #
-#d_camera
+# d_camera
 fov = 90
 d_camera = 1/(math.tan(math.radians(fov)/2))
 # positie van de speler
@@ -34,11 +34,11 @@ moet_afsluiten = False
 
 world_map = np.array(
     [[2, 2, 2, 2, 2, 2, 2],
-     [2, 0, 0, 0, 0, 0, 2],
+     [2, 0, 0, 3, 0, 0, 2],
      [2, 0, 0, 0, 0, 1, 2],
-     [2, 0, 0, 0, 0, 0, 2],
+     [2, 3, 0, 0, 0, 3, 2],
      [2, 0, 0, 0, 0, 3, 2],
-     [2, 0, 0, 0, 0, 0, 2],
+     [2, 0, 0, 3, 0, 0, 2],
      [2, 2, 2, 2, 2, 2, 2]]
 )
 
@@ -89,11 +89,11 @@ def verwerk_input(delta):
             if key == sdl2.SDLK_ESCAPE:
                 moet_afsluiten = True
             if key == sdl2.SDLK_z and p_speler[0]<7 and p_speler[1]<7: #bewegen in richting van muis
-                p_speler += r_speler/(r_speler[0]**2+r_speler[1]**2)
-            if key == sdl2.SDLK_q:                                      #bewegen loodrecht op richting muis naar links
-                p_speler += rot(90, r_speler/(r_speler[0]**2+r_speler[1]**2))
-            if key == sdl2.SDLK_d:
-                p_speler += rot(270, r_speler/(r_speler[0]**2+r_speler[1]**2))
+                p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))/20
+            if key == sdl2.SDLK_q and p_speler[0]<7 and p_speler[1]<7:                                      #bewegen loodrecht op richting muis naar links
+                p_speler += rot(90, r_speler/(r_speler[0]**2+r_speler[1]**2))/20
+            if key == sdl2.SDLK_d and p_speler[0]<7 and p_speler[1]<7:
+                p_speler += rot(270, r_speler/(r_speler[0]**2+r_speler[1]**2))/20
             break
 
         # Analoog aan SDL_KEYDOWN. Dit event wordt afgeleverd wanneer de
@@ -177,6 +177,8 @@ def raycast(p_speler, r_straal):
             i_horizontaal_x_component = int(p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0])
             i_horizontaal_y_component = y
             x += 1
+            if i_horizontaal_x_component >= 7 or i_horizontaal_y_component >= 7:
+                return "error", "error"
             if world_map[i_horizontaal_x_component, i_horizontaal_y_component] != 0:
                 d_muur = math.sqrt(i_horizontaal_x_component ** 2 + i_horizontaal_y_component ** 2)
                 k_muur = kleuren[world_map[i_horizontaal_x_component, i_horizontaal_y_component]]
@@ -186,6 +188,9 @@ def raycast(p_speler, r_straal):
             i_verticaal_x_component = x
             i_verticaal_y_component = int(p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1])
             y += 1
+            if i_verticaal_x_component >= 7 or i_verticaal_y_component >= 7:
+                return "error", "error"
+
             if not test_punt_dicht() and world_map[i_verticaal_x_component, i_verticaal_y_component] != 0:
                 d_muur = math.sqrt(i_verticaal_x_component ** 2 + i_verticaal_y_component ** 2)
                 k_muur = kleuren[world_map[i_verticaal_x_component, i_verticaal_y_component]]
@@ -213,13 +218,12 @@ def raycast(p_speler, r_straal):
     # als getal 1 dan kleur 1 rood
     if a == 0:
         return (d_muur, k_muur)
-    elif a == 1:
+    elif d_muur == "error":
         return ("Error", k_muur)
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
-    if d_muur != "Error":
-        y1 = int(window.size[1]/4 - 2*d_muur) #d_muur
-        renderer.draw_line((kolom, y1, kolom, window.size[1]-y1), k_muur)
+    y1 = int(window.size[1]/4 - 2*d_muur) #d_muur
+    renderer.draw_line((kolom, y1, kolom, window.size[1]-y1), k_muur)
     return
 # Initialiseer font voor de fps counter
 fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
@@ -261,7 +265,10 @@ def main():
         for kolom in range(0, window.size[0]): #window.size[0] = 800
             r_straal = bereken_r_straal(r_speler, kolom)
             (d_muur, k_muur) = raycast(p_speler, r_straal)
-            render_kolom(renderer, window, kolom, d_muur, k_muur)
+            if d_muur == "error":
+                print(p_speler, r_straal)
+            else:
+                render_kolom(renderer, window, kolom, d_muur, k_muur)
 
         end_time = time.time()
         delta = end_time - start_time
