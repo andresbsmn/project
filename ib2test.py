@@ -34,10 +34,10 @@ moet_afsluiten = False
 
 world_map = np.array(
     [[2, 2, 2, 2, 2, 2, 2],
-     [2, 0, 0, 0, 1, 3, 2],
-     [2, 0, 0, 0, 3, 1, 2],
      [2, 0, 0, 0, 0, 0, 2],
+     [2, 0, 0, 0, 0, 1, 2],
      [2, 0, 0, 0, 0, 0, 2],
+     [2, 0, 0, 0, 0, 3, 2],
      [2, 0, 0, 0, 0, 0, 2],
      [2, 2, 2, 2, 2, 2, 2]]
 )
@@ -60,6 +60,10 @@ kleuren = [
 #
 # Argumenten:
 # @delta       Tijd in milliseconden sinds de vorige oproep van deze functie
+
+def rot(alfa, vector):
+    rotmatrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
+    return np.dot(rotmatrix, vector)
 #
 def verwerk_input(delta):
     global moet_afsluiten
@@ -82,11 +86,16 @@ def verwerk_input(delta):
         # maar 1 SDL_KEYDOWN en 1 SDL_KEYUP event.
         elif event.type == sdl2.SDL_KEYDOWN:
             key = event.key.keysym.sym
-            if key == sdl2.SDLK_q:
+            if key == sdl2.SDLK_ESCAPE:
                 moet_afsluiten = True
-            if key == sdl2.SDLK_z and p_speler[0]<7 and p_speler[1]<7:
+            if key == sdl2.SDLK_z and p_speler[0]<7 and p_speler[1]<7: #bewegen in richting van muis
                 p_speler += r_speler/(r_speler[0]**2+r_speler[1]**2)
+            if key == sdl2.SDLK_q:                                      #bewegen loodrecht op richting muis naar links
+                p_speler += rot(90, r_speler/(r_speler[0]**2+r_speler[1]**2))
+            if key == sdl2.SDLK_d:
+                p_speler += rot(270, r_speler/(r_speler[0]**2+r_speler[1]**2))
             break
+
         # Analoog aan SDL_KEYDOWN. Dit event wordt afgeleverd wanneer de
         # gebruiker een muisknop indrukt
         elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
@@ -107,15 +116,10 @@ def verwerk_input(delta):
             # Aangezien we in onze game maar 1 as hebben waarover de camera
             # kan roteren zijn we enkel geinteresseerd in bewegingen over de
             # X-as
-            def rot(alfa, vector):
-                rotmatrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
-                return np.dot(rotmatrix, vector)
             if event.motion.xrel > 1 or event.motion.xrel < -1:
                 beweging = event.motion.xrel
                 r_speler = rot(beweging/100, r_speler)
-                rot90 = [-1, 1]  # rotatie matrix voor 90°, al vereenvoudigt
-                r_cameravlak = rot90 * r_speler
-                print(r_speler)
+                r_cameravlak = rot(90, r_speler)
                 continue
 
     # Polling-gebaseerde input. Dit gebruiken we bij voorkeur om bv het ingedrukt
@@ -147,8 +151,6 @@ def raycast(p_speler, r_straal):
     d_horizontaal = 0
     d_verticaal = 0
     # stap 1:
-    if 1 - math.sqrt(r_straal[0]*r_straal[0] + r_straal[1]*r_straal[1]) > 0.01:
-        print("straalfout", r_straal, 'moet 1 zijn', math.sqrt(r_straal[0]*r_straal[0] + r_straal[1]*r_straal[1]))
     delta_v = 1 / abs(r_straal[0])
     delta_h = 1 / abs(r_straal[1])
     # stap 2:
