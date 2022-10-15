@@ -15,7 +15,9 @@ HOOGTE = 600
 fov = 90
 d_camera = 1/(math.tan(math.radians(fov)/2))
 # positie van de speler
-p_speler = np.array([3, 3])
+start_positie_x = 3
+start_positie_y = 3
+p_speler = np.array([float(start_positie_x), float(start_positie_y)])
 
 # richting waarin de speler kijkt
 r_speler = np.array([1 / math.sqrt(2), 1 / math.sqrt(2)])
@@ -32,8 +34,8 @@ moet_afsluiten = False
 
 world_map = np.array(
     [[2, 2, 2, 2, 2, 2, 2],
-     [2, 0, 0, 0, 1, 2, 2],
-     [2, 0, 0, 0, 0, 1, 2],
+     [2, 0, 0, 0, 1, 3, 2],
+     [2, 0, 0, 0, 3, 1, 2],
      [2, 0, 0, 0, 0, 0, 2],
      [2, 0, 0, 0, 0, 0, 2],
      [2, 0, 0, 0, 0, 0, 2],
@@ -63,6 +65,7 @@ def verwerk_input(delta):
     global moet_afsluiten
     global r_speler
     global r_cameravlak
+    global p_speler
 
     # Handelt alle input events af die zich voorgedaan hebben sinds de vorige
     # keer dat we de sdl2.ext.get_events() functie hebben opgeroepen
@@ -81,6 +84,8 @@ def verwerk_input(delta):
             key = event.key.keysym.sym
             if key == sdl2.SDLK_q:
                 moet_afsluiten = True
+            if key == sdl2.SDLK_z and p_speler[0]<7 and p_speler[1]<7:
+                p_speler += r_speler/(r_speler[0]**2+r_speler[1]**2)
             break
         # Analoog aan SDL_KEYDOWN. Dit event wordt afgeleverd wanneer de
         # gebruiker een muisknop indrukt
