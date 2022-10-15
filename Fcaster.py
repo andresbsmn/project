@@ -18,7 +18,7 @@ d_camera=1/(math.tan(math.radians(fov)/2))
 # positie van de speler
 #p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
 p_speler_x =3 + 1 / math.sqrt(2)
-p_speler_y = 4 - 1 / math.sqrt(2)
+p_speler_y =  4 - 1 / math.sqrt(2)
 # richting waarin de speler kijkt
 #r_speler = np.array([1 / math.sqrt(2), -1 / math.sqrt(2)])
 r_speler_x= 1 / math.sqrt(2)
@@ -157,31 +157,41 @@ def raycast(p_speler_x,p_speler_y,r_straal):
             return False
 
     # stap 4:
+    global i_horizontaal_x
+    i_horizontaal_x=0
+    global i_verticaal_x
+    i_verticaal_x=0
     if test() == True:
-        i_horizontaal_x = int(p_speler_x + (d_horizontaal + x * delta_h) * r_straal[0])
-        i_horizontaal_x = int(i_horizontaal_x + x)
+        i_horizontaal_x = int(p_speler_x + (d_horizontaal + x * delta_h) * r_straal[0]+x)
+
 
     else:
-        i_verticaal_x = int(p_speler_y + (d_verticaal + x * delta_v) * r_straal[1])
-        i_verticaal_x = int(i_verticaal_x + y)
+        i_verticaal_x = int(p_speler_y + (d_verticaal + x * delta_v) * r_straal[1]+y)
+
 
 
     # stap 5:
-    if test() == True and (world_map[i_horizontaal_x] == 2):
-        raise ValueError
-    elif test() == False and (world_map[i_verticaal_x] == 2):
-        raise ValueError
+    #if test() == True and (world_map[i_horizontaal_x] == 2):
+    #    raise ValueError
+    #elif test() == False and (world_map[i_verticaal_x] == 2):
+       # raise ValueError
 
     # stap 6:
-    if test() == True and r_straal[1] >= 0:
-        check(world_map[math.ceil(r_straal[0])])
+    if test() == True and r_straal[1] >= 0: #snijlijn met horizontale
+        if (world_map[ i_horizontaal_x, i_verticaal_x+1]==1):
+            return (d_muur, k_muur)                                           #check(world_map[x][y])
     elif test() == True and r_straal[1] < 0:
-        check(world_map[math.floor(r_straal[0])])
-    elif test() == False and r_straal[0] < 0:
-        check(world_map[math.floor(r_straal[0])])
+        if (world_map[ i_horizontaal_x,i_verticaal_x-1] == 1):
+            return (d_muur, k_muur) #check(world_map[math.floor(r_straal[0])])
+    elif test() == False and r_straal[0] < 0: #snijlijn met verticale
+        if (world_map[ i_horizontaal_x-1,  i_verticaal_x] == 1):
+            return (d_muur, k_muur)
+                                    #check(world_map[math.floor(r_straal[0])])
     elif test() == False and r_straal[0] >= 0:
-        check(world_map[math.ceil(r_straal[0])])
-    return (d_muur, k_muur)
+        if (world_map[ i_horizontaal_x+1, i_verticaal_x] == 1):
+            return (d_muur, k_muur)
+            #check(world_map[math.ceil(r_straal[0])])
+
 
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
