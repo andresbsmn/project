@@ -12,7 +12,7 @@ HOOGTE = 600
 # Globale variabelen
 #
 # d_camera
-fov = 90
+fov = 45
 d_camera = 1/(math.tan(math.radians(fov)/2))
 # positie van de speler
 start_positie_x = 3
@@ -34,11 +34,11 @@ moet_afsluiten = False
 
 world_map = np.array(
     [[2, 2, 2, 2, 2, 2, 2],
-     [2, 0, 0, 3, 0, 0, 2],
+     [2, 0, 0, 0, 1, 2, 2],
      [2, 0, 0, 0, 0, 1, 2],
-     [2, 3, 0, 0, 0, 3, 2],
-     [2, 0, 0, 0, 0, 3, 2],
-     [2, 0, 0, 3, 0, 0, 2],
+     [2, 0, 0, 0, 0, 0, 2],
+     [2, 0, 0, 0, 0, 0, 2],
+     [2, 0, 0, 0, 0, 0, 2],
      [2, 2, 2, 2, 2, 2, 2]]
 )
 
@@ -88,12 +88,15 @@ def verwerk_input(delta):
             key = event.key.keysym.sym
             if key == sdl2.SDLK_ESCAPE:
                 moet_afsluiten = True
+            stapverkleiner = 0.05
             if key == sdl2.SDLK_z and p_speler[0]<7 and p_speler[1]<7: #bewegen in richting van muis
-                p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))/20
+                p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
             if key == sdl2.SDLK_q and p_speler[0]<7 and p_speler[1]<7:                                      #bewegen loodrecht op richting muis naar links
-                p_speler += rot(90, r_speler/(r_speler[0]**2+r_speler[1]**2))/20
+                p_speler += rot(90, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
             if key == sdl2.SDLK_d and p_speler[0]<7 and p_speler[1]<7:
-                p_speler += rot(270, r_speler/(r_speler[0]**2+r_speler[1]**2))/20
+                p_speler += rot(270, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+            if key == sdl2.SDLK_s and p_speler[0]<7 and p_speler[1]<7:
+                p_speler += rot(180, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
             break
 
         # Analoog aan SDL_KEYDOWN. Dit event wordt afgeleverd wanneer de
@@ -141,7 +144,6 @@ def bereken_r_straal(r_speler, kolom):
 
 
 def raycast(p_speler, r_straal):
-
     # DDA algoritme:
     # stap 0:
     x = 0
@@ -218,8 +220,6 @@ def raycast(p_speler, r_straal):
     # als getal 1 dan kleur 1 rood
     if a == 0:
         return (d_muur, k_muur)
-    elif d_muur == "error":
-        return ("Error", k_muur)
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
     y1 = int(window.size[1]/4 - 2*d_muur) #d_muur
