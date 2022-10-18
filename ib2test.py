@@ -33,13 +33,13 @@ moet_afsluiten = False
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
 
 world_map = np.array(
-    [[3, 4, 4, 4, 4, 4, 4],
-     [3, 0, 0, 0, 1, 0, 2],
+    [[3, 6, 4, 4, 4, 6, 4],
+     [6, 0, 0, 0, 1, 0, 6],
      [3, 0, 0, 0, 0, 1, 2],
      [3, 0, 0, 0, 0, 0, 2],
      [3, 0, 0, 0, 0, 0, 2],
-     [3, 0, 0, 0, 0, 0, 2],
-     [7, 7, 7, 7, 7, 7, 7]]
+     [6, 0, 0, 0, 0, 0, 6],
+     [7, 6, 7, 7, 7, 6, 7]]
 )
 
 # Vooraf gedefinieerde kleuren
