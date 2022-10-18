@@ -161,7 +161,7 @@ def raycast(p_speler_x,p_speler_y,r_straal):
     i_horizontaal_x=0
     global i_verticaal_x
     i_verticaal_x=0
-    if test() == True:
+    if test():
         i_horizontaal_x = int(p_speler_x + (d_horizontaal + x * delta_h) * r_straal[0]+x)
 
 
@@ -177,17 +177,17 @@ def raycast(p_speler_x,p_speler_y,r_straal):
        # raise ValueError
 
     # stap 6:
-    if test() == True and r_straal[1] >= 0: #snijlijn met horizontale
+    if test()  and r_straal[1] >= 0: #snijlijn met horizontale
         if (world_map[ i_horizontaal_x, i_verticaal_x+1]==1):
             return (d_muur, k_muur)                                           #check(world_map[x][y])
-    elif test() == True and r_straal[1] < 0:
+    elif test()  and r_straal[1] < 0:
         if (world_map[ i_horizontaal_x,i_verticaal_x-1] == 1):
             return (d_muur, k_muur) #check(world_map[math.floor(r_straal[0])])
-    elif test() == False and r_straal[0] < 0: #snijlijn met verticale
+    elif not test()  and r_straal[0] < 0: #snijlijn met verticale
         if (world_map[ i_horizontaal_x-1,  i_verticaal_x] == 1):
             return (d_muur, k_muur)
                                     #check(world_map[math.floor(r_straal[0])])
-    elif test() == False and r_straal[0] >= 0:
+    elif not test()  and r_straal[0] >= 0:
         if (world_map[ i_horizontaal_x+1, i_verticaal_x] == 1):
             return (d_muur, k_muur)
             #check(world_map[math.ceil(r_straal[0])])
