@@ -126,7 +126,8 @@ def bereken_r_straal(r_speler_x,r_speler_y, kolom):
     r_straal_kolom_norm= math.sqrt(r_straal_kolom_x**2 + r_straal_kolom_y**2)
     r_straal_x = r_straal_kolom_x/r_straal_kolom_norm
     r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
-    return [r_straal_x,r_straal_y]
+    r_straal= [r_straal_x,r_straal_y]
+    return r_straal
 
 
 
