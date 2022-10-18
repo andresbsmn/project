@@ -12,7 +12,7 @@ HOOGTE = 600
 # Globale variabelen
 #
 # d_camera
-fov = 45
+fov = 90
 d_camera = 1/(math.tan(math.radians(fov)/2))
 # positie van de speler
 start_positie_x = 3
@@ -25,7 +25,6 @@ r_speler = np.array([1 / math.sqrt(2), 1 / math.sqrt(2)])
 rot90 = [-1, 1] #rotatie matrix voor 90°, al vereenvoudigt
 r_cameravlak = rot90 * r_speler #d_camera*r_speler+p_speler als nulpunt
 
-
 # wordt op True gezet als het spel afgesloten moet worden
 moet_afsluiten = False
 
@@ -33,13 +32,13 @@ moet_afsluiten = False
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
 
 world_map = np.array(
-    [[2, 2, 2, 2, 2, 2, 2],
-     [2, 0, 0, 0, 1, 2, 2],
-     [2, 0, 0, 0, 0, 1, 2],
-     [2, 0, 0, 0, 0, 0, 2],
-     [2, 0, 0, 0, 0, 0, 2],
-     [2, 0, 0, 0, 0, 0, 2],
-     [2, 2, 2, 2, 2, 2, 2]]
+    [[3, 2, 2, 2, 2, 2, 2],
+     [3, 0, 0, 0, 1, 0, 2],
+     [3, 0, 0, 0, 0, 1, 2],
+     [3, 0, 0, 0, 0, 0, 2],
+     [3, 0, 0, 0, 0, 0, 2],
+     [3, 0, 0, 0, 0, 0, 2],
+     [7, 7, 7, 7, 7, 7, 7]]
 )
 
 # Vooraf gedefinieerde kleuren
@@ -70,6 +69,7 @@ def verwerk_input(delta):
     global r_speler
     global r_cameravlak
     global p_speler
+    r_speler = r_speler / math.sqrt(r_speler[0] ** 2 + r_speler[1] ** 2)
 
     # Handelt alle input events af die zich voorgedaan hebben sinds de vorige
     # keer dat we de sdl2.ext.get_events() functie hebben opgeroepen
@@ -148,8 +148,6 @@ def raycast(p_speler, r_straal):
     # stap 0:
     x = 0
     y = 0
-    i_verticaal_x = 0
-    i_horizontaal_x = 0
     d_horizontaal = 0
     d_verticaal = 0
     # stap 1:
@@ -158,7 +156,6 @@ def raycast(p_speler, r_straal):
     # stap 2:
     if r_straal[1] < 0:
         d_horizontaal = (p_speler[1] - math.floor(p_speler[1])) * delta_h
-
     elif r_straal[1] >= 0:
         d_horizontaal = (1 - p_speler[1] + math.floor(p_speler[1])) * delta_h
 
@@ -174,7 +171,6 @@ def raycast(p_speler, r_straal):
     # stap 4: while nog geen snijpunt doen
 
     while True:
-        a = 0
         if test_punt_dicht():
             i_horizontaal_x_component = int(p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0])
             i_horizontaal_y_component = y
@@ -198,31 +194,10 @@ def raycast(p_speler, r_straal):
                 k_muur = kleuren[world_map[i_verticaal_x_component, i_verticaal_y_component]]
                 break
 
-
-
-        # als intersectie buiten grenzen van level ligt: error returnen
-        # stap 5:
-
-        # stap 6 kijken of muur geraakt, indien geraakt d_muur en k_muur returnen, anders terug naar stap 3:
-        # afstand dus pythagoras met coordinaten naar intersection die ook effectief muur snijdt
-        # if (test_punt_dicht()) and (world_map[i_horizontaal_x_component, i_horizontaal_y_component] != 0):
-        #    d_muur = math.sqrt(i_horizontaal_x_component ** 2 + i_horizontaal_y_component ** 2)
-        # elif not test_punt_dicht() and (world_map[i_verticaal_x_component, i_verticaal_y_component] != 0):
-        #    d_muur = math.sqrt(i_verticaal_x_component ** 2 + i_verticaal_y_component ** 2)
-    # if test() and r_straal[y] >= 0:
-    #    check(world_map[math.ceil(r_straal[x])])
-    # elif test() and r_straal[y] < 0:
-    #    check(world_map[math.floor(r_straal[x])])
-    # elif not test()  and r_straal[x] < 0:
-    #    check(world_map[math.floor(r_straal[x])])
-    # elif not test() and r_straal[x] >= 0:
-    #    check(world_map[math.ceil(r_straal[x])])
-    # als getal 1 dan kleur 1 rood
-    if a == 0:
-        return (d_muur, k_muur)
+    return (d_muur, k_muur)
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
-    y1 = int(window.size[1]/4 - 2*d_muur) #d_muur
+    y1 = int(window.size[1]/2 + 20*d_muur)
     renderer.draw_line((kolom, y1, kolom, window.size[1]-y1), k_muur)
     return
 # Initialiseer font voor de fps counter
@@ -254,10 +229,8 @@ def main():
 
     # Blijf frames renderen tot we het signaal krijgen dat we moeten afsluiten
     while not moet_afsluiten:
-
         # Onthoud de huidige tijd
         start_time = time.time()
-
         # Reset de rendering context
         renderer.clear()
 
@@ -267,7 +240,7 @@ def main():
             (d_muur, k_muur) = raycast(p_speler, r_straal)
             if d_muur == "error":
                 print(p_speler, r_straal)
-            else:
+            elif d_muur != "error":
                 render_kolom(renderer, window, kolom, d_muur, k_muur)
 
         end_time = time.time()

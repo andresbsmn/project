@@ -13,11 +13,7 @@ def run():
     running = True
     while running:
         events = sdl2.ext.get_events()
-
-
         renderer.present()
-
-
         breedte = wall_texture.size[0]
         hoogte = wall_texture.size[1]
         textuur_x = 0
