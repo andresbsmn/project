@@ -164,8 +164,11 @@ def raycast(p_speler_x,p_speler_y,r_straal):
     if test() == True:
         i_horizontaal_x = int(p_speler_x + (d_horizontaal + x * delta_h) * r_straal[0]+x)
 
+
     else:
         i_verticaal_x = int(p_speler_y + (d_verticaal + x * delta_v) * r_straal[1]+y)
+
+
 
     # stap 5:
     #if test() == True and (world_map[i_horizontaal_x] == 2):
@@ -236,7 +239,7 @@ def main():
         # Render de huidige frame
         for kolom in range(0, window.size[0]):
             r_straal = bereken_r_straal(r_speler_x,r_speler_y, kolom)
-            (d_muur, k_muur) = raycast(p_speler_x, p_speler_y, r_straal)
+            (d_muur, k_muur) = raycast(p_speler_x,p_speler_y,r_straal)
             render_kolom(renderer, window, kolom, d_muur, k_muur)
 
         end_time = time.time()
