@@ -222,8 +222,10 @@ def raycast(p_speler, r_straal):
         return (d_muur, k_muur)
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
-    y1 = int(window.size[1]/4 - 2*d_muur) #d_muur
+    hoogte =window.size[1]/4 - 2*d_muur
+    y1 = int(hoogte) #d_muur
     renderer.draw_line((kolom, y1, kolom, window.size[1]-y1), k_muur)
+    renderer.draw_line((kolom, y1+hoogte , kolom, window.size[1]), kleuren[3])
     return
 # Initialiseer font voor de fps counter
 fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
@@ -231,8 +233,7 @@ fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
 def render_fps(fps, renderer, window):
     message = f'{fps:.2f} fps'
     text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
-    renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 16), 20,
-                                 text.size[0], text.size[1]))
+    renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 16), 20,text.size[0], text.size[1]))
 
 
 def main():
