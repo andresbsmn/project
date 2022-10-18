@@ -10,8 +10,7 @@ HOOGTE = 600
 
 #
 # Globale variabelen
-global  i_verticaal_x_component
-global i_horizontaal_x_component
+
 # d_camera
 fov = 45
 d_camera = 1/(math.tan(math.radians(fov)/2))
@@ -204,36 +203,31 @@ def raycast(p_speler, r_straal):
         # als intersectie buiten grenzen van level ligt: error returnen
         # stap 5:
 
-        # stap 6 kijken of muur geraakt, indien geraakt d_muur en k_muur returnen, anders terug naar stap 3:
-        # afstand dus pythagoras met coordinaten naar intersection die ook effectief muur snijdt
-        # if (test_punt_dicht()) and (world_map[i_horizontaal_x_component, i_horizontaal_y_component] != 0):
-        #    d_muur = math.sqrt(i_horizontaal_x_component ** 2 + i_horizontaal_y_component ** 2)
-        # elif not test_punt_dicht() and (world_map[i_verticaal_x_component, i_verticaal_y_component] != 0):
-        #    d_muur = math.sqrt(i_verticaal_x_component ** 2 + i_verticaal_y_component ** 2)
-    # if test() and r_straal[y] >= 0:
-    #    check(world_map[math.ceil(r_straal[x])])
-    # elif test() and r_straal[y] < 0:
+    # stap 6 kijken of muur geraakt, indien geraakt d_muur en k_muur returnen, anders terug naar stap 3:
+    # afstand dus pythagoras met coordinaten naar intersection die ook effectief muur snijdt
+    #if (test_punt_dicht()) and (world_map[i_horizontaal_x_component, i_horizontaal_y_component] != 0):
+    #    d_muur = math.sqrt(i_horizontaal_x_component ** 2 + i_horizontaal_y_component ** 2)
+    #elif not test_punt_dicht() and (world_map[i_verticaal_x_component, i_verticaal_y_component] != 0):
+    #   d_muur = math.sqrt(i_verticaal_x_component ** 2 + i_verticaal_y_component ** 2)
+
+    #if test_punt_dicht() and r_straal[y] >= 0:
+        #if (world_map[ i_horizontaal_x_component, i_verticaal_x_component+1]==1):
+            #return (d_muur, k_muur)
+        #elif test_punt_dicht() and r_straal[y] < 0:
     #    check(world_map[math.floor(r_straal[x])])
-    # elif not test()  and r_straal[x] < 0:
+        #if(world_map[i_horizontaal_x_component,i_verticaal_x_component-1]==1):
+            #return(d_muur,k_muur)
+            #elif not test_punt_dicht()  and r_straal[x] < 0:
+        #if (world_map[i_horizontaal_x_component-1, i_verticaal_x_component] == 1):
+            #return (d_muur, k_muur)
+
     #    check(world_map[math.floor(r_straal[x])])
-    # elif not test() and r_straal[x] >= 0:
+    elif not test_punt_dicht() and r_straal[x] >= 0:
+        if (world_map[i_horizontaal_x_component+1, i_verticaal_x_component] == 1):
+            return (d_muur, k_muur)
+
     #    check(world_map[math.ceil(r_straal[x])])
     # als getal 1 dan kleur 1 rood
-    # stap 6:
-
-    if test_punt_dicht()  and r_straal[1] >= 0: #snijlijn met horizontale
-        if (world_map[ i_horizontaal_x_component, i_verticaal_x_component+1]==1):
-            return (d_muur, k_muur)
-    elif test_punt_dicht()  and r_straal[1] < 0:
-        if (world_map[ i_horizontaal_x_component,i_verticaal_x_component-1] == 1):
-            return (d_muur, k_muur)
-    elif not test_punt_dicht()  and r_straal[0] < 0: #snijlijn met verticale
-        if (world_map[ i_horizontaal_x_component-1, i_verticaal_x_component] == 1):
-            return (d_muur, k_muur)
-
-    elif not test_punt_dicht()  and r_straal[0] >= 0:
-        if (world_map[ i_horizontaal_x_component+1, i_verticaal_x_component] == 1):
-            return (d_muur, k_muur)
 
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur):
