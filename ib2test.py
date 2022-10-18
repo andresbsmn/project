@@ -14,6 +14,7 @@ HOOGTE = 600
 # d_camera
 fov = 90
 d_camera = 1/(math.tan(math.radians(fov)/2))
+print(d_camera)
 # positie van de speler
 start_positie_x = 3
 start_positie_y = 3
@@ -23,7 +24,7 @@ p_speler = np.array([float(start_positie_x), float(start_positie_y)])
 r_speler = np.array([1 / math.sqrt(2), 1 / math.sqrt(2)])
 # cameravlak
 rot90 = [-1, 1] #rotatie matrix voor 90°, al vereenvoudigt
-r_cameravlak = rot90 * r_speler #d_camera*r_speler+p_speler als nulpunt
+r_cameravlak = [0, -1] #d_camera*r_speler+p_speler als nulpunt
 
 # wordt op True gezet als het spel afgesloten moet worden
 moet_afsluiten = False
@@ -32,7 +33,7 @@ moet_afsluiten = False
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
 
 world_map = np.array(
-    [[3, 2, 2, 2, 2, 2, 2],
+    [[3, 4, 4, 4, 4, 4, 4],
      [3, 0, 0, 0, 1, 0, 2],
      [3, 0, 0, 0, 0, 1, 2],
      [3, 0, 0, 0, 0, 0, 2],
@@ -61,6 +62,7 @@ kleuren = [
 # @delta       Tijd in milliseconden sinds de vorige oproep van deze functie
 
 def rot(alfa, vector):
+    alfa = alfa * np.pi/180
     rotmatrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
     return np.dot(rotmatrix, vector)
 #
@@ -121,7 +123,7 @@ def verwerk_input(delta):
             # X-as
             if event.motion.xrel > 1 or event.motion.xrel < -1:
                 beweging = event.motion.xrel
-                r_speler = rot(beweging/100, r_speler)
+                r_speler = rot(beweging/20, r_speler)
                 r_cameravlak = rot(90, r_speler)
                 continue
 
@@ -137,9 +139,12 @@ def verwerk_input(delta):
 
 
 def bereken_r_straal(r_speler, kolom):
-    r_straal_kolom = d_camera*r_speler+(-1+(2*kolom)/BREEDTE)*r_cameravlak
-    r_straal_kolom_norm = np.linalg.norm(r_straal_kolom)
-    r_straal = r_straal_kolom/r_straal_kolom_norm
+    r_straal_kolom_x = d_camera * r_speler[0] + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak[0]
+    r_straal_kolom_y = d_camera * r_speler[1] + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak[1]
+    r_straal_kolom_norm= math.sqrt(r_straal_kolom_x**2 + r_straal_kolom_y**2)
+    r_straal_x = r_straal_kolom_x/r_straal_kolom_norm
+    r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
+    r_straal = [r_straal_x, r_straal_y]
     return r_straal
 
 
@@ -155,14 +160,14 @@ def raycast(p_speler, r_straal):
     delta_h = 1 / abs(r_straal[1])
     # stap 2:
     if r_straal[1] < 0:
-        d_horizontaal = (p_speler[1] - math.floor(p_speler[1])) * delta_h
+        d_horizontaal = (p_speler[1] - p_speler[1]) * delta_h
     elif r_straal[1] >= 0:
-        d_horizontaal = (1 - p_speler[1] + math.floor(p_speler[1])) * delta_h
+        d_horizontaal = (1 - p_speler[1] + p_speler[1]) * delta_h
 
     if r_straal[0] < 0:
-        d_verticaal = (p_speler[0] - math.floor(p_speler[0])) * delta_v
+        d_verticaal = (p_speler[0] - p_speler[0]) * delta_v
     elif r_straal[0] >= 0:
-        d_verticaal = (1 - p_speler[0] + math.floor(p_speler[0])) * delta_v
+        d_verticaal = (1 - p_speler[0] + p_speler[0]) * delta_v
 
     # stap 3:
     def test_punt_dicht():
@@ -172,26 +177,28 @@ def raycast(p_speler, r_straal):
 
     while True:
         if test_punt_dicht():
-            i_horizontaal_x_component = int(p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0])
+            i_horizontaal_x_component = p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0]
+            i_horizontaal_x_component_hoekpunt = int(i_horizontaal_x_component)
             i_horizontaal_y_component = y
             x += 1
-            if i_horizontaal_x_component >= 7 or i_horizontaal_y_component >= 7:
+            if i_horizontaal_x_component_hoekpunt >= 7 or i_horizontaal_y_component >= 7:
                 return "error", "error"
-            if world_map[i_horizontaal_x_component, i_horizontaal_y_component] != 0:
+            if world_map[i_horizontaal_x_component_hoekpunt, i_horizontaal_y_component] != 0:
                 d_muur = math.sqrt(i_horizontaal_x_component ** 2 + i_horizontaal_y_component ** 2)
-                k_muur = kleuren[world_map[i_horizontaal_x_component, i_horizontaal_y_component]]
+                k_muur = kleuren[world_map[i_horizontaal_x_component_hoekpunt, i_horizontaal_y_component]]
                 break
 
         else:
             i_verticaal_x_component = x
-            i_verticaal_y_component = int(p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1])
+            i_verticaal_y_component = p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1]
+            i_verticaal_y_component_hoekpunt = int(i_verticaal_y_component)
             y += 1
-            if i_verticaal_x_component >= 7 or i_verticaal_y_component >= 7:
+            if i_verticaal_x_component >= 7 or i_verticaal_y_component_hoekpunt >= 7:
                 return "error", "error"
 
-            if not test_punt_dicht() and world_map[i_verticaal_x_component, i_verticaal_y_component] != 0:
+            if not test_punt_dicht() and world_map[i_verticaal_x_component, i_verticaal_y_component_hoekpunt] != 0:
                 d_muur = math.sqrt(i_verticaal_x_component ** 2 + i_verticaal_y_component ** 2)
-                k_muur = kleuren[world_map[i_verticaal_x_component, i_verticaal_y_component]]
+                k_muur = kleuren[world_map[i_verticaal_x_component, i_verticaal_y_component_hoekpunt]]
                 break
 
     return (d_muur, k_muur)
