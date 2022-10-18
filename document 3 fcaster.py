@@ -16,15 +16,24 @@ HOOGTE = 600
 fov=90
 d_camera=1/(math.tan(math.radians(fov)/2))
 # positie van de speler
-p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
+#p_speler = np.array([3 + 1 / math.sqrt(2), 4 - 1 / math.sqrt(2)])
+p_speler_x =3 + 1 / math.sqrt(2)
+p_speler_y = 4 - 1 / math.sqrt(2)
 #p_speler = np.array([2,2])
 
 # richting waarin de speler kijkt
-r_speler = np.array([-1 / math.sqrt(2), 1 / math.sqrt(2)]) #bij 2e getal stond in oorspronkelijke code nog -
+#r_speler = np.array([-1 / math.sqrt(2), 1 / math.sqrt(2)]) bij 2e getal stond in oorspronkelijke code nog -
+r_speler_x= 1 / math.sqrt(2)
+r_speler_y= -1 / math.sqrt(2)
 
 # cameravlak
-rot90 = [-1, 1] #rotatie matrix voor 90°, al vereenvoudigt
-r_cameravlak = rot90*r_speler #d_camera*r_speler+p_speler als nulpunt
+#rot90 = [-1, 1] #rotatie matrix voor 90°, al vereenvoudigt
+rot90_x= -1
+rot90_y= 1
+
+#r_cameravlak = rot90*r_speler #d_camera*r_speler+p_speler als nulpunt
+r_cameravlak_x= rot90_x*r_speler_x
+r_cameravlak_y= rot90_y*r_speler_y
 
 # wordt op True gezet als het spel afgesloten moet worden
 moet_afsluiten = False
@@ -116,15 +125,24 @@ def verwerk_input(delta):
         moet_afsluiten = True
 
 
-def bereken_r_straal(r_speler, kolom):
-    r_straal_kolom=d_camera*r_speler+(-1+(2*kolom)/BREEDTE)*r_cameravlak
-    r_straal_kolom_norm=np.linalg.norm(r_straal_kolom)
-    r_straal = r_straal_kolom/r_straal_kolom_norm
-    return r_straal
+#def bereken_r_straal(r_speler, kolom):
+    #r_straal_kolom=d_camera*r_speler+(-1+(2*kolom)/BREEDTE)*r_cameravlak
+    #r_straal_kolom_norm=np.linalg.norm(r_straal_kolom)
+    #r_straal = r_straal_kolom/r_straal_kolom_norm
+    #return r_straal
+
+def bereken_r_straal(r_speler_x,r_speler_y, kolom):
+    #r_straal_kolom=d_camera*r_speler+(-1+(2*kolom)/BREEDTE)*r_cameravlak
+    r_straal_kolom_x = d_camera * r_speler_x + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak_x
+    r_straal_kolom_y = d_camera * r_speler_y + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak_y
+    r_straal_kolom_norm= math.sqrt(r_straal_kolom_x**2 + r_straal_kolom_y**2)
+    r_straal_x = r_straal_kolom_x/r_straal_kolom_norm
+    r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
+    return [r_straal_x,r_straal_y]
 
 
 
-def raycast(p_speler, r_straal):
+def raycast(p_speler_x,p_speler_y, r_straal):
     # DDA algoritme:
     # stap 0:
     x = 0
@@ -136,14 +154,14 @@ def raycast(p_speler, r_straal):
     delta_h = 1 / (math.fabs(r_straal[1]))
     # stap 2:
     if r_straal[1] < 0:
-        d_horizontaal = (p_speler[1] - math.floor(p_speler[1])) * delta_h
+        d_horizontaal = (p_speler_y - math.floor(p_speler_y)) * delta_h
     elif r_straal[1] >= 0:
-        d_horizontaal = (1 - p_speler[1] + math.floor(p_speler[1])) * delta_h
+        d_horizontaal = (1 - p_speler_y + math.floor(p_speler_y)) * delta_h
 
     if r_straal[0] < 0:
-        d_verticaal = (p_speler[0] - math.floor(p_speler[0])) * delta_v
+        d_verticaal = (p_speler_x - math.floor(p_speler_x)) * delta_v
     elif r_straal[0] >= 0:
-        d_verticaal = (1 - p_speler[0] + math.floor(p_speler[0])) * delta_v
+        d_verticaal = (1 - p_speler_x + math.floor(p_speler_x)) * delta_v
 
     # stap 3:
     def test_punt_dicht():
@@ -155,7 +173,7 @@ def raycast(p_speler, r_straal):
     while True:
         a=0
         if test_punt_dicht() == True:
-            i_horizontaal_x_component = int(p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0])
+            i_horizontaal_x_component = int(p_speler_x + (d_horizontaal + x * delta_h) * r_straal[0])
             i_horizontaal_y_component = y
             x+=1
 
@@ -174,7 +192,7 @@ def raycast(p_speler, r_straal):
 
         else:
             i_verticaal_x_component = x
-            i_verticaal_y_component = int(p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1])
+            i_verticaal_y_component = int(p_speler_y + (d_verticaal + y * delta_v) * r_straal[1])
             y+=1
             #if (world_map[i_verticaal_x_component, i_verticaal_y_component] == 2):
             #    a = 1
@@ -262,9 +280,9 @@ def main():
         print(window.size[0])
         # Render de huidige frame
         for kolom in range(0, window.size[0]):
-            r_straal = bereken_r_straal(r_speler, kolom)
+            r_straal = bereken_r_straal(r_speler_x,r_speler_y, kolom)
             print(r_straal)
-            (d_muur, k_muur) = raycast(p_speler, r_straal)
+            (d_muur, k_muur) = raycast(p_speler_x,p_speler_y,r_straal)
             print(kolom)
             print(d_muur)
             render_kolom(renderer, window, kolom, d_muur, k_muur)
