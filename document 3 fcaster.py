@@ -140,7 +140,7 @@ def bereken_r_straal(r_speler_x,r_speler_y, kolom):
     r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
     return [r_straal_x,r_straal_y]
 
-
+e
 
 def raycast(p_speler_x,p_speler_y, r_straal):
     # DDA algoritme:
