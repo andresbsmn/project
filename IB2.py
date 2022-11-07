@@ -1,7 +1,6 @@
 import math
 import time
 
-
 import numpy as np
 import sdl2.ext
 
@@ -14,27 +13,27 @@ HOOGTE = 600
 #
 
 # positie van de speler
-p_speler = np.array([3,3])
+p_speler = np.array([3, 3])
 
-#print(p_speler[0])
+# print(p_speler[0])
 
 # richting waarin de speler kijkt
-r_speler = np.array([1,0])
-#r_speler = np.array([(-1/math.sqrt(2)),(1/math.sqrt(2))])
-#r_speler = np.array([0,1])
+r_speler = np.array([1, 0])
+# r_speler = np.array([(-1/math.sqrt(2)),(1/math.sqrt(2))])
+# r_speler = np.array([0,1])
 
-#afstand tot cameravlak
+# afstand tot cameravlak
 d_camera = 1
 
-#middelpunt cameravlak
+# middelpunt cameravlak
 middelpuntcameravlak = p_speler + d_camera * r_speler
-#print(middelpuntcameravlak)
+# print(middelpuntcameravlak)
 
-#cameravlak
-#r_cameravlak = np.array([-1 / math.sqrt(2), -1 / math.sqrt(2)])
-rotmin90 = np.array([[0,1], [-1,0]])
+# cameravlak
+# r_cameravlak = np.array([-1 / math.sqrt(2), -1 / math.sqrt(2)])
+rotmin90 = np.array([[0, 1], [-1, 0]])
 r_cameravlak = np.dot(rotmin90, r_speler)
-#print(r_cameravlak)
+# print(r_cameravlak)
 
 # wordt op True gezet als het spel afgesloten moet worden
 moet_afsluiten = False
@@ -50,7 +49,7 @@ world_map = np.array(
      [2, 3, 0, 0, 0, 0, 2],
      [2, 2, 2, 2, 2, 2, 2]]
 )
-#print(world_map[1,3])
+# print(world_map[1,3])
 # Vooraf gedefinieerde kleuren
 kleuren = [
     sdl2.ext.Color(0, 0, 0),  # 0 = Zwart
@@ -74,6 +73,7 @@ def rot(alfa, vector):
     alfa = alfa * math.pi / 180
     rotmatrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
     return np.dot(rotmatrix, vector)
+
 
 def verwerk_input(delta):
     global moet_afsluiten
@@ -99,14 +99,16 @@ def verwerk_input(delta):
             if key == sdl2.SDLK_ESCAPE:
                 moet_afsluiten = True
             stapverkleiner = 0.05
-            if key == sdl2.SDLK_z and p_speler[0]<world_map.shape[0] and p_speler[1]<world_map.shape[1]: #bewegen in richting van muis
-                p_speler = p_speler + (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
-            if key == sdl2.SDLK_d and p_speler[0]<world_map.shape[0] and p_speler[1]<world_map.shape[1]:                                      #bewegen loodrecht op richting muis naar links
-                p_speler = p_speler + rot(90, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
-            if key == sdl2.SDLK_q and p_speler[0]<world_map.shape[0] and p_speler[1]<world_map.shape[1]:
-                p_speler = p_speler + rot(270, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
-            if key == sdl2.SDLK_s and p_speler[0]<world_map.shape[0] and p_speler[1]<world_map.shape[1]:
-                p_speler += rot(180, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+            if key == sdl2.SDLK_z and p_speler[0] < world_map.shape[0] and p_speler[1] < world_map.shape[
+                1]:  # bewegen in richting van muis
+                p_speler = p_speler + (r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+            if key == sdl2.SDLK_d and p_speler[0] < world_map.shape[0] and p_speler[1] < world_map.shape[
+                1]:  # bewegen loodrecht op richting muis naar links
+                p_speler = p_speler + rot(90, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+            if key == sdl2.SDLK_q and p_speler[0] < world_map.shape[0] and p_speler[1] < world_map.shape[1]:
+                p_speler = p_speler + rot(270, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+            if key == sdl2.SDLK_s and p_speler[0] < world_map.shape[0] and p_speler[1] < world_map.shape[1]:
+                p_speler += rot(180, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
             break
 
         # Analoog aan SDL_KEYDOWN. Dit event wordt afgeleverd wanneer de
@@ -131,7 +133,7 @@ def verwerk_input(delta):
             # X-as
             if event.motion.xrel > 1 or event.motion.xrel < -1:
                 beweging = event.motion.xrel
-                r_speler = rot(beweging/100, r_speler)
+                r_speler = rot(beweging / 100, r_speler)
                 r_cameravlak = rot(90, r_speler)
                 continue
 
@@ -147,158 +149,169 @@ def verwerk_input(delta):
 
 
 def bereken_r_straal(r_speler, kolom):
-
     # print(r_speler)
-    #r_straal_kolom = d_camera * r_speler + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak
-    #print(r_straal_kolom)
+    # r_straal_kolom = d_camera * r_speler + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak
+    # print(r_straal_kolom)
     r_straal_kolom_x = d_camera * r_speler[0] + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak[0]
-    #if kolom == 134:
-        #print(r_straal_kolom_x)
-    #print(r_straal_kolom_x)
+    # if kolom == 134:
+    # print(r_straal_kolom_x)
+    # print(r_straal_kolom_x)
     r_straal_kolom_y = d_camera * r_speler[1] + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak[1]
-    #if kolom == 134:
-        #print(r_straal_kolom_y)
-    #print(r_straal_kolom_y)
-    #print(" ")
+    # if kolom == 134:
+    # print(r_straal_kolom_y)
+    # print(r_straal_kolom_y)
+    # print(" ")
 
-
-    #print("x: ", r_straal_kolom_x, "y:", r_straal_kolom_y)
+    # print("x: ", r_straal_kolom_x, "y:", r_straal_kolom_y)
     r_straal_kolom_norm = math.sqrt(r_straal_kolom_x ** 2 + r_straal_kolom_y ** 2)
-    #print(r_straal_kolom_norm)
+    # print(r_straal_kolom_norm)
     r_straal_x = r_straal_kolom_x / r_straal_kolom_norm
-    #print(r_straal_x)
+    # print(r_straal_x)
     r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
-    #print(r_straal_y)
-
-
+    # print(r_straal_y)
 
     # r_straal_kolom = d_camera*r_speler+(-1+(2*kolom)/BREEDTE)*r_cameravlak
     # r_straal_kolom_norm = np.linalg.norm(r_straal_kolom)
     # r_straal = r_straal_kolom/r_straal_kolom_norm
-    #print (r_straal_x)
+    # print (r_straal_x)
     return np.array([r_straal_x, r_straal_y])
 
 
 def raycast(p_speler, r_straal):
     global r_speler
-    delta_h = 1 / abs(r_straal[0]) #gebruikt x ipv y
+    delta_h = 1 / abs(r_straal[0])  # gebruikt x ipv y
     delta_v = 1 / abs(r_straal[1])
-    #print(delta_v)
+    # print(delta_v)
     if r_straal[0] < 0:
         d_horizontaal = (p_speler[0] - int(p_speler[0])) * delta_h
-        #d_horizontaal = (p_speler[1] - math.floor(p_speler[1])) * delta_h
-        #print("hit")
+        # d_horizontaal = (p_speler[1] - math.floor(p_speler[1])) * delta_h
+        # print("hit")
     else:
         d_horizontaal = (1 - (p_speler[0] - int(p_speler[0]))) * delta_h
-        #d_horizontaal = (1 - p_speler[1] + math.floor(p_speler[1])) * delta_h
-        #print("hit2")
-        #print(d_horizontaal)
+        # d_horizontaal = (1 - p_speler[1] + math.floor(p_speler[1])) * delta_h
+        # print("hit2")
+        # print(d_horizontaal)
     if r_straal[1] < 0:
         d_verticaal = (p_speler[1] - int(p_speler[1])) * delta_v
-        #d_verticaal = (p_speler[0] - math.floor(p_speler[0])) * delta_v
-        #print("hit3")
+        # d_verticaal = (p_speler[0] - math.floor(p_speler[0])) * delta_v
+        # print("hit3")
     else:
         d_verticaal = (1 - (p_speler[1] - int(p_speler[1]))) * delta_v
-        #d_verticaal = (1 - p_speler[0] + math.floor(p_speler[0])) * delta_v
-        #print("hit4")
-        #print(d_verticaal)
+        # d_verticaal = (1 - p_speler[0] + math.floor(p_speler[0])) * delta_v
+        # print("hit4")
+        # print(d_verticaal)
 
     x = 0
-    #print(x)
+    # print(x)
     y = 0
-    #print(y)
+    # print(y)
     wall_boundaryfound = False
     d_muur = 0
     k_muur = kleuren[1]
     while True:
-        #print(x)
-        #print(y)
-        #print(r_straal)
-        #print(d_horizontaal)
-        #print(d_verticaal)
-        #print(delta_h)
-        #print(delta_v)
+        # print(x)
+        # print(y)
+        # print(r_straal)
+        # print(d_horizontaal)
+        # print(d_verticaal)
+        # print(delta_h)
+        # print(delta_v)
         if d_horizontaal + x * delta_h <= d_verticaal + y * delta_v:
-            #print("hit")
+            # print("hit")
             i_horizontaal_x = p_speler + (d_horizontaal + x * delta_h) * r_straal
-            #print(i_horizontaal_x)
-            #i_horizontaal_x_rounded_float = np.round_(i_horizontaal_x)
-            #print(i_horizontaal_x_rounded_float)
+            # print(i_horizontaal_x)
+            # i_horizontaal_x_rounded_float = np.round_(i_horizontaal_x)
+            # print(i_horizontaal_x_rounded_float)
             i_horizontaal_x_rounded_int = i_horizontaal_x.astype("i")
-            #print(i_horizontaal_x_rounded_int)
+            # print(i_horizontaal_x_rounded_int)
             x += 1
-            #print(x)
-            #print(r_straal[0])
+            # print(x)
+            # print(r_straal[0])
             if r_straal[0] >= 0:
-                #print("hit")
-                #print(i_horizontaal_x_rounded_int[0])
-                #print(i_horizontaal_x_rounded_int[1] + 1) #indien dit het geval kijken we in [5,5] terwijl we in [5,4] moeten kijken => +1 moet weg!
-                #print(world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])])
-                if world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])] :
-                    #print(world_map[i_horizontaal_x_rounded_int[0] + 1, (i_horizontaal_x_rounded_int[1])])
-                    #print("hit")
-                    d_muur  = math.sqrt((i_horizontaal_x[0]-p_speler[0])**2 + (i_horizontaal_x[1]-p_speler[1])**2)
-                    #print(d_muur)
+                # print("hit")
+                # print(i_horizontaal_x_rounded_int[0])
+                # print(i_horizontaal_x_rounded_int[1] + 1) #indien dit het geval kijken we in [5,5] terwijl we in [5,4] moeten kijken => +1 moet weg!
+                # print(world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])])
+                if world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]:
+                    # print(world_map[i_horizontaal_x_rounded_int[0] + 1, (i_horizontaal_x_rounded_int[1])])
+                    # print("hit")
+                    d_muur = math.sqrt(
+                        (i_horizontaal_x[0] - p_speler[0]) ** 2 + (i_horizontaal_x[1] - p_speler[1]) ** 2)
+                    # print(d_muur)
                     k_muur = kleuren[world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]]
-                    #print(k_muur)
+                    # print(k_muur)
                     break
-                    #return (d_muur, k_muur)
-                #else:
-                    #print("not hit")
+                    # return (d_muur, k_muur)
+                # else:
+                # print("not hit")
 
             elif r_straal[0] < 0:
                 if world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])]:
-                    d_muur = math.sqrt((i_horizontaal_x[0]-p_speler[0])**2 + (i_horizontaal_x[1]-p_speler[1])**2)
+                    d_muur = math.sqrt(
+                        (i_horizontaal_x[0] - p_speler[0]) ** 2 + (i_horizontaal_x[1] - p_speler[1]) ** 2)
                     k_muur = kleuren[world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])]]
                     break
-                    #return (d_muur, k_muur)
+                    # return (d_muur, k_muur)
 
         else:
-            #print("hit2")
+            # print("hit2")
             i_verticaal_y = p_speler + (d_verticaal + y * delta_v) * r_straal
-            #print(i_verticaal_y)
-            #i_verticaal_y_rounded_float = np.round_(i_verticaal_y)
-            #print(i_verticaal_y_rounded_float)
+            # print(i_verticaal_y)
+            # i_verticaal_y_rounded_float = np.round_(i_verticaal_y)
+            # print(i_verticaal_y_rounded_float)
             i_verticaal_y_rounded_int = i_verticaal_y.astype("i")
-            #print(i_verticaal_y_rounded_int)
+            # print(i_verticaal_y_rounded_int)
             y += 1
-            #print(y)
-            #print(r_straal[0])
+            # print(y)
+            # print(r_straal[0])
             if r_straal[1] >= 0:
-                #print("hit")
-                #print(world_map[(i_verticaal_y_rounded_int[0] + 1), i_verticaal_y_rounded_int[1]]) #hier kijken we in [6,4] maar we moeten in [5,5] kijken
+                # print("hit")
+                # print(world_map[(i_verticaal_y_rounded_int[0] + 1), i_verticaal_y_rounded_int[1]]) #hier kijken we in [6,4] maar we moeten in [5,5] kijken
                 if i_verticaal_y_rounded_int[0] >= 7 or i_verticaal_y_rounded_int[1] >= 7:
                     print(i_verticaal_y_rounded_int)
                     quit()
                 if world_map[i_verticaal_y_rounded_int[0], i_verticaal_y_rounded_int[1]]:
-                    #print("hit")
-                    d_muur = math.sqrt((i_verticaal_y[0]-p_speler[0])**2 + (i_verticaal_y[1]-p_speler[1])**2)
+                    # print("hit")
+                    d_muur = math.sqrt((i_verticaal_y[0] - p_speler[0]) ** 2 + (i_verticaal_y[1] - p_speler[1]) ** 2)
                     k_muur = kleuren[world_map[(i_verticaal_y_rounded_int[0]), i_verticaal_y_rounded_int[1]]]
                     break
-                    #return (d_muur, k_muur)
+                    # return (d_muur, k_muur)
 
-            elif r_straal[1] < 0: #omgewisseld: 0 --> 1
+            elif r_straal[1] < 0:  # omgewisseld: 0 --> 1
                 if world_map[i_verticaal_y_rounded_int[0], i_verticaal_y_rounded_int[1] - 1]:
-                    d_muur = math.sqrt((i_verticaal_y[0]-p_speler[0])**2 + (i_verticaal_y[1]-p_speler[1])**2)
+                    d_muur = math.sqrt((i_verticaal_y[0] - p_speler[0]) ** 2 + (i_verticaal_y[1] - p_speler[1]) ** 2)
                     k_muur = kleuren[world_map[i_verticaal_y_rounded_int[0], i_verticaal_y_rounded_int[1] - 1]]
                     break
-                    #return (d_muur, k_muur)
+                    # return (d_muur, k_muur)
     d_muur = d_muur * np.dot(r_speler, r_straal)
     d_muur = round(d_muur, 12)
-    #print(d_muur)
+    # print(d_muur)
     return (d_muur, k_muur)
 
-def render_kolom(renderer, window, kolom, d_muur, k_muur):
-    #print("in render: ",d_muur)
-    hoogte = (HOOGTE/2) * 1/d_muur
-    if d_muur < 1/2:
+
+def render_kolom(renderer, window, kolom, d_muur, k_muur, wall_texture, vloer):
+
+    # print("in render: ",d_muur)
+    hoogte = (HOOGTE / 2) * 1 / d_muur
+    if d_muur < 1 / 2:
         y1 = 0
     else:
-        y1 = (HOOGTE - hoogte)/2
-    #print("hoogte: ", hoogte)
-    #print()
-    renderer.draw_line((kolom, y1, kolom, HOOGTE-y1), k_muur) #renderer.draw_line((kolom, 300, kolom, 1/d_muur), k_muur) #renderer.draw_line((kolom, 0, kolom, window.size[1]), kleuren[1])
+        y1 = (HOOGTE - hoogte) / 2
+    # print("hoogte: ", hoogte)
+    # print()
+    if k_muur == sdl2.ext.Color(0, 255, 0) and False:
+        # sprite begin
+        # https://pysdl2.readthedocs.io/en/stable/modules/ext/renderer.html?highlight=copy#sdl2.ext.renderer.Renderer.copy
+        renderer.copy(wall_texture,
+                      dstrect=(kolom, y1, kolom, HOOGTE-1))
+        # sprite einde
+
+    else:
+        renderer.draw_line((kolom, y1, kolom, HOOGTE - y1),
+                           k_muur)  # renderer.draw_line((kolom, 300, kolom, 1/d_muur), k_muur) #renderer.draw_line((kolom, 0, kolom, window.size[1]), kleuren[1])
+
     return
+
 
 # Initialiseer font voor de fps counter
 fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
@@ -314,7 +327,6 @@ def render_fps(fps, renderer, window):
     text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
     renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 16), 20,
                                  text.size[0], text.size[1]))
-
 
 
 def main():
@@ -334,25 +346,37 @@ def main():
     fps_list = []
     fps = 0
 
+    # begin sprites test setup
+    resources = sdl2.ext.Resources(__file__, "resources")
+    factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+    wall_texture = factory.from_image(resources.get_path("test.png"))
+    vloer = factory.from_image(resources.get_path("floor.png"))
+    dak = factory.from_image(resources.get_path("dak.png"))
+    # eind sprites test setup
+
     # Blijf frames renderen tot we het signaal krijgen dat we moeten afsluiten
     while not moet_afsluiten:
-
         # Onthoud de huidige tijd
         start_time = time.time()
 
         # Reset de rendering context
         renderer.clear()
 
+        # begin vloer en dak
+        renderer.copy(vloer,dstrect=(0, window.size[1]/2, vloer.size[0], vloer.size[1]))
+        renderer.copy(dak, dstrect=(0, 0, dak.size[0], window.size[1]/2))
+        # eind vloer en dak
+
         # Render de huidige frame
         for kolom in range(0, window.size[0]):
-            #if kolom == 400:
-                #print("half")
-            #print(kolom)
+            # if kolom == 400:
+            # print("half")
+            # print(kolom)
             r_straal = bereken_r_straal(r_speler, kolom)
-            if r_straal[0] ==0 or r_straal[1] == 0:
+            if r_straal[0] == 0 or r_straal[1] == 0:
                 continue
             (d_muur, k_muur) = raycast(p_speler, r_straal)
-            render_kolom(renderer, window, kolom, d_muur, k_muur)
+            render_kolom(renderer, window, kolom, d_muur, k_muur, wall_texture, vloer)
 
         end_time = time.time()
         delta = end_time - start_time
@@ -360,7 +384,7 @@ def main():
         verwerk_input(delta)
 
         # Teken gemiddelde fps van de laatste 20 frames
-        fps_list.append(1/(time.time() - start_time))
+        fps_list.append(1 / (time.time() - start_time))
         if len(fps_list) == 20:
             fps = np.average(fps_list)
             fps_list = []
