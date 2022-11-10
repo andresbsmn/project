@@ -5,6 +5,8 @@ import time
 import numpy as np
 import sdl2.ext
 
+from levels import *
+
 # Constanten
 BREEDTE = 800
 HOOGTE = 600
@@ -16,7 +18,6 @@ HOOGTE = 600
 # positie van de speler
 p_speler = np.array([5.0,5.0])
 
-#print(p_speler[0])
 
 # richting waarin de speler kijkt
 r_speler = np.array([0,-1])
@@ -28,13 +29,11 @@ d_camera = 1
 
 #middelpunt cameravlak
 middelpuntcameravlak = p_speler + d_camera * r_speler
-#print(middelpuntcameravlak)
 
 #cameravlak
 #r_cameravlak = np.array([-1 / math.sqrt(2), -1 / math.sqrt(2)])
 rotmin90 = np.array([[0,1], [-1,0]])   #[cos alfa, -sin afla],[sin alfa, cos alfa] voor -pi/2
 r_cameravlak = np.dot(rotmin90, r_speler)
-#print(r_cameravlak)
 
 # wordt op True gezet als het spel afgesloten moet worden
 moet_afsluiten = False
@@ -42,26 +41,22 @@ moet_afsluiten = False
 # de "wereldkaart". Dit is een 2d matrix waarin elke cel een type van muur voorstelt
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
 
+keuzenr = int(input(f'kies een map door een getal van 0 t.e.m. {aantal_mappen} in te geven'))
 
-
-world_map = np.array(
-    [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-     [2, 1, 1, 0, 0, 0, 0, 3, 3, 0, 2],
-     [2, 0, 1, 0, 0, 0, 0, 0, 3, 0, 2],
-     [2, 0, 1, 1, 0, 0, 0, 0, 3, 0, 2],
-     [2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2],
-     [2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2],
-     [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-     [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-     [2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-     [2, 6, 6, 0, 0, 0, 0, 0, 0, 0, 2],
-     [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]
-)
-
-
-
-
-
+# world_map = np.array(
+#     [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+#      [2, 1, 1, 0, 0, 0, 0, 3, 3, 0, 2],
+#      [2, 0, 1, 0, 0, 0, 0, 0, 3, 0, 2],
+#      [2, 0, 1, 1, 0, 0, 0, 0, 3, 0, 2],
+#      [2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2],
+#      [2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2],
+#      [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+#      [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+#      [2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+#      [2, 6, 6, 0, 0, 0, 0, 0, 0, 0, 2],
+#      [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]
+# )
+world_map = maps[keuzenr]
 
 # Vooraf gedefinieerde kleuren
 kleuren = [
@@ -252,9 +247,7 @@ def raycast(p_speler, r_straal):
 
             y += 1
             if r_straal[1] >= 0:
-                #print(world_map[(i_verticaal_y_rounded_int[0] + 1), i_verticaal_y_rounded_int[1]]) #hier kijken we in [6,4] maar we moeten in [5,5] kijken
                 if world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])] :
-                    #print("hit")
                     d_muur  = math.sqrt((i_verticaal_y[0]-p_speler[0])**2 + (i_verticaal_y[1]-p_speler[1])**2)
                     k_muur = kleuren[world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])]]
                     if k_muur == kleuren[1]:
@@ -341,8 +334,7 @@ def main():
                 continue
             (d_muur, k_muur) = raycast(p_speler, r_straal)
             render_kolom(renderer, window, kolom, d_muur, k_muur)
-            #if kolom == 797:
-            #    print("d_muur: ", d_muur)
+
         end_time = time.time()
         delta = end_time - start_time
 
