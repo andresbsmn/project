@@ -10,7 +10,8 @@ from levels import *
 # Constanten
 BREEDTE = 800
 HOOGTE = 600
-
+tijd_verstrekentot = 0 # var aanmaken
+deadline = 10
 #
 # Globale variabelen
 #
@@ -77,6 +78,7 @@ kleuren = [
 # Argumenten:
 # @delta       Tijd in milliseconden sinds de vorige oproep van deze functie
 #
+
 def rotatie(alfa, vector):
     #alfa moet in radialen!!!!
     rotatie_matrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
@@ -145,7 +147,7 @@ def verwerk_input(delta):
             if event.motion.xrel > 1 or event.motion.xrel < -1:
 
                 beweging = event.motion.xrel
-                rotatie_beweging = (beweging * math.pi/2)/50
+                rotatie_beweging = (beweging * math.pi/2)/100
                 r_speler = rotatie(rotatie_beweging, r_speler)
                 #r_speler = rotatie(beweging/100, r_speler)
                 r_cameravlak = rotatie((math.pi/2), r_speler)
@@ -299,8 +301,15 @@ def render_fps(fps, renderer, window):
     message = f'{fps:.2f} fps'
     text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
     renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
-
-
+def timer(delta, renderer, window, deadline):
+    global tijd_verstrekentot
+    tijd_deadline = deadline
+    tijd_verstrekentot += delta
+    message = f'je hebt nog {deadline - tijd_verstrekentot} seconden'
+    if tijd_verstrekentot > tijd_deadline:
+        message = f'je tijd is op :('
+    text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
+    renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), window.size[1]/3, text.size[0], text.size[1]))
 def main():
     # Initialiseer de SDL2 bibliotheek
     sdl2.ext.init()
@@ -339,7 +348,7 @@ def main():
         delta = end_time - start_time
 
         verwerk_input(delta)
-
+        timer(delta, renderer, window, deadline)
         # Teken gemiddelde fps van de laatste 20 frames
         fps_list.append(1/(time.time() - start_time))
         if len(fps_list) == 20:
