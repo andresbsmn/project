@@ -118,7 +118,7 @@ def levelselect():
             if event.type == sdl2.SDL_KEYDOWN:  #nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
                 if key == sdl2.SDLK_l:
-                    message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven \n (moet nu nog met speciale tekentjes)'
+                    message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven'
                 if key >= 48 and key <= 57:
                     try:
                         world_map = maps[int(chr(key))-1]
