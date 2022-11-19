@@ -94,17 +94,20 @@ kleuren = [
 def levelselect():
     global world_map
     sdl2.ext.init()
-    # Maak een venster aan om de game te renderen
+    # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
     window = sdl2.ext.Window("level selectie scherm", size=(BREEDTE, HOOGTE))
     window.show()
     renderer = sdl2.ext.Renderer(window)
+    #afbeelding erin
+    resources = sdl2.ext.Resources(__file__, "textures")
+    factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+    achtergrond = factory.from_image(resources.get_path("winkel_start.jpg"))
+
     while True:
         renderer.clear()
-        for kolom in range(0, window.size[0]):
-            renderer.draw_line((kolom, 0, kolom, window.size[1]), kleuren[1])
-        # renderer.draw_rect((0, 0, window.size[0], window.size[1]), kleuren[4])
+        renderer.copy(achtergrond, dstrect=(0,0, window.size[0], window.size[1]))
         message = f'kies een map door een getal van 0 t.e.m. {aantal_mappen} in te geven \n (moet nu nog met speciale tekentjes)'
-        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
+        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[3])
         text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
         renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
         events = sdl2.ext.get_events()
