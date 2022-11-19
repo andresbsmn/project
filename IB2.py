@@ -109,15 +109,17 @@ def levelselect():
         renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
         events = sdl2.ext.get_events()
         for event in events:
-            if event.type == sdl2.SDL_KEYDOWN:
+            if event.type == sdl2.SDL_KEYDOWN:  #nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                # print(key == sdl2.SDLK_2)
-                # print(chr(key), sdl2.SDLK_2)
-                # return int(chr(key))
-                world_map = maps[int(chr(key))]
+                if key >= 48 and key <= 57:
+                    world_map = maps[int(chr(key))]
+                    print(world_map)
+                    # return int(chr(key))
+                    world_map = maps[int(chr(key))]
+                    return world_map
                 # sdl2.ext.quit()
-                return world_map
-                break
+                #
+                # break
         renderer.present()
         # window.refresh()
 
