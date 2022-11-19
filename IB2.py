@@ -420,11 +420,13 @@ def timer(delta, renderer, window, deadline):
     global tijd_verstrekentot
     tijd_deadline = deadline
     tijd_verstrekentot += delta
-    message = f'je hebt nog {deadline - tijd_verstrekentot} seconden'
+    message = f'je hebt nog {round(deadline - tijd_verstrekentot, 2)} seconden'
     if tijd_verstrekentot > tijd_deadline:
         message = f'je tijd is op :('
     text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
-    renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), window.size[1]/3, text.size[0], text.size[1]))
+    # renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), window.size[1]/3, text.size[0], text.size[1]))
+    renderer.copy(text,
+                  dstrect=(10, text.size[1], text.size[0], text.size[1]))
 def main():
     world_map = levelselect()
     print(world_map)
