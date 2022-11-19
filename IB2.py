@@ -1,6 +1,9 @@
+import cProfile
 import math
 import time
 
+import sdl2
+import snakeviz
 
 import numpy as np
 import sdl2.ext
@@ -102,27 +105,34 @@ def levelselect():
     resources = sdl2.ext.Resources(__file__, "textures")
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
     achtergrond = factory.from_image(resources.get_path("winkel_start.jpg"))
-
+    errormessage = ""
+    message = f'voor level selectie druk "l"'
     while True:
         renderer.clear()
         renderer.copy(achtergrond, dstrect=(0,0, window.size[0], window.size[1]))
-        message = f'kies een map door een getal van 0 t.e.m. {aantal_mappen} in te geven \n (moet nu nog met speciale tekentjes)'
+        if errormessage: #lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
+            message = f'{errormessage}'
         font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[3])
-        text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
-        renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
         events = sdl2.ext.get_events()
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  #nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
+                if key == sdl2.SDLK_l:
+                    message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven \n (moet nu nog met speciale tekentjes)'
                 if key >= 48 and key <= 57:
-                    world_map = maps[int(chr(key))]
-                    print(world_map)
-                    # return int(chr(key))
-                    world_map = maps[int(chr(key))]
-                    return world_map
+                    try:
+                        world_map = maps[int(chr(key))-1]
+                        print(world_map)
+                        # return int(chr(key))
+                        world_map = maps[int(chr(key))-1]
+                        return world_map
+                    except:
+                        errormessage = f'je hebt een ongeldige waarde ingegeven \n gelieve een waarde tussen 1 en {aantal_mappen} in te geven'
                 # sdl2.ext.quit()
                 #
                 # break
+        text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
+        renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
         renderer.present()
         # window.refresh()
 
@@ -488,4 +498,10 @@ def main():
 
 
 if __name__ == '__main__':
+    #comments met #sv naast wegdoen als je wilt kijken naar snakeviz
+    # profiler = cProfile.Profile() # sv
+    # profiler.enable() # sv
     main()
+    # profiler.disable() # sv
+    # stats = pstats.Stats(profiler) # sv
+    # stats.dump_stats('data_prof') # sv
