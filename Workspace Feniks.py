@@ -21,8 +21,9 @@ npc_x_scale=1    #scale npcs mogelijkheid om big chungus of reuzen te maken van 
 npc_y_scale=1    #eig model uitrekken
 
 def npc_scherm_coords(p_npc_x,p_npc_y,npc_y_scale):   #zet de wereld coords npc om naar scherm coords
-    u=(r_speler[1]-r_speler[0])*p_npc_x                # a is en value gebruikt in rendering.
-    v=(r_cameravlak[0]-r_cameravlak[1])*p_npc_y         #u is de x coord, v de y coord
+    det=r_cameravlak[0]*r_speler[1]-r_cameravlak[1]*r_speler[0]
+    u=(r_speler[1]*p_npc_x-r_speler[0]*p_npc_y)/det           # a is en value gebruikt in rendering.
+    v=(r_cameravlak[0]*p_npc_y-r_cameravlak[1]*p_npc_x)/  det      #u is de x coord, v de y coord
     a=u/v                                                #de hoogte van een npc wordt gescaled
     npc_hoogte_scherm=(npc_y_scale/1)*100                #naar scherm/muur groote. Maar kan zelf nog gescaled worden.
     return u,v,a,npc_hoogte_scherm
