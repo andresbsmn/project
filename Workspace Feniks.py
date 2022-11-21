@@ -26,7 +26,7 @@ def npc_scherm_coords(p_npc_x,p_npc_y,npc_y_scale):   #zet de wereld coords npc 
     a=u/v                                                #de hoogte van een npc wordt gescaled
     npc_hoogte_scherm=(npc_y_scale/1)*100                #naar scherm/muur groote. Maar kan zelf nog gescaled worden.
     return u,v,a,npc_hoogte_scherm
-
+e
 # richting waarin de speler kijkt
 r_speler = np.array([0,1])
 
