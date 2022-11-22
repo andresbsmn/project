@@ -534,15 +534,19 @@ def main():
     melkfrigo = factory.from_image(resources.get_path("melkfrigo.png"))
     roodrek = factory.from_image(resources.get_path("roodrek.png"))
     slager = factory.from_image(resources.get_path("slager.png"))
+    winkelmuur = factory.from_image(resources.get_path("winkelmuur.png"))
+    bakker = factory.from_image(resources.get_path("bakker.png"))
 
     list_wall = [
         "empty",  # 0
         rek,  # 1
         kassa,  # 2,
-        frigo, #3
-        melkfrigo ,  #4
-        roodrek,   #5
-        slager    #6
+        frigo,  # 3
+        melkfrigo,  # 4
+        roodrek,  # 5
+        slager,  # 6
+        winkelmuur,  # 7
+        bakker  # 8
     ]
 
     #global wall
