@@ -12,22 +12,13 @@ HOOGTE = 600
 #
 # Globale variabelen
 #
-
-# positie van de speler
-p_speler = np.array([5.0,5.0])
 p_npc_x=3.0
 p_npc_y=5.0
 npc_x_scale=1    #scale npcs mogelijkheid om big chungus of reuzen te maken van een smalle npc,kleine npc.
-npc_y_scale=1    #eig model uitrekken
+npc_y_scale=1
+# positie van de speler
+p_speler = np.array([5.0,5.0])
 
-def npc_scherm_coords(p_npc_x,p_npc_y,npc_y_scale):   #zet de wereld coords npc om naar scherm coords
-    det=r_cameravlak[0]*r_speler[1]-r_cameravlak[1]*r_speler[0]
-    u=(r_speler[1]*p_npc_x-r_speler[0]*p_npc_y)/det           # a is en value gebruikt in rendering.
-    v=(r_cameravlak[0]*p_npc_y-r_cameravlak[1]*p_npc_x)/  det      #u is de x coord, v de y coord
-    a=u/v                                                #de hoogte van een npc wordt gescaled
-    npc_hoogte_scherm=(npc_y_scale/1)*100                #naar scherm/muur groote. Maar kan zelf nog gescaled worden.
-    return u,v,a,npc_hoogte_scherm
-e
 # richting waarin de speler kijkt
 r_speler = np.array([0,1])
 
@@ -357,6 +348,29 @@ def render_kolom(renderer, window, kolom, d_muur, k_muur, wall, is_texture, text
     #renderer.draw_line((kolom, y1, kolom, HOOGTE-y1), k_muur)
     return
 
+def npc_scherm_coords(p_npc_x,p_npc_y,npc_y_scale):   #zet de wereld coords npc om naar scherm coords
+    det=r_cameravlak[0]*r_speler[1]-r_cameravlak[1]*r_speler[0]
+    u=(r_speler[1]*p_npc_x-r_speler[0]*p_npc_y)/det           # a is en value gebruikt in rendering.
+    v=(r_cameravlak[0]*p_npc_y-r_cameravlak[1]*p_npc_x)/det      #u is de x coord, v de y coord
+    a=u/v                                                #de hoogte van een npc wordt gescaled
+    npc_hoogte_scherm=(npc_y_scale/1)*100                #naar scherm/muur groote. Maar kan zelf nog gescaled worden.
+    return u,v,a,npc_hoogte_scherm
+
+u,v,a,npc_hoogte_scherm= npc_scherm_coords(p_npc_x,p_npc_y,npc_y_scale)
+def npc_renderer (u,v,a,npc_hoogte_scherm):
+
+
+    breedte  =npc.size[0]
+    hoogte   =npc.size[1]
+    textuur_x=0   #breedte op textuur W?
+    textuur_y=0  #hoogte op textuur  Z?
+    scherm_x =u    #u
+    scherm_y=v    #v
+    if(a>=-1 & a<=1 & v>=0):
+        renderer.copy(npc,
+        srcrect = (textuur_x,textuur_y, breedte, hoogte),
+        dstrect = (scherm_x,scherm_y, breedte * 4, hoogte * 4))
+    return
 # Initialiseer font voor de fps counter
 fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
 
@@ -388,7 +402,6 @@ def main():
     wall = factory.from_image(resources.get_path("stone_wall.png"))
     global scannergun_sprite
     scannergun_sprite= factory.from_image(resources.get_path("scanner.png"))
-
     fps_list = []
     fps = 0
 
