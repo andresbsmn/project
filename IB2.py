@@ -47,38 +47,6 @@ is_texture = False
 # de "wereldkaart". Dit is een 2d matrix waarin elke cel een type van muur voorstelt
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
 
-
-
-world_map = np.array(
-    [[11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11],
-     [11, 11, 11,  0,  0,  0,  0, 11, 11,  0, 11],
-     [11,  0, 11,  0,  0,  0,  0,  0, 11,  0, 11],
-     [11,  0, 11, 11,  0,  0,  0,  0, 11,  0, 11],
-     [11,  0,  0,  0,  0,  0,  0,  0, 11,  0, 11],
-     [11,  0,  0,  0,  0,  0,  0,  0, 11,  0, 11],
-     [11,  0,  0,  0,  0,  0,  0,  0,  0,  0, 11],
-     [11,  0,  0,  0,  0,  0,  0,  0,  0,  0, 11],
-     [11, 11,  0,  0,  0,  0,  0,  0,  0,  0, 11],
-     [11, 11, 11,  0,  0,  0,  0,  0,  0,  0, 11],
-     [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11]]
-)
-
-
-# world_map = np.array(
-#     [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-#      [2, 1, 1, 0, 0, 0, 0, 3, 3, 0, 2],
-#      [2, 0, 1, 0, 0, 0, 0, 0, 3, 0, 2],
-#      [2, 0, 1, 1, 0, 0, 0, 0, 3, 0, 2],
-#      [2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2],
-#      [2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2],
-#      [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-#      [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-#      [2, 6, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-#      [2, 6, 6, 0, 0, 0, 0, 0, 0, 0, 2],
-#      [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]]
-# )
-# world_map = maps[0]
-
 # Vooraf gedefinieerde kleuren
 kleuren = [
     sdl2.ext.Color(0, 0, 0),  # 0 = Zwart
@@ -91,13 +59,6 @@ kleuren = [
     sdl2.ext.Color(255, 255, 255),  # 7 = Wit
 ]
 
-
-#
-# Verwerkt alle input van het toetsenbord en de muis
-#
-# Argumenten:
-# @delta       Tijd in milliseconden sinds de vorige oproep van deze functie
-#
 def levelselect():
     global world_map
     sdl2.ext.init()
@@ -204,25 +165,26 @@ def verwerk_input(delta):
         # toets op het toetsenbord indrukt.
         # Let op: als de gebruiker de toets blijft inhouden, dan zien we
         # maar 1 SDL_KEYDOWN en 1 SDL_KEYUP event.
-        elif event.type == sdl2.SDL_KEYDOWN:
-            key = event.key.keysym.sym
-            #hier nog alles van limitaties ook aanpassen
-            if key == sdl2.SDLK_ESCAPE:
-                moet_afsluiten = True
-            stapverkleiner = 0.05
-            if key == sdl2.SDLK_z and p_speler[0] <= len(world_map) and p_speler[1] <= len(world_map[0]): # bewegen in richting van muis
-                # nog aanpassen
-                p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
-            if key == sdl2.SDLK_q and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]): # bewegen loodrecht op richting muis naar links
-                p_speler += rotatie((3 / 2) * math.pi,r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-            if key == sdl2.SDLK_d and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
-                p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-            if key == sdl2.SDLK_s and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
-                #rijen = len(matrix) => hoogte
-                #kolommen = len(matrix[0]) => width
-                p_speler += rotatie(math.pi, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
 
-            break
+        # elif event.type == sdl2.SDL_KEYDOWN:
+        #     key = event.key.keysym.sym
+        #     #hier nog alles van limitaties ook aanpassen
+        #     if key == sdl2.SDLK_ESCAPE:
+        #         moet_afsluiten = True
+        #     stapverkleiner = 0.05
+        #     if key == sdl2.SDLK_z and p_speler[0] <= len(world_map) and p_speler[1] <= len(world_map[0]): # bewegen in richting van muis
+                # nog aanpassen
+                # p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+        #     if key == sdl2.SDLK_q and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]): # bewegen loodrecht op richting muis naar links
+        #         p_speler += rotatie((3 / 2) * math.pi,r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        #     if key == sdl2.SDLK_d and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
+        #         p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        #     if key == sdl2.SDLK_s and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
+        #         #rijen = len(matrix) => hoogte
+        #         #kolommen = len(matrix[0]) => width
+        #         p_speler += rotatie(math.pi, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+        #
+        #     break
 
         # Analoog aan SDL_KEYDOWN. Dit event wordt afgeleverd wanneer de
         # gebruiker een muisknop indrukt
@@ -260,10 +222,20 @@ def verwerk_input(delta):
 
     # if key_states[sdl2.SDL_SCANCODE_UP] or key_states[sdl2.SDL_SCANCODE_W]:
     # beweeg vooruit...
+    stapverkleiner = 0.05
+    #moet quertie volgen om een of andere reden
+    if key_states[sdl2.SDL_SCANCODE_W]: # komt overeen met Z
+        p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+        print("z bereikt")
+    if key_states[sdl2.SDL_SCANCODE_A]: #komt overeen met D
+        p_speler += rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+    if key_states[sdl2.SDL_SCANCODE_D]:
+        p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+    if key_states[sdl2.SDL_SCANCODE_S]:
+        p_speler += rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
 
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
-
 
 def bereken_r_straal(r_speler, kolom):
     #r_straal_kolom = d_camera * r_speler + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak
@@ -275,7 +247,6 @@ def bereken_r_straal(r_speler, kolom):
     r_straal_x = r_straal_kolom_x / r_straal_kolom_norm
     r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
     return np.array([r_straal_x, r_straal_y])
-
 
 def raycast(p_speler, r_straal):
     global r_speler
@@ -418,9 +389,6 @@ def raycast(p_speler, r_straal):
     d_muur = d_muur * np.dot(r_speler, r_straal)
     d_muur = round(d_muur, 12)
     return (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok)
-#return (d_muur, k_muur, , textuurcoordinaten_X)
-
-
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok):
     global is_horizontaal
@@ -472,13 +440,6 @@ def render_kolom(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoo
     #renderer.draw_line((kolom, HOOGTE-y1, kolom, HOOGTE), kleuren[5])
     #renderer.draw_line((kolom, y1, kolom, HOOGTE-y1), k_muur)
     return
-
-# Initialiseer font voor de fps counter
-fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
-
-# Initialiseer font voor de fps counter
-
-
 
 def render_fps(fps, renderer, window):
     message = f'{fps:.2f} fps'

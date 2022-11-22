@@ -1,16 +1,20 @@
+import cProfile
 import math
 import time
 
-#from levels import * ( nieuw document met levels in apart)
+import sdl2
+import snakeviz
 
 import numpy as np
 import sdl2.ext
-from playsound import playsound
 
+from levels import *
+from playsound import playsound
 # Constanten
 BREEDTE = 800
 HOOGTE = 600
-
+# var aanmaken
+deadline = 5
 #
 # Globale variabelen
 #
@@ -21,6 +25,7 @@ tijd_verstrekentot = 0 #variabele aanmaken
 deadline = 10
 # positie van de speler
 p_speler = np.array([5.0,5.0])
+
 
 # richting waarin de speler kijkt
 r_speler = np.array([0,1])
@@ -42,26 +47,6 @@ is_texture = False
 # de "wereldkaart". Dit is een 2d matrix waarin elke cel een type van muur voorstelt
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
 
-#keuzenummber = int(input(f'kies een map door een gtal van 0 t.e.m. {aantal_mappen} in te geven'))
-
-
-world_map = np.array(
-    [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-     [1, 1, 1,  0,  0,  0,  0, 3, 3,  0, 1],
-     [6,  0, 1,  0,  0,  0,  0,  0, 3,  0, 1],
-     [5,  0, 1, 1,  0,  0,  0,  0, 3,  0, 1],
-     [4,  0,  0,  0,  0,  0,  0,  0, 3,  0, 1],
-     [2,  0,  0,  0,  0,  0,  0,  0, 3,  0, 1],
-     [6,  0,  0,  0,  0,  0,  0,  0,  0,  0, 1],
-     [1,  0,  0,  0,  0,  0,  0,  0,  0,  0, 1],
-     [1, 1,  0,  0,  0,  0,  0,  0,  0,  0, 1],
-     [1, 1, 1,  0,  0,  0,  0,  0,  0,  0, 1],
-     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
-)
-
-#world_map = maps[keuzenr]
-
-
 # Vooraf gedefinieerde kleuren
 kleuren = [
     sdl2.ext.Color(0, 0, 0),  # 0 = Zwart
@@ -74,16 +59,89 @@ kleuren = [
     sdl2.ext.Color(255, 255, 255),  # 7 = Wit
 ]
 
-#list texturen
+def levelselect():
+    global world_map
+    sdl2.ext.init()
+    # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
+    window = sdl2.ext.Window("level selectie scherm", size=(BREEDTE, HOOGTE))
+    window.show()
+    renderer = sdl2.ext.Renderer(window)
+    #afbeelding erin
+    resources = sdl2.ext.Resources(__file__, "textures")
+    factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+    achtergrond = factory.from_image(resources.get_path("winkel_start.jpg"))
+    errormessage = ""
+    message = f'voor level selectie druk "l"'
+    moet_afsluiten = False
+    while not moet_afsluiten:
+        renderer.clear()
+        renderer.copy(achtergrond, dstrect=(0,0, window.size[0], window.size[1]))
+        if errormessage: #lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
+            message = f'{errormessage}'
+        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[3])
+        events = sdl2.ext.get_events()
+        for event in events:
+            if event.type == sdl2.SDL_KEYDOWN:  #nummers gaan van 48(=0) tot 57(=9)
+                key = event.key.keysym.sym
+                if key == sdl2.SDLK_l:
+                    message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven'
+                if key >= 48 and key <= 57:
+                    try:
+                        world_map = maps[int(chr(key))-1]
+                        print(world_map)
+                        # return int(chr(key))
+                        world_map = maps[int(chr(key))-1]
+                        return world_map
+                    except:
+                        errormessage = f'je hebt een ongeldige waarde ingegeven \n gelieve een waarde tussen 1 en {aantal_mappen} in te geven'
+                #afsluiten bij kruisje of escape
+                if key == sdl2.SDLK_ESCAPE:
+                    quit()
 
-#
-# Verwerkt alle input van het toetsenbord en de muis
-#
-# Argumenten:
-# @delta       Tijd in milliseconden sinds de vorige oproep van deze functie
-#
+                #
+                # break
+        text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
+        renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
+        renderer.present()
+        # window.refresh()
+
+def levelfailed(reden):
+    global world_map
+    sdl2.ext.init()
+    # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
+    window = sdl2.ext.Window("level mislukt", size=(BREEDTE, HOOGTE))
+    window.show()
+    renderer = sdl2.ext.Renderer(window)
+    # afbeelding erin
+    resources = sdl2.ext.Resources(__file__, "textures")
+    factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+    achtergrond = factory.from_image(resources.get_path("winkel_start.jpg"))
+    errormessage = ""
+    message = f'Game Over, {reden} \n druk op "r" op opnieuw te proberen'
+    while True:
+        renderer.clear()
+        renderer.copy(achtergrond, dstrect=(0, 0, window.size[0], window.size[1]))
+        if errormessage:  # lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
+            message = f'{errormessage}'
+        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[3])
+        events = sdl2.ext.get_events()
+        for event in events:
+            if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
+                key = event.key.keysym.sym
+                if key == sdl2.SDLK_r:
+                    # message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven'
+                    sdl2.ext.quit()
+                    main()
+                if key == sdl2.SDLK_ESCAPE:
+                    quit()
+
+        text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
+        renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
+        renderer.present()
+        # window.refresh()
+
 def rotatie(alfa, vector):
-    #alfa moet in radialen!!!!s
+    #alfa moet in radialen!!!!
     rotatie_matrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
     return np.dot(rotatie_matrix, vector)
 
@@ -107,27 +165,26 @@ def verwerk_input(delta):
         # toets op het toetsenbord indrukt.
         # Let op: als de gebruiker de toets blijft inhouden, dan zien we
         # maar 1 SDL_KEYDOWN en 1 SDL_KEYUP event.
-        elif event.type == sdl2.SDL_KEYDOWN:
-            key = event.key.keysym.sym
-            #hier nog alles van limitaties ook aanpassen
-            if key == sdl2.SDLK_ESCAPE:
-                moet_afsluiten = True
-            stapverkleiner = 0.05
-            if key == sdl2.SDLK_z and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]): #bewegen in richting van muis
-                #nog aanpassen
-                p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
-                #print(p_speler)
-            if key == sdl2.SDLK_q and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):                                      #bewegen loodrecht op richting muis naar links
 
-                p_speler += rotatie((3 / 2) * math.pi,r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-            if key == sdl2.SDLK_d and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
-                p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-            if key == sdl2.SDLK_s and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
-                #rijen = len(matrix) => hoogte
-                #kolommen = len(matrix[0]) => width
-                p_speler += rotatie(math.pi, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
-
-            break
+        # elif event.type == sdl2.SDL_KEYDOWN:
+        #     key = event.key.keysym.sym
+        #     #hier nog alles van limitaties ook aanpassen
+        #     if key == sdl2.SDLK_ESCAPE:
+        #         moet_afsluiten = True
+        #     stapverkleiner = 0.05
+        #     if key == sdl2.SDLK_z and p_speler[0] <= len(world_map) and p_speler[1] <= len(world_map[0]): # bewegen in richting van muis
+                # nog aanpassen
+                # p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+        #     if key == sdl2.SDLK_q and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]): # bewegen loodrecht op richting muis naar links
+        #         p_speler += rotatie((3 / 2) * math.pi,r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        #     if key == sdl2.SDLK_d and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
+        #         p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        #     if key == sdl2.SDLK_s and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
+        #         #rijen = len(matrix) => hoogte
+        #         #kolommen = len(matrix[0]) => width
+        #         p_speler += rotatie(math.pi, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+        #
+        #     break
 
         # Analoog aan SDL_KEYDOWN. Dit event wordt afgeleverd wanneer de
         # gebruiker een muisknop indrukt
@@ -165,10 +222,20 @@ def verwerk_input(delta):
 
     # if key_states[sdl2.SDL_SCANCODE_UP] or key_states[sdl2.SDL_SCANCODE_W]:
     # beweeg vooruit...
+    stapverkleiner = 0.05
+    #moet quertie volgen om een of andere reden
+    if key_states[sdl2.SDL_SCANCODE_W]: # komt overeen met Z
+        p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+        print("z bereikt")
+    if key_states[sdl2.SDL_SCANCODE_A]: #komt overeen met D
+        p_speler += rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+    if key_states[sdl2.SDL_SCANCODE_D]:
+        p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+    if key_states[sdl2.SDL_SCANCODE_S]:
+        p_speler += rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
 
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
-
 
 def bereken_r_straal(r_speler, kolom):
     #r_straal_kolom = d_camera * r_speler + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak
@@ -180,7 +247,6 @@ def bereken_r_straal(r_speler, kolom):
     r_straal_x = r_straal_kolom_x / r_straal_kolom_norm
     r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
     return np.array([r_straal_x, r_straal_y])
-#return np.array([r_straal_x, r_straal_y])
 
 def raycast(p_speler, r_straal):
     global r_speler
@@ -323,9 +389,6 @@ def raycast(p_speler, r_straal):
     d_muur = d_muur * np.dot(r_speler, r_straal)
     d_muur = round(d_muur, 12)
     return (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok)
-#return (d_muur, k_muur, , textuurcoordinaten_X)
-
-
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok):
     global is_horizontaal
@@ -378,26 +441,35 @@ def render_kolom(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoo
     #renderer.draw_line((kolom, y1, kolom, HOOGTE-y1), k_muur)
     return
 
-# Initialiseer font voor de fps counter
-fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
-
-
 def render_fps(fps, renderer, window):
     message = f'{fps:.2f} fps'
     text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
     renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
-
 def timer(delta, renderer, window, deadline):
     global tijd_verstrekentot
     tijd_deadline = deadline
     tijd_verstrekentot += delta
-    message = f'je hebt nog {int(deadline - tijd_verstrekentot)} seconden'
+    message = f'je hebt nog {round(deadline - tijd_verstrekentot, 2)} seconden'
+    text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
     if tijd_verstrekentot > tijd_deadline:
         message = f'je tijd is op :('
-    text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
-    renderer.copy(text,dstrect=(int((window.size[0] - text.size[0]) / 2), window.size[1] / 3, text.size[0], text.size[1]))
+        text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
+        levelfailed("tijd was op")
+    else:
+        renderer.draw_rect((10, text.size[1] * 2, (tijd_verstrekentot / tijd_deadline) * text.size[0], text.size[1]),
+                           kleuren[7])
+
+    # renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), window.size[1]/3, text.size[0], text.size[1]))
+    renderer.copy(text,
+                  dstrect=(10, text.size[1], text.size[0], text.size[1]))
 
 def main():
+    global fps_font
+    global tijd_verstrekentot
+    tijd_verstrekentot = 0
+    fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
+    world_map = levelselect()
+    # print(world_map)
     # Initialiseer de SDL2 bibliotheek
     global laser_shot, laser_shot_rent
     sdl2.ext.init()
@@ -415,7 +487,6 @@ def main():
     resources = sdl2.ext.Resources(__file__, "resources")
     global factory
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
-
     global wall
     global list_wall
     rek = factory.from_image(resources.get_path("rek.png"))
@@ -424,15 +495,19 @@ def main():
     melkfrigo = factory.from_image(resources.get_path("melkfrigo.png"))
     roodrek = factory.from_image(resources.get_path("roodrek.png"))
     slager = factory.from_image(resources.get_path("slager.png"))
+    winkelmuur = factory.from_image(resources.get_path("winkelmuur.png"))
+    bakker = factory.from_image(resources.get_path("bakker.png"))
 
     list_wall = [
         "empty",  # 0
         rek,  # 1
         kassa,  # 2,
-        frigo, #3
-        melkfrigo ,  #4
-        roodrek,   #5
-        slager    #6
+        frigo,  # 3
+        melkfrigo,  # 4
+        roodrek,  # 5
+        slager,  # 6
+        winkelmuur,  # 7
+        bakker  # 8
     ]
 
     #global wall
@@ -457,7 +532,6 @@ def main():
         renderer.copy(color_textures[4], srcrect=(0, 0, 1, 1), dstrect=(0, 0, window.size[0], window.size[1] / 2))
         # floor
         renderer.copy(color_textures[5], srcrect=(0, 0, 1, 1),dstrect=(0, window.size[1] / 2, window.size[0], window.size[1] / 2))
-
 
 
         for kolom in range(0, window.size[0]):
@@ -527,4 +601,10 @@ def main():
 
 
 if __name__ == '__main__':
+    #comments met #sv naast wegdoen als je wilt kijken naar snakeviz
+    # profiler = cProfile.Profile() # sv
+    # profiler.enable() # sv
     main()
+    # profiler.disable() # sv
+    # stats = pstats.Stats(profiler) # sv
+    # stats.dump_stats('data_prof') # sv
