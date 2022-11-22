@@ -506,7 +506,7 @@ def main():
             # scanner laser
             #test = sdl2.ext.Resources(__file__, "resources")
             #test2 = test.get_path("Scanner_beep_3.mp3")
-            playsound("C:/Users/Indra/PycharmProjects/GameShopPersonal/resources/Scanner_beep_3.mp3")
+            playsound("resources/Scanner_beep_3.mp3")
             #playsound("C:/Gebruikers/Indra/PycharmProjects/Scanner_beep_3.mp3")
             resources = sdl2.ext.Resources(__file__, "resources")
             factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
