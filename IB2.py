@@ -9,7 +9,7 @@ import numpy as np
 import sdl2.ext
 
 from levels import *
-
+from playsound import playsound
 # Constanten
 BREEDTE = 800
 HOOGTE = 600
@@ -18,7 +18,11 @@ deadline = 5
 #
 # Globale variabelen
 #
-
+global is_horizontaal
+global laser_shot
+laser_shot = False
+tijd_verstrekentot = 0 #variabele aanmaken
+deadline = 10
 # positie van de speler
 p_speler = np.array([5.0,5.0])
 
@@ -185,6 +189,7 @@ def verwerk_input(delta):
     global r_speler
     global r_cameravlak
     global p_speler
+    global laser_shot
 
     # Handelt alle input events af die zich voorgedaan hebben sinds de vorige
     # keer dat we de sdl2.ext.get_events() functie hebben opgeroepen
@@ -225,6 +230,7 @@ def verwerk_input(delta):
             button = event.button.button
             if button == sdl2.SDL_BUTTON_LEFT:
                 # ...
+                laser_shot = True
                 continue
         # Een SDL_MOUSEWHEEL event wordt afgeleverd wanneer de gebruiker
         # aan het muiswiel draait.
@@ -242,7 +248,7 @@ def verwerk_input(delta):
             if event.motion.xrel > 1 or event.motion.xrel < -1:
 
                 beweging = event.motion.xrel
-                rotatie_beweging = (beweging * math.pi/2)/100
+                rotatie_beweging = (beweging * math.pi/2)/50
                 r_speler = rotatie(rotatie_beweging, r_speler)
                 #r_speler = rotatie(beweging/100, r_speler)
                 r_cameravlak = rotatie((math.pi/2), r_speler)
@@ -276,6 +282,8 @@ def raycast(p_speler, r_straal):
     global is_texture
     is_texture = False
     global is_horizontaal
+    global blok
+
     delta_h = 1 / abs(r_straal[0]) #gebruikt x ipv y
     delta_v = 1 / abs(r_straal[1])
 
@@ -292,6 +300,7 @@ def raycast(p_speler, r_straal):
     y = 0
     d_muur = 0
     k_muur = kleuren[1]
+
     while True:
         if d_horizontaal + x * delta_h <= d_verticaal + y * delta_v:
             i_horizontaal_x = p_speler + (d_horizontaal + x * delta_h) * r_straal
@@ -315,35 +324,39 @@ def raycast(p_speler, r_straal):
 
             if r_straal[0] >= 0:
                 #if world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])].dtype == "<U1":
-                if world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])] == 11:
+                if world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]:
                     d_muur = math.sqrt((i_horizontaal_x[0] - p_speler[0]) ** 2 + (i_horizontaal_x[1] - p_speler[1]) ** 2)
                     is_texture = True
-                    textuurcoordinaten_X = (i_horizontaal_x - i_horizontaal_x_rounded_int) * wall.size[0]
+                    blok = world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]
+                    textuurcoordinaten_X_zondermaalbreedtetextuur = (i_horizontaal_x - i_horizontaal_x_rounded_int)
+                    #textuurcoordinaten_X = (i_horizontaal_x - i_horizontaal_x_rounded_int) * wall.size[0]
                     break
 
-                elif world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]:
+                #elif world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]:
 
-                    d_muur = math.sqrt((i_horizontaal_x[0]-p_speler[0])**2 + (i_horizontaal_x[1]-p_speler[1])**2)
-                    k_muur = kleuren[world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]]
-                    is_texture = False
-                    textuurcoordinaten_X = (i_horizontaal_x - i_horizontaal_x_rounded_int) * wall.size[0]
-                    break
+                #    d_muur = math.sqrt((i_horizontaal_x[0]-p_speler[0])**2 + (i_horizontaal_x[1]-p_speler[1])**2)
+                #    k_muur = kleuren[world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]]
+                #    is_texture = False
+                #    textuurcoordinaten_X = (i_horizontaal_x - i_horizontaal_x_rounded_int) * wall.size[0]
+                #    break
 
 
             elif r_straal[0] < 0:
-                if world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])] == 11:
+                if world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])]:
                 #if world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])].dtype == "<U1":
                     d_muur = math.sqrt((i_horizontaal_x[0] - p_speler[0]) ** 2 + (i_horizontaal_x[1] - p_speler[1]) ** 2)
                     is_texture = True
-                    textuurcoordinaten_X = (i_horizontaal_x - i_horizontaal_x_rounded_int) * wall.size[0]
+                    textuurcoordinaten_X_zondermaalbreedtetextuur = (i_horizontaal_x - i_horizontaal_x_rounded_int)
+                    #textuurcoordinaten_X = (i_horizontaal_x - i_horizontaal_x_rounded_int) * wall.size[0]
+                    blok = world_map[(i_horizontaal_x_rounded_int[0] - 1), i_horizontaal_x_rounded_int[1]]
                     break
 
-                elif world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])]:
-                    d_muur = math.sqrt((i_horizontaal_x[0]-p_speler[0])**2 + (i_horizontaal_x[1]-p_speler[1])**2)
-                    k_muur = kleuren[world_map[(i_horizontaal_x_rounded_int[0] - 1), i_horizontaal_x_rounded_int[1]]]
-                    is_texture = False
-                    textuurcoordinaten_X = (i_horizontaal_x - i_horizontaal_x_rounded_int) * wall.size[0]
-                    break
+                #elif world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])]:
+                #    d_muur = math.sqrt((i_horizontaal_x[0]-p_speler[0])**2 + (i_horizontaal_x[1]-p_speler[1])**2)
+                #    k_muur = kleuren[world_map[(i_horizontaal_x_rounded_int[0] - 1), i_horizontaal_x_rounded_int[1]]]
+                #    is_texture = False
+                #    textuurcoordinaten_X = (i_horizontaal_x - i_horizontaal_x_rounded_int) * wall.size[0]
+                #    break
 
         else:
             i_verticaal_y = p_speler + (d_verticaal + y * delta_v) * r_straal
@@ -366,48 +379,61 @@ def raycast(p_speler, r_straal):
             y += 1
             if r_straal[1] >= 0:
                 #print(world_map[(i_verticaal_y_rounded_int[0] + 1), i_verticaal_y_rounded_int[1]]) #hier kijken we in [6,4] maar we moeten in [5,5] kijken
-                if world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])] ==11 :
+                if world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])] :
                 #if world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])].dtype =="<U1" :
                     d_muur = math.sqrt((i_verticaal_y[0] - p_speler[0]) ** 2 + (i_verticaal_y[1] - p_speler[1]) ** 2)
                     is_texture = True
-                    textuurcoordinaten_X = (1-(i_verticaal_y - i_verticaal_y_rounded_int)) * wall.size[0]
+                    textuurcoordinaten_X_zondermaalbreedtetextuur = (1-(i_verticaal_y - i_verticaal_y_rounded_int))
+                    #textuurcoordinaten_X = (1-(i_verticaal_y - i_verticaal_y_rounded_int)) * wall.size[0]
+                    blok = world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])]
                     break
 
-                elif world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])] :
-                    #print("hit")
-                    d_muur  = math.sqrt((i_verticaal_y[0]-p_speler[0])**2 + (i_verticaal_y[1]-p_speler[1])**2)
-                    k_muur = kleuren[world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])]]
-                    is_texture = False
-                    textuurcoordinaten_X = (1-(i_verticaal_y - i_verticaal_y_rounded_int)) * wall.size[0]
+                #elif world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])] :
+                #    #print("hit")
+                #    d_muur  = math.sqrt((i_verticaal_y[0]-p_speler[0])**2 + (i_verticaal_y[1]-p_speler[1])**2)
+                #    k_muur = kleuren[world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])]]
+                #    is_texture = False
+                #    textuurcoordinaten_X = (1-(i_verticaal_y - i_verticaal_y_rounded_int)) * wall.size[0]
 
-                    break
+                #    break
 
             elif r_straal[1] < 0: #omgewisseld: 0 --> 1
-                if world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)] == 11:
+                if world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]:
                 #if world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)].dtype == "<U1":
 
                     d_muur = math.sqrt((i_verticaal_y[0] - p_speler[0]) ** 2 + (i_verticaal_y[1] - p_speler[1]) ** 2)
                     is_texture = True
-                    textuurcoordinaten_X = (1-(i_verticaal_y - i_verticaal_y_rounded_int)) * wall.size[0]
+                    textuurcoordinaten_X_zondermaalbreedtetextuur = (1-(i_verticaal_y - i_verticaal_y_rounded_int))
+                    #textuurcoordinaten_X = (1-(i_verticaal_y - i_verticaal_y_rounded_int)) * wall.size[0]
+                    blok = world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]
                     break
 
-                elif world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]:
-                    d_muur  = math.sqrt((i_verticaal_y[0]-p_speler[0])**2 + (i_verticaal_y[1]-p_speler[1])**2)
-                    k_muur = kleuren[world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]]
-                    is_texture = False
-                    textuurcoordinaten_X = (1-(i_verticaal_y - i_verticaal_y_rounded_int)) * wall.size[0]
-                    break
+                #elif world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]:
+                #    d_muur  = math.sqrt((i_verticaal_y[0]-p_speler[0])**2 + (i_verticaal_y[1]-p_speler[1])**2)
+                #    k_muur = kleuren[world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]]
+                #    is_texture = False
+                #    textuurcoordinaten_X = (1-(i_verticaal_y - i_verticaal_y_rounded_int)) * wall.size[0]
+                #    break
 
     d_muur = d_muur * np.dot(r_speler, r_straal)
     d_muur = round(d_muur, 12)
-    return (d_muur, k_muur, is_texture, textuurcoordinaten_X)
+    return (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok)
 #return (d_muur, k_muur, , textuurcoordinaten_X)
 
 
 
-def render_kolom(renderer, window, kolom, d_muur, k_muur, wall, is_texture, textuurcoordinaten_X):
-
-    hoogte = (HOOGTE/2) * 1/d_muur #200/d_muur#(HOOGTE/2) * 1/d_muur
+def render_kolom(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok):
+    global is_horizontaal
+    global list_wall
+    muur = list_wall[blok]
+    #global resources
+    #resources = sdl2.ext.Resources(__file__, "resources")
+    #global factory
+    #factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+    #wall = factory.from_image(resources.get_path(blok))   #probleem denkik hier, doordat telkens opnieuw moet opvragen
+    textuurcoordinaten_X = textuurcoordinaten_X_zondermaalbreedtetextuur * muur.size[0]
+    hoogte = (HOOGTE) * 1/(d_muur+0.00001) #200/d_muur#(HOOGTE/2) * 1/d_muur
+    #hoogte = (HOOGTE / 2) * 1 / d_muur
 
     if hoogte >= HOOGTE: #hier stond 1/2 naar 1 gezet
         y1 = 0
@@ -416,20 +442,23 @@ def render_kolom(renderer, window, kolom, d_muur, k_muur, wall, is_texture, text
 
     if is_texture == True:
 
-        breedte = wall.size[0]
-        hoogte_ander = wall.size[1]
-        textuur_x = textuurcoordinaten_X[0]
+        breedte = muur.size[0]
+        hoogte_ander = muur.size[1]
+        if is_horizontaal == True:
+            textuur_x = textuurcoordinaten_X[1]
+        else:
+            textuur_x = textuurcoordinaten_X[0]
         textuur_y = 0
         scherm_x = kolom
         scherm_y = y1
         #renderer.copy(wall, srcrect = (textuur_x, textuur_y, int(breedte/BREEDTE), hoogte_ander), dstrect=(scherm_x, scherm_y, 1, hoogte))
         #renderer.copy(wall, srcrect=(textuur_x, textuur_y, breedte/133, hoogte_ander), dstrect=(scherm_x, scherm_y, 1, hoogte))
         if hoogte <= HOOGTE:
-            renderer.copy(wall, srcrect=(textuur_x, textuur_y, breedte / 100, hoogte_ander),dstrect=(scherm_x, scherm_y, 1, hoogte))
+            renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte / 100, hoogte_ander),dstrect=(scherm_x, scherm_y, 1, hoogte))
         else:
-            textuur_y = ((hoogte - HOOGTE)/ 2)* (wall.size[1]/hoogte) #hoogte waar scherm start op textuur
+            textuur_y = ((hoogte - HOOGTE)/ 2)* (muur.size[1]/hoogte) #hoogte waar scherm start op textuur
             hoogte_ander = hoogte_ander - (2* textuur_y) #hoogte_ander - 2* textuur_y
-            renderer.copy(wall, srcrect=(textuur_x, textuur_y, breedte / 100, hoogte_ander),dstrect=(scherm_x, scherm_y, 1, hoogte))
+            renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte / 100, hoogte_ander),dstrect=(scherm_x, scherm_y, 1, hoogte))
 
     else:
         renderer.draw_line((kolom, y1, kolom, HOOGTE - y1), k_muur)
@@ -443,6 +472,9 @@ def render_kolom(renderer, window, kolom, d_muur, k_muur, wall, is_texture, text
     #renderer.draw_line((kolom, HOOGTE-y1, kolom, HOOGTE), kleuren[5])
     #renderer.draw_line((kolom, y1, kolom, HOOGTE-y1), k_muur)
     return
+
+# Initialiseer font voor de fps counter
+fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
 
 # Initialiseer font voor de fps counter
 
@@ -478,6 +510,7 @@ def main():
     world_map = levelselect()
     # print(world_map)
     # Initialiseer de SDL2 bibliotheek
+    global laser_shot, laser_shot_rent
     sdl2.ext.init()
 
     # Maak een venster aan om de game te renderen
@@ -489,12 +522,31 @@ def main():
 
     # Maak een renderer aan zodat we in ons venster kunnen renderen
     renderer = sdl2.ext.Renderer(window)
-
-    resources = sdl2.ext.Resources(__file__, "textures")
+    global resources
+    resources = sdl2.ext.Resources(__file__, "resources")
     global factory
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
     global wall
-    wall = factory.from_image(resources.get_path("stone_wall.png"))
+    global list_wall
+    rek = factory.from_image(resources.get_path("rek.png"))
+    kassa = factory.from_image(resources.get_path("kassa.png"))
+    frigo = factory.from_image(resources.get_path("frigo.png"))
+    melkfrigo = factory.from_image(resources.get_path("melkfrigo.png"))
+    roodrek = factory.from_image(resources.get_path("roodrek.png"))
+    slager = factory.from_image(resources.get_path("slager.png"))
+
+    list_wall = [
+        "empty",  # 0
+        rek,  # 1
+        kassa,  # 2,
+        frigo, #3
+        melkfrigo ,  #4
+        roodrek,   #5
+        slager    #6
+    ]
+
+    #global wall
+    #wall = factory.from_image(resources.get_path("test1.png"))
     global scannergun_sprite
     scannergun_sprite= factory.from_image(resources.get_path("scanner.png"))
     fps_list = []
@@ -521,8 +573,8 @@ def main():
             r_straal = bereken_r_straal(r_speler, kolom)
             if r_straal[0] ==0 or r_straal[1] == 0:
                 continue
-            (d_muur, k_muur, is_texture, textuurcoordinaten_X) = raycast(p_speler, r_straal)
-            render_kolom(renderer, window, kolom, d_muur, k_muur, wall, is_texture, textuurcoordinaten_X)
+            (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur,blok) = raycast(p_speler, r_straal)
+            render_kolom(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok)
             #if kolom == 797:
             #    print("d_muur: ", d_muur)
 
@@ -538,10 +590,47 @@ def main():
             fps = np.average(fps_list)
             fps_list = []
         render_fps(fps, renderer, window)
+        #scanner gun
+        resources = sdl2.ext.Resources(__file__, "resources")
+        factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+        scannergun_texture = factory.from_image(resources.get_path("scanner.png"))
+        # print(scannergun_texture.size[0])
+        # print(scannergun_texture.size[1])
+
+        renderer.copy(scannergun_texture, srcrect=(0, 0, scannergun_texture.size[0], scannergun_texture.size[1]),
+                      dstrect=(299, 415, scannergun_texture.size[0], scannergun_texture.size[1]))
+
+        # crosshair
+        resources = sdl2.ext.Resources(__file__, "resources")
+        factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+        crosshair_texture = factory.from_image(resources.get_path("crosshair_white.png"))
+        # print(crosshair_texture.size[0])
+        # print(crosshair_texture.size[1])
+
+        renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture.size[0], crosshair_texture.size[1]),
+                      dstrect=(380, 277, crosshair_texture.size[0], crosshair_texture.size[1]))
+
+        if laser_shot == True:
+            # print("hit")
+            # scanner laser
+            #test = sdl2.ext.Resources(__file__, "resources")
+            #test2 = test.get_path("Scanner_beep_3.mp3")
+            playsound("resources/Scanner_beep_3.mp3")
+            #playsound("C:/Gebruikers/Indra/PycharmProjects/Scanner_beep_3.mp3")
+            resources = sdl2.ext.Resources(__file__, "resources")
+            factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+            laser_texture = factory.from_image(resources.get_path("scanner_laser2.png"))
+            # print(laser_texture.size[0])
+            # print(laser_texture.size[1])
+
+            renderer.copy(laser_texture, srcrect=(0, 0, laser_texture.size[0], laser_texture.size[1]),
+                          dstrect=(381, 298, laser_texture.size[0], laser_texture.size[1]))
+            laser_shot = False
 
         # Verwissel de rendering context met de frame buffer
         renderer.present()
-
+        # na renderen frame venster verversen
+        window.refresh()
     # Sluit SDL2 af
     sdl2.ext.quit()
 
