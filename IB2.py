@@ -168,11 +168,10 @@ def verwerk_input(delta):
             if key == sdl2.SDLK_ESCAPE:
                 moet_afsluiten = True
             stapverkleiner = 0.05
-            if key == sdl2.SDLK_z and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]): #bewegen in richting van muis
-                #nog aanpassen
+            if key == sdl2.SDLK_z and p_speler[0] <= len(world_map) and p_speler[1] <= len(world_map[0]): # bewegen in richting van muis
+                # nog aanpassen
                 p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
-            if key == sdl2.SDLK_q and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):                                      #bewegen loodrecht op richting muis naar links
-
+            if key == sdl2.SDLK_q and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]): # bewegen loodrecht op richting muis naar links
                 p_speler += rotatie((3 / 2) * math.pi,r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
             if key == sdl2.SDLK_d and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
                 p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
@@ -421,15 +420,21 @@ def timer(delta, renderer, window, deadline):
     tijd_deadline = deadline
     tijd_verstrekentot += delta
     message = f'je hebt nog {round(deadline - tijd_verstrekentot, 2)} seconden'
+    text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
     if tijd_verstrekentot > tijd_deadline:
         message = f'je tijd is op :('
-    text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
+        text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
+    else:
+        renderer.draw_rect((10, text.size[1] * 2, (tijd_verstrekentot / tijd_deadline) * text.size[0], text.size[1]),
+                           kleuren[7])
+
     # renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), window.size[1]/3, text.size[0], text.size[1]))
     renderer.copy(text,
                   dstrect=(10, text.size[1], text.size[0], text.size[1]))
+
 def main():
     world_map = levelselect()
-    print(world_map)
+    # print(world_map)
     # Initialiseer de SDL2 bibliotheek
     sdl2.ext.init()
 
