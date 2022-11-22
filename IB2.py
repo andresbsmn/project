@@ -13,8 +13,8 @@ from levels import *
 # Constanten
 BREEDTE = 800
 HOOGTE = 600
-tijd_verstrekentot = 0 # var aanmaken
-deadline = 10
+# var aanmaken
+deadline = 5
 #
 # Globale variabelen
 #
@@ -107,7 +107,8 @@ def levelselect():
     achtergrond = factory.from_image(resources.get_path("winkel_start.jpg"))
     errormessage = ""
     message = f'voor level selectie druk "l"'
-    while True:
+    moet_afsluiten = False
+    while not moet_afsluiten:
         renderer.clear()
         renderer.copy(achtergrond, dstrect=(0,0, window.size[0], window.size[1]))
         if errormessage: #lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
@@ -128,7 +129,10 @@ def levelselect():
                         return world_map
                     except:
                         errormessage = f'je hebt een ongeldige waarde ingegeven \n gelieve een waarde tussen 1 en {aantal_mappen} in te geven'
-                # sdl2.ext.quit()
+                #afsluiten bij kruisje of escape
+                if key == sdl2.SDLK_ESCAPE:
+                    quit()
+
                 #
                 # break
         text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
@@ -136,7 +140,40 @@ def levelselect():
         renderer.present()
         # window.refresh()
 
+def levelfailed(reden):
+    global world_map
+    sdl2.ext.init()
+    # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
+    window = sdl2.ext.Window("level mislukt", size=(BREEDTE, HOOGTE))
+    window.show()
+    renderer = sdl2.ext.Renderer(window)
+    # afbeelding erin
+    resources = sdl2.ext.Resources(__file__, "textures")
+    factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+    achtergrond = factory.from_image(resources.get_path("winkel_start.jpg"))
+    errormessage = ""
+    message = f'Game Over, {reden} \n druk op "r" op opnieuw te proberen'
+    while True:
+        renderer.clear()
+        renderer.copy(achtergrond, dstrect=(0, 0, window.size[0], window.size[1]))
+        if errormessage:  # lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
+            message = f'{errormessage}'
+        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[3])
+        events = sdl2.ext.get_events()
+        for event in events:
+            if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
+                key = event.key.keysym.sym
+                if key == sdl2.SDLK_r:
+                    # message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven'
+                    sdl2.ext.quit()
+                    main()
+                if key == sdl2.SDLK_ESCAPE:
+                    quit()
 
+        text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
+        renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
+        renderer.present()
+        # window.refresh()
 
 def rotatie(alfa, vector):
     #alfa moet in radialen!!!!
@@ -408,7 +445,7 @@ def render_kolom(renderer, window, kolom, d_muur, k_muur, wall, is_texture, text
     return
 
 # Initialiseer font voor de fps counter
-fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
+
 
 
 def render_fps(fps, renderer, window):
@@ -424,6 +461,7 @@ def timer(delta, renderer, window, deadline):
     if tijd_verstrekentot > tijd_deadline:
         message = f'je tijd is op :('
         text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
+        levelfailed("tijd was op")
     else:
         renderer.draw_rect((10, text.size[1] * 2, (tijd_verstrekentot / tijd_deadline) * text.size[0], text.size[1]),
                            kleuren[7])
@@ -433,6 +471,10 @@ def timer(delta, renderer, window, deadline):
                   dstrect=(10, text.size[1], text.size[0], text.size[1]))
 
 def main():
+    global fps_font
+    global tijd_verstrekentot
+    tijd_verstrekentot = 0
+    fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
     world_map = levelselect()
     # print(world_map)
     # Initialiseer de SDL2 bibliotheek
