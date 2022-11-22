@@ -14,7 +14,7 @@ from playsound import playsound
 BREEDTE = 800
 HOOGTE = 600
 # var aanmaken
-global deadline
+deadline = 5
 #
 # Globale variabelen
 #
@@ -61,7 +61,6 @@ kleuren = [
 
 def levelselect():
     global world_map
-    global deadline
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
     window = sdl2.ext.Window("level selectie scherm", size=(BREEDTE, HOOGTE))
@@ -72,43 +71,32 @@ def levelselect():
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
     achtergrond = factory.from_image(resources.get_path("winkel_start.jpg"))
     errormessage = ""
-    message = f'voor level selectie druk "l" \n voor timer aan te passen druk "t"'
-    keuze = ''
+    message = f'voor level selectie druk "l"'
     moet_afsluiten = False
     while not moet_afsluiten:
         renderer.clear()
         renderer.copy(achtergrond, dstrect=(0,0, window.size[0], window.size[1]))
         if errormessage: #lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
             message = f'{errormessage}'
-        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
+        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[3])
         events = sdl2.ext.get_events()
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  #nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
+                if key == sdl2.SDLK_l:
+                    message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven'
+                if key >= 48 and key <= 57:
+                    try:
+                        world_map = maps[int(chr(key))-1]
+                        print(world_map)
+                        # return int(chr(key))
+                        world_map = maps[int(chr(key))-1]
+                        return world_map
+                    except:
+                        errormessage = f'je hebt een ongeldige waarde ingegeven \n gelieve een waarde tussen 1 en {aantal_mappen} in te geven'
                 #afsluiten bij kruisje of escape
                 if key == sdl2.SDLK_ESCAPE:
                     quit()
-                if key == sdl2.SDLK_l:
-                    message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven'
-                    keuze = "level"
-                elif key == sdl2.SDLK_t:
-                    message = f'kies een tijd door te scrollen'
-                    keuze = "timer"
-                elif keuze == "level":
-                    if key >= 48 and key <= 57:
-                        try:
-                            world_map = maps[int(chr(key))-1]
-                            print(world_map)
-                            # return int(chr(key))
-                            world_map = maps[int(chr(key))-1]
-                            return world_map
-                        except:
-                            errormessage = f'je hebt een ongeldige waarde ingegeven \n gelieve een waarde tussen 1 en {aantal_mappen} in te geven'
-            if keuze == "timer" and event.type == sdl2.SDL_MOUSEWHEEL:
-                deadline += event.wheel.y
-                message = f'de tijd is nu {deadline}'
-
-
 
                 #
                 # break
@@ -178,12 +166,25 @@ def verwerk_input(delta):
         # Let op: als de gebruiker de toets blijft inhouden, dan zien we
         # maar 1 SDL_KEYDOWN en 1 SDL_KEYUP event.
 
-        elif event.type == sdl2.SDL_KEYDOWN:
-            key = event.key.keysym.sym
-            #hier nog alles van limitaties ook aanpassen
-            if key == sdl2.SDLK_ESCAPE:
-                moet_afsluiten = True
-            break
+        # elif event.type == sdl2.SDL_KEYDOWN:
+        #     key = event.key.keysym.sym
+        #     #hier nog alles van limitaties ook aanpassen
+        #     if key == sdl2.SDLK_ESCAPE:
+        #         moet_afsluiten = True
+        #     stapverkleiner = 0.05
+        #     if key == sdl2.SDLK_z and p_speler[0] <= len(world_map) and p_speler[1] <= len(world_map[0]): # bewegen in richting van muis
+                # nog aanpassen
+                # p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+        #     if key == sdl2.SDLK_q and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]): # bewegen loodrecht op richting muis naar links
+        #         p_speler += rotatie((3 / 2) * math.pi,r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        #     if key == sdl2.SDLK_d and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
+        #         p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        #     if key == sdl2.SDLK_s and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
+        #         #rijen = len(matrix) => hoogte
+        #         #kolommen = len(matrix[0]) => width
+        #         p_speler += rotatie(math.pi, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+        #
+        #     break
 
         # Analoog aan SDL_KEYDOWN. Dit event wordt afgeleverd wanneer de
         # gebruiker een muisknop indrukt
@@ -222,9 +223,10 @@ def verwerk_input(delta):
     # if key_states[sdl2.SDL_SCANCODE_UP] or key_states[sdl2.SDL_SCANCODE_W]:
     # beweeg vooruit...
     stapverkleiner = 0.05
-    #moet querty volgen om een of andere reden
+    #moet quertie volgen om een of andere reden
     if key_states[sdl2.SDL_SCANCODE_W]: # komt overeen met Z
         p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+        print("z bereikt")
     if key_states[sdl2.SDL_SCANCODE_A]: #komt overeen met D
         p_speler += rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
     if key_states[sdl2.SDL_SCANCODE_D]:
