@@ -166,25 +166,12 @@ def verwerk_input(delta):
         # Let op: als de gebruiker de toets blijft inhouden, dan zien we
         # maar 1 SDL_KEYDOWN en 1 SDL_KEYUP event.
 
-        # elif event.type == sdl2.SDL_KEYDOWN:
-        #     key = event.key.keysym.sym
-        #     #hier nog alles van limitaties ook aanpassen
-        #     if key == sdl2.SDLK_ESCAPE:
-        #         moet_afsluiten = True
-        #     stapverkleiner = 0.05
-        #     if key == sdl2.SDLK_z and p_speler[0] <= len(world_map) and p_speler[1] <= len(world_map[0]): # bewegen in richting van muis
-                # nog aanpassen
-                # p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
-        #     if key == sdl2.SDLK_q and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]): # bewegen loodrecht op richting muis naar links
-        #         p_speler += rotatie((3 / 2) * math.pi,r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-        #     if key == sdl2.SDLK_d and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
-        #         p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-        #     if key == sdl2.SDLK_s and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
-        #         #rijen = len(matrix) => hoogte
-        #         #kolommen = len(matrix[0]) => width
-        #         p_speler += rotatie(math.pi, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
-        #
-        #     break
+        elif event.type == sdl2.SDL_KEYDOWN:
+            key = event.key.keysym.sym
+            #hier nog alles van limitaties ook aanpassen
+            if key == sdl2.SDLK_ESCAPE:
+                moet_afsluiten = True
+            break
 
         # Analoog aan SDL_KEYDOWN. Dit event wordt afgeleverd wanneer de
         # gebruiker een muisknop indrukt
@@ -226,7 +213,6 @@ def verwerk_input(delta):
     #moet quertie volgen om een of andere reden
     if key_states[sdl2.SDL_SCANCODE_W]: # komt overeen met Z
         p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
-        print("z bereikt")
     if key_states[sdl2.SDL_SCANCODE_A]: #komt overeen met D
         p_speler += rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
     if key_states[sdl2.SDL_SCANCODE_D]:
