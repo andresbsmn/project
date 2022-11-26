@@ -15,16 +15,19 @@ BREEDTE = 800
 HOOGTE = 600
 # var aanmaken
 global deadline
+
 #
 # Globale variabelen
 #
 global is_horizontaal
+global renderer
+global list_wall_create
 global laser_shot
 laser_shot = False
 tijd_verstrekentot = 0 #variabele aanmaken
 deadline = 10
 # positie van de speler
-p_speler = np.array([5.0,5.0])
+p_speler = np.array([10.0,15.0])
 
 
 # richting waarin de speler kijkt
@@ -283,36 +286,23 @@ def raycast(p_speler, r_straal):
             elif i_horizontaal_x[1] == len(world_map[0]):
                 i_horizontaal_x[1] = len(world_map[0]) - 0.5
 
-
-            #i_horizontaal_x_tijdelijk = np.array([round(i_horizontaal_x[0], 3), round(i_horizontaal_x[1], 3)])
-            #i_horizontaal_x_rounded_int = i_horizontaal_x_tijdelijk.astype("i")
             i_horizontaal_x_rounded_int = (i_horizontaal_x + 0.0005).astype(int)
             x += 1
-            #textuurcoordinaten_X = (i_horizontaal_x-i_horizontaal_x_rounded_int)* wall.size[0]
             is_horizontaal = True
 
             if r_straal[0] >= 0:
-                #if world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])].dtype == "<U1":
                 if world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]:
                     d_muur = math.sqrt((i_horizontaal_x[0] - p_speler[0]) ** 2 + (i_horizontaal_x[1] - p_speler[1]) ** 2)
                     is_texture = True
                     blok = world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]
                     textuurcoordinaten_X_zondermaalbreedtetextuur = (i_horizontaal_x - i_horizontaal_x_rounded_int)
-                    #textuurcoordinaten_X = (i_horizontaal_x - i_horizontaal_x_rounded_int) * wall.size[0]
                     break
 
-                #elif world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]:
 
-                #    d_muur = math.sqrt((i_horizontaal_x[0]-p_speler[0])**2 + (i_horizontaal_x[1]-p_speler[1])**2)
-                #    k_muur = kleuren[world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]]
-                #    is_texture = False
-                #    textuurcoordinaten_X = (i_horizontaal_x - i_horizontaal_x_rounded_int) * wall.size[0]
-                #    break
 
 
             elif r_straal[0] < 0:
                 if world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])]:
-                #if world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])].dtype == "<U1":
                     d_muur = math.sqrt((i_horizontaal_x[0] - p_speler[0]) ** 2 + (i_horizontaal_x[1] - p_speler[1]) ** 2)
                     is_texture = True
                     textuurcoordinaten_X_zondermaalbreedtetextuur = (i_horizontaal_x - i_horizontaal_x_rounded_int)
@@ -320,36 +310,23 @@ def raycast(p_speler, r_straal):
                     blok = world_map[(i_horizontaal_x_rounded_int[0] - 1), i_horizontaal_x_rounded_int[1]]
                     break
 
-                #elif world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])]:
-                #    d_muur = math.sqrt((i_horizontaal_x[0]-p_speler[0])**2 + (i_horizontaal_x[1]-p_speler[1])**2)
-                #    k_muur = kleuren[world_map[(i_horizontaal_x_rounded_int[0] - 1), i_horizontaal_x_rounded_int[1]]]
-                #    is_texture = False
-                #    textuurcoordinaten_X = (i_horizontaal_x - i_horizontaal_x_rounded_int) * wall.size[0]
-                #    break
 
         else:
             i_verticaal_y = p_speler + (d_verticaal + y * delta_v) * r_straal
-            #hier if elif tijdelijk toegevoegd,nog verder aanpassen
-            # rijen = len(matrix) => hoogte
-            # kolommen = len(matrix[0]) => width
+
             if i_verticaal_y[0] == len(world_map):
                 i_verticaal_y[0] = len(world_map) - 0.5
             elif i_verticaal_y[1] == len(world_map[0]):
                 i_verticaal_y[1] = len(world_map[0]) - 0.5
 
-            #i_verticaal_y_tijdelijk = np.array([round(i_verticaal_y[0], 3), round(i_verticaal_y[1],3)])
-            #i_verticaal_y_rounded_int = i_verticaal_y.astype('i')
-            #i_verticaal_y_rounded_int = i_verticaal_y_tijdelijk.astype('i')
+
 
             i_verticaal_y_rounded_int = (i_verticaal_y + 0.0005).astype(int)
 
-            #textuurcoordinaten_X = (i_verticaal_y - i_verticaal_y_rounded_int) * wall.size[0]
             is_horizontaal = False
             y += 1
             if r_straal[1] >= 0:
-                #print(world_map[(i_verticaal_y_rounded_int[0] + 1), i_verticaal_y_rounded_int[1]]) #hier kijken we in [6,4] maar we moeten in [5,5] kijken
                 if world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])] :
-                #if world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])].dtype =="<U1" :
                     d_muur = math.sqrt((i_verticaal_y[0] - p_speler[0]) ** 2 + (i_verticaal_y[1] - p_speler[1]) ** 2)
                     is_texture = True
                     textuurcoordinaten_X_zondermaalbreedtetextuur = (1-(i_verticaal_y - i_verticaal_y_rounded_int))
@@ -357,18 +334,10 @@ def raycast(p_speler, r_straal):
                     blok = world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])]
                     break
 
-                #elif world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])] :
-                #    #print("hit")
-                #    d_muur  = math.sqrt((i_verticaal_y[0]-p_speler[0])**2 + (i_verticaal_y[1]-p_speler[1])**2)
-                #    k_muur = kleuren[world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])]]
-                #    is_texture = False
-                #    textuurcoordinaten_X = (1-(i_verticaal_y - i_verticaal_y_rounded_int)) * wall.size[0]
 
-                #    break
 
             elif r_straal[1] < 0: #omgewisseld: 0 --> 1
                 if world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]:
-                #if world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)].dtype == "<U1":
 
                     d_muur = math.sqrt((i_verticaal_y[0] - p_speler[0]) ** 2 + (i_verticaal_y[1] - p_speler[1]) ** 2)
                     is_texture = True
@@ -377,26 +346,42 @@ def raycast(p_speler, r_straal):
                     blok = world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]
                     break
 
-                #elif world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]:
-                #    d_muur  = math.sqrt((i_verticaal_y[0]-p_speler[0])**2 + (i_verticaal_y[1]-p_speler[1])**2)
-                #    k_muur = kleuren[world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]]
-                #    is_texture = False
-                #    textuurcoordinaten_X = (1-(i_verticaal_y - i_verticaal_y_rounded_int)) * wall.size[0]
-                #    break
+
 
     d_muur = d_muur * np.dot(r_speler, r_straal)
     d_muur = round(d_muur, 12)
     return (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok)
 
-def render_kolom(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok):
+def create_textures():
+    rek = factory.from_image(resources.get_path("rek.png"))
+    kassa = factory.from_image(resources.get_path("kassa.png"))
+    frigo = factory.from_image(resources.get_path("frigo.png"))
+    melkfrigo = factory.from_image(resources.get_path("melkfrigo.png"))
+    roodrek = factory.from_image(resources.get_path("roodrek.png"))
+    slager = factory.from_image(resources.get_path("slager.png"))
+    winkelmuur = factory.from_image(resources.get_path("winkelmuur.png"))
+    bakker = factory.from_image(resources.get_path("bakker.png"))
+
+    list_wall = [
+        "empty",  # 0
+        rek,  # 1
+        kassa,  # 2,
+        frigo,  # 3
+        melkfrigo,  # 4
+        roodrek,  # 5
+        slager,  # 6
+        winkelmuur,  # 7
+        bakker  # 8
+    ]
+    return list_wall
+
+
+def render_wall(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok, list_wall_create):
     global is_horizontaal
-    global list_wall
-    muur = list_wall[blok]
-    #global resources
-    #resources = sdl2.ext.Resources(__file__, "resources")
-    #global factory
-    #factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
-    #wall = factory.from_image(resources.get_path(blok))   #probleem denkik hier, doordat telkens opnieuw moet opvragen
+    global wall
+
+    muur = list_wall_create[blok]
+
     textuurcoordinaten_X = textuurcoordinaten_X_zondermaalbreedtetextuur * muur.size[0]
     hoogte = (HOOGTE) * 1/(d_muur+0.00001) #200/d_muur#(HOOGTE/2) * 1/d_muur
     #hoogte = (HOOGTE / 2) * 1 / d_muur
@@ -408,8 +393,8 @@ def render_kolom(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoo
 
     if is_texture == True:
 
-        breedte = muur.size[0]
-        hoogte_ander = muur.size[1]
+        breedte_textuur = muur.size[0]
+        hoogte_textuur = muur.size[1]
         if is_horizontaal == True:
             textuur_x = textuurcoordinaten_X[1]
         else:
@@ -417,37 +402,63 @@ def render_kolom(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoo
         textuur_y = 0
         scherm_x = kolom
         scherm_y = y1
-        #renderer.copy(wall, srcrect = (textuur_x, textuur_y, int(breedte/BREEDTE), hoogte_ander), dstrect=(scherm_x, scherm_y, 1, hoogte))
-        #renderer.copy(wall, srcrect=(textuur_x, textuur_y, breedte/133, hoogte_ander), dstrect=(scherm_x, scherm_y, 1, hoogte))
+
+
         if hoogte <= HOOGTE:
-            renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte / 100, hoogte_ander),dstrect=(scherm_x, scherm_y, 1, hoogte))
+            renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte_textuur / 100, hoogte_textuur),dstrect=(scherm_x, scherm_y, 1, hoogte))
         else:
-            textuur_y = ((hoogte - HOOGTE)/ 2)* (muur.size[1]/hoogte) #hoogte waar scherm start op textuur
-            hoogte_ander = hoogte_ander - (2* textuur_y) #hoogte_ander - 2* textuur_y
-            renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte / 100, hoogte_ander),dstrect=(scherm_x, scherm_y, 1, hoogte))
+            textuur_y = ((hoogte - HOOGTE) / 2) * (hoogte_textuur / hoogte)
+            hoogte_textuur_volledig_scherm = HOOGTE * (hoogte_textuur / hoogte)
+            renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte_textuur / 100, hoogte_textuur_volledig_scherm),
+                          dstrect=(scherm_x, scherm_y, 1, HOOGTE))
 
     else:
         renderer.draw_line((kolom, y1, kolom, HOOGTE - y1), k_muur)
 
-    #renderer.draw_line((kolom, HOOGTE - y1, kolom, HOOGTE), kleuren[5])
-    #hoogte = (HOOGTE/2) * 1/d_muur
-    #if hoogte >= HOOGTE: #hier stond 1/2 naar 1 gezet
-    #    y1 = 0
-    #else:
-    #    y1 = (HOOGTE - hoogte)/2 #-1 toegevoegd
-    #renderer.draw_line((kolom, HOOGTE-y1, kolom, HOOGTE), kleuren[5])
-    #renderer.draw_line((kolom, y1, kolom, HOOGTE-y1), k_muur)
+
     return
 
 def render_fps(fps, renderer, window):
     message = f'{fps:.2f} fps'
     text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
     renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
+
+    
+def scannergun():
+    global laser_shot, laser_shot_rent
+    global window
+    global renderer
+    resources = sdl2.ext.Resources(__file__, "resources")
+    factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+    scannergun_texture = factory.from_image(resources.get_path("scanner.png"))
+
+    renderer.copy(scannergun_texture, srcrect=(0, 0, scannergun_texture.size[0], scannergun_texture.size[1]),
+                  dstrect=(299, 415, scannergun_texture.size[0], scannergun_texture.size[1]))
+
+    # crosshair
+    resources = sdl2.ext.Resources(__file__, "resources")
+    factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+    crosshair_texture = factory.from_image(resources.get_path("crosshair_white.png"))
+
+    renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture.size[0], crosshair_texture.size[1]),
+                  dstrect=(380, 277, crosshair_texture.size[0], crosshair_texture.size[1]))
+
+    if laser_shot == True:
+
+        playsound("resources/Scanner_beep_3.mp3")
+        resources = sdl2.ext.Resources(__file__, "resources")
+        factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+        laser_texture = factory.from_image(resources.get_path("scanner_laser2.png"))
+
+        renderer.copy(laser_texture, srcrect=(0, 0, laser_texture.size[0], laser_texture.size[1]),
+                      dstrect=(381, 298, laser_texture.size[0], laser_texture.size[1]))
+        laser_shot = False
+    
 def timer(delta, renderer, window, deadline):
     global tijd_verstrekentot
     tijd_deadline = deadline
     tijd_verstrekentot += delta
-    message = f'je hebt nog {round(deadline - tijd_verstrekentot, 2)} seconden'
+    message = f'je hebt nog {int(deadline - tijd_verstrekentot)} seconden'
     text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
     if tijd_verstrekentot > tijd_deadline:
         message = f'je tijd is op :('
@@ -480,36 +491,14 @@ def main():
     sdl2.SDL_SetRelativeMouseMode(True)
 
     # Maak een renderer aan zodat we in ons venster kunnen renderen
+    global renderer
     renderer = sdl2.ext.Renderer(window)
     global resources
     resources = sdl2.ext.Resources(__file__, "resources")
     global factory
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
-    global wall
-    global list_wall
-    rek = factory.from_image(resources.get_path("rek.png"))
-    kassa = factory.from_image(resources.get_path("kassa.png"))
-    frigo = factory.from_image(resources.get_path("frigo.png"))
-    melkfrigo = factory.from_image(resources.get_path("melkfrigo.png"))
-    roodrek = factory.from_image(resources.get_path("roodrek.png"))
-    slager = factory.from_image(resources.get_path("slager.png"))
-    winkelmuur = factory.from_image(resources.get_path("winkelmuur.png"))
-    bakker = factory.from_image(resources.get_path("bakker.png"))
 
-    list_wall = [
-        "empty",  # 0
-        rek,  # 1
-        kassa,  # 2,
-        frigo,  # 3
-        melkfrigo,  # 4
-        roodrek,  # 5
-        slager,  # 6
-        winkelmuur,  # 7
-        bakker  # 8
-    ]
-
-    #global wall
-    #wall = factory.from_image(resources.get_path("test1.png"))
+    list_wall_create = create_textures()
     global scannergun_sprite
     scannergun_sprite= factory.from_image(resources.get_path("scanner.png"))
     fps_list = []
@@ -537,9 +526,8 @@ def main():
             if r_straal[0] ==0 or r_straal[1] == 0:
                 continue
             (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur,blok) = raycast(p_speler, r_straal)
-            render_kolom(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok)
-            #if kolom == 797:
-            #    print("d_muur: ", d_muur)
+            render_wall(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok, list_wall_create)
+
 
         renderer.copy(scannergun_sprite, srcrect=(0, 0, scannergun_sprite.size[0], scannergun_sprite.size[1]),dstrect=(299, 415, scannergun_sprite.size[0], scannergun_sprite.size[1]))
         end_time = time.time()
@@ -553,42 +541,20 @@ def main():
             fps = np.average(fps_list)
             fps_list = []
         render_fps(fps, renderer, window)
-        #scanner gun
-        resources = sdl2.ext.Resources(__file__, "resources")
-        factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
-        scannergun_texture = factory.from_image(resources.get_path("scanner.png"))
-        # print(scannergun_texture.size[0])
-        # print(scannergun_texture.size[1])
-
-        renderer.copy(scannergun_texture, srcrect=(0, 0, scannergun_texture.size[0], scannergun_texture.size[1]),
-                      dstrect=(299, 415, scannergun_texture.size[0], scannergun_texture.size[1]))
-
-        # crosshair
-        resources = sdl2.ext.Resources(__file__, "resources")
-        factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
-        crosshair_texture = factory.from_image(resources.get_path("crosshair_white.png"))
-        # print(crosshair_texture.size[0])
-        # print(crosshair_texture.size[1])
-
-        renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture.size[0], crosshair_texture.size[1]),
-                      dstrect=(380, 277, crosshair_texture.size[0], crosshair_texture.size[1]))
-
-        if laser_shot == True:
-            # print("hit")
-            # scanner laser
-            #test = sdl2.ext.Resources(__file__, "resources")
-            #test2 = test.get_path("Scanner_beep_3.mp3")
-            playsound("resources/Scanner_beep_3.mp3")
-            #playsound("C:/Gebruikers/Indra/PycharmProjects/Scanner_beep_3.mp3")
-            resources = sdl2.ext.Resources(__file__, "resources")
-            factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
-            laser_texture = factory.from_image(resources.get_path("scanner_laser2.png"))
-            # print(laser_texture.size[0])
-            # print(laser_texture.size[1])
-
-            renderer.copy(laser_texture, srcrect=(0, 0, laser_texture.size[0], laser_texture.size[1]),
-                          dstrect=(381, 298, laser_texture.size[0], laser_texture.size[1]))
-            laser_shot = False
+        
+        scannergun()
+        
+        map_weergave = factory.from_image(resources.get_path("Map1.png"))
+        positie_persoon_sprite = factory.from_image(resources.get_path("pion_bolletje.png"))
+        kaart_genomen = True
+        if kaart_genomen == True:
+            # mogelijke optimalisatie de hoogte en breedtes als variabelen opslaan of als getallen invullen ipv size opvragen
+            renderer.copy(map_weergave, srcrect=(0, 0, map_weergave.size[0], map_weergave.size[1]),dstrect=(20, 20, map_weergave.size[0] * 1.5, map_weergave.size[1] * 1.5))
+            positie_pion_x = 22 + ((p_speler[0] / 18) * (map_weergave.size[1] - 4))  # ( 16+(p_speler[0]/18)*(map_weergave.size[0]-5))
+            #mss toch gsm ofzo rond zetten dan kan vierkante afbeelding als kaart (niet knippen, naar juiste pixels converteren dus niet pixelconverter online)en Geen rand!!
+            # map size breedt en hoogte voorlopig gwn manueel 18 ingevuld
+            positie_pion_y = 22 + map_weergave.size[0] - ((p_speler[1] / 18) * (map_weergave.size[0] - 4))  # 16+ map_weergave.size[1]-((p_speler[1]/18)*(map_weergave.size[1]-5))
+            renderer.copy(positie_persoon_sprite,srcrect=(0, 0, positie_persoon_sprite.size[0], positie_persoon_sprite.size[1]), dstrect=(positie_pion_y, positie_pion_x, positie_persoon_sprite.size[0] / 4, positie_persoon_sprite.size[1] / 4))
 
         # Verwissel de rendering context met de frame buffer
         renderer.present()
