@@ -9,7 +9,7 @@ import sdl2.ext
 BREEDTE = 800
 HOOGTE = 600
 
-#e
+#ee
 # Globale variabelen
 #
 p_npc_x=3.0
