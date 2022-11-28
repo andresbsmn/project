@@ -81,7 +81,13 @@ def rotatie(alfa, vector):
     #alfa moet in radialen!!!!
     rotatie_matrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
     return np.dot(rotatie_matrix, vector)
-
+def wall_collission(pd):
+    pdx=int(pd[0])
+    pdy=int(pd[1])
+    if world_map[pdx, pdy]==11:
+        return False
+    else:
+        return True
 def verwerk_input(delta):
     global moet_afsluiten
     global r_speler
@@ -109,17 +115,26 @@ def verwerk_input(delta):
             stapverkleiner = 0.05
             if key == sdl2.SDLK_z and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]): #bewegen in richting van muis
                 #nog aanpassen
-                p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+                pd=p_speler+(r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+                if wall_collission(pd):
+                    p_speler = pd
                 #print(p_speler)
             if key == sdl2.SDLK_q and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):                                      #bewegen loodrecht op richting muis naar links
+                pd=p_speler+rotatie((3 / 2) * math.pi,r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+                if wall_collission(pd):
+                    p_speler=pd
 
-                p_speler += rotatie((3 / 2) * math.pi,r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
             if key == sdl2.SDLK_d and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
-                p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+                pd=p_speler+rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+                if wall_collission(pd):
+                    p_speler = pd
+
             if key == sdl2.SDLK_s and p_speler[0]<= len(world_map) and p_speler[1]<= len(world_map[0]):
                 #rijen = len(matrix) => hoogte
                 #kolommen = len(matrix[0]) => width
-                p_speler += rotatie(math.pi, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+                pd=p_speler+rotatie(math.pi, r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+                if wall_collission(pd):
+                    p_speler= pd
 
             break
 
@@ -312,7 +327,6 @@ def raycast(p_speler, r_straal):
 def render_kolom(renderer, window, kolom, d_muur, k_muur, wall, is_texture, textuurcoordinaten_X):
 
     hoogte = (HOOGTE/2) * 1/d_muur #200/d_muur#(HOOGTE/2) * 1/d_muur
-
     if hoogte >= HOOGTE: #hier stond 1/2 naar 1 gezet
         y1 = 0
     else:
@@ -348,29 +362,26 @@ def render_kolom(renderer, window, kolom, d_muur, k_muur, wall, is_texture, text
     #renderer.draw_line((kolom, y1, kolom, HOOGTE-y1), k_muur)
     return
 
-def npc_scherm_coords(p_npc_x,p_npc_y,npc_y_scale):   #zet de wereld coords npc om naar scherm coords
-    det=r_cameravlak[0]*r_speler[1]-r_cameravlak[1]*r_speler[0]
-    u=(r_speler[1]*p_npc_x-r_speler[0]*p_npc_y)/det           # a is en value gebruikt in rendering.
-    v=(r_cameravlak[0]*p_npc_y-r_cameravlak[1]*p_npc_x)/det      #u is de x coord, v de y coord
-    a=u/v                                                #de hoogte van een npc wordt gescaled
-    npc_hoogte_scherm=(npc_y_scale/1)*100                #naar scherm/muur groote. Maar kan zelf nog gescaled worden.
-    return u,v,a,npc_hoogte_scherm
+def npc_renderer (p_npc_x,p_npc_y,npc_x_scale,npc_y_scale,renderer,npc):
+    breedte = npc.size[0]
+    hoogte = npc.size[1]
+    det = r_cameravlak[0] * r_speler[1] - r_cameravlak[1] * r_speler[0]
+    u = (r_speler[1] * p_npc_x - r_speler[0] * p_npc_y) / det  # a is en value gebruikt in rendering.
+    v = (r_cameravlak[0] * p_npc_y - r_cameravlak[1] * p_npc_x) / det  # u is de x coord, v de y coord
+    a = u / v  # de hoogte van een npc wordt gescaled
+    hoogte_scherm = (v/1)* 100  # naar scherm/muur groote. Maar kan zelf nog gescaled worden.
+    breedte_scherm= (u/1)*100
 
-u,v,a,npc_hoogte_scherm= npc_scherm_coords(p_npc_x,p_npc_y,npc_y_scale)
-def npc_renderer (u,v,a,npc_hoogte_scherm):
-
-
-    breedte  =npc.size[0]
-    hoogte   =npc.size[1]
-    textuur_x=0   #breedte op textuur W?
-    textuur_y=0  #hoogte op textuur  Z?
-    scherm_x =u    #u
-    scherm_y=v    #v
-    if(a>=-1 & a<=1 & v>=0):
+    textuur_x=0
+    textuur_y=0
+    scherm_x =BREEDTE-breedte_scherm  #2*a
+    scherm_y=HOOGTE-hoogte_scherm
+    if(a>=-1 and a<=1 and v>=0):
         renderer.copy(npc,
-        srcrect = (textuur_x,textuur_y, breedte, hoogte),
-        dstrect = (scherm_x,scherm_y, breedte * 4, hoogte * 4))
+            srcrect = (textuur_x,textuur_y, breedte, hoogte),
+            dstrect = (scherm_x,scherm_y, breedte_scherm, hoogte_scherm))
     return
+
 # Initialiseer font voor de fps counter
 fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
 
@@ -402,6 +413,8 @@ def main():
     wall = factory.from_image(resources.get_path("stone_wall.png"))
     global scannergun_sprite
     scannergun_sprite= factory.from_image(resources.get_path("scanner.png"))
+    global npc
+    npc=factory.from_image(resources.get_path("doom.png"))
     fps_list = []
     fps = 0
 
@@ -428,10 +441,14 @@ def main():
                 continue
             (d_muur, k_muur, is_texture, textuurcoordinaten_X) = raycast(p_speler, r_straal)
             render_kolom(renderer, window, kolom, d_muur, k_muur, wall, is_texture, textuurcoordinaten_X)
+
             #if kolom == 797:
             #    print("d_muur: ", d_muur)
 
+        npc_renderer(p_npc_x, p_npc_y,npc_x_scale, npc_y_scale, renderer, npc)
+
         renderer.copy(scannergun_sprite, srcrect=(0, 0, scannergun_sprite.size[0], scannergun_sprite.size[1]),dstrect=(299, 415, scannergun_sprite.size[0], scannergun_sprite.size[1]))
+
         end_time = time.time()
         delta = end_time - start_time
 
