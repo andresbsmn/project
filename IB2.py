@@ -235,14 +235,21 @@ def verwerk_input(delta):
     stapverkleiner = 0.05
     #moet querty volgen om een of andere reden
     if key_states[sdl2.SDL_SCANCODE_W]: # komt overeen met Z
-        p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
+        pd = p_speler + (r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        if wall_collission(pd):
+            p_speler = pd
     if key_states[sdl2.SDL_SCANCODE_A]: #komt overeen met D
-        p_speler += rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        pd = p_speler + rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        if wall_collission(pd):
+            p_speler = pd
     if key_states[sdl2.SDL_SCANCODE_D]:
-        p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        pd = p_speler + rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        if wall_collission(pd):
+            p_speler = pd
     if key_states[sdl2.SDL_SCANCODE_S]:
-        p_speler += rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-
+        pd = p_speler + rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        if wall_collission(pd):
+            p_speler = pd
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
 
@@ -554,7 +561,7 @@ def main():
         
         map_weergave = factory.from_image(resources.get_path("__map1.png"))
         positie_persoon_sprite = factory.from_image(resources.get_path("pion_bolletje.png"))
-        kaart_genomen = True
+        kaart_genomen = False
         if kaart_genomen == True:
             # mogelijke optimalisatie de hoogte en breedtes als variabelen opslaan of als getallen invullen ipv size opvragen
             renderer.copy(map_weergave, srcrect=(0, 0, map_weergave.size[0], map_weergave.size[1]),dstrect=(20, 20, map_weergave.size[0] * 1.5, map_weergave.size[1] * 1.5))
