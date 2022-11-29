@@ -11,8 +11,8 @@ import sdl2.ext
 from levels import *
 from playsound import playsound
 # Constanten
-BREEDTE = 800
-HOOGTE = 600
+BREEDTE = 1200#800
+HOOGTE = 900#600
 # var aanmaken
 global deadline
 
@@ -24,10 +24,30 @@ global renderer
 global list_wall_create
 global laser_shot
 laser_shot = False
+global kaart_genomen
+kaart_genomen = True
+
+render_pizza_in_world = True
+pizza_collected = False
+
+apple_collected = False
+egg_collected = False
+broccoli_collected = False
+
+total_hearts_present = 3
+
+player_hit = False
+
+total_money_present = 0
+money_collected = True
+moneysprite = ""
+
+pizza_x = 0 #407.5
+pizza_y = 0 #299.5
 tijd_verstrekentot = 0 #variabele aanmaken
 deadline = 10
 # positie van de speler
-p_speler = np.array([10.0,15.0])
+p_speler = np.array([9.5,15.5])
 
 
 # richting waarin de speler kijkt
@@ -49,7 +69,26 @@ moet_afsluiten = False
 is_texture = False
 # de "wereldkaart". Dit is een 2d matrix waarin elke cel een type van muur voorstelt
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
+#positie van de cornflakes in wereldcoördinaten
+p_cornflakes_wereld = np.array([1, 2])
 
+
+#cameramatrix
+camera_matrix = np.array(
+    [[r_cameravlak[0], r_speler[0]],
+     [r_cameravlak[1], r_speler[1]]]
+)
+
+#determinant van cameramatrix
+determinant_m = r_cameravlak[0] * r_speler[1] - r_cameravlak[1] * r_speler[0]
+
+#adjunct van cameramatrix
+adjunct_m = np.array(
+    [[r_speler[1], (-1 * r_speler[0])],
+     [(-1 * r_cameravlak[1]), r_cameravlak[0]]]
+)
+#cameracoördinaten bepalen van cornflakes
+p_cornflakes_camera = (1/determinant_m) * adjunct_m * p_cornflakes_wereld
 # Vooraf gedefinieerde kleuren
 kleuren = [
     sdl2.ext.Color(0, 0, 0),  # 0 = Zwart
@@ -65,6 +104,7 @@ kleuren = [
 def levelselect():
     global world_map
     global deadline
+    global kaart_gekozen
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
     window = sdl2.ext.Window("level selectie scherm", size=(BREEDTE, HOOGTE))
@@ -100,6 +140,7 @@ def levelselect():
                 elif keuze == "level":
                     if key >= 48 and key <= 57:
                         try:
+                            kaart_gekozen = (int(chr(key)) - 1)
                             world_map = maps[int(chr(key))-1]
                             print(world_map)
                             # return int(chr(key))
@@ -119,7 +160,7 @@ def levelselect():
         renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
         renderer.present()
         # window.refresh()
-
+#tot hier Indra code, ik commit strakts te rest
 def levelfailed(reden):
     global world_map
     # waarden resetten
