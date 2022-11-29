@@ -142,7 +142,6 @@ def levelselect():
                         try:
                             kaart_gekozen = (int(chr(key)) - 1)
                             world_map = maps[int(chr(key))-1]
-
                             # return int(chr(key))
                             world_map = maps[int(chr(key))-1]
                             return world_map
