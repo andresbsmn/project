@@ -162,6 +162,7 @@ def levelselect():
 
 def levelfailed(reden):
     global world_map
+    global p_speler
     # waarden resetten
     p_speler = np.array([10.0,15.0])
     sdl2.ext.init()
