@@ -122,6 +122,8 @@ def levelselect():
 
 def levelfailed(reden):
     global world_map
+    # waarden resetten
+    p_speler = np.array([10.0,15.0])
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
     window = sdl2.ext.Window("level mislukt", size=(BREEDTE, HOOGTE))
@@ -544,7 +546,7 @@ def main():
         
         scannergun()
         
-        map_weergave = factory.from_image(resources.get_path("Map1.png"))
+        map_weergave = factory.from_image(resources.get_path("__map1.png"))
         positie_persoon_sprite = factory.from_image(resources.get_path("pion_bolletje.png"))
         kaart_genomen = True
         if kaart_genomen == True:
