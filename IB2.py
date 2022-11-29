@@ -124,7 +124,6 @@ def levelfailed(reden):
     global world_map
     # waarden resetten
     p_speler = np.array([10.0,15.0])
-
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
     window = sdl2.ext.Window("level mislukt", size=(BREEDTE, HOOGTE))
@@ -162,15 +161,13 @@ def rotatie(alfa, vector):
     #alfa moet in radialen!!!!
     rotatie_matrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
     return np.dot(rotatie_matrix, vector)
-
 def wall_collission(pd):
     pdx=int(pd[0])
     pdy=int(pd[1])
-    if world_map[pdx, pdy]==11:
+    if world_map[pdx, pdy]!=0:
         return False
     else:
         return True
-
 def verwerk_input(delta):
     global moet_afsluiten
     global r_speler
@@ -238,21 +235,14 @@ def verwerk_input(delta):
     stapverkleiner = 0.05
     #moet querty volgen om een of andere reden
     if key_states[sdl2.SDL_SCANCODE_W]: # komt overeen met Z
-        pd = p_speler + (r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-        if wall_collission(pd):
-            p_speler = pd
+        p_speler += (r_speler/(r_speler[0]**2+r_speler[1]**2))*stapverkleiner
     if key_states[sdl2.SDL_SCANCODE_A]: #komt overeen met D
-        pd = p_speler + rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-        if wall_collission(pd):
-            p_speler = pd
+        p_speler += rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
     if key_states[sdl2.SDL_SCANCODE_D]:
-        pd = p_speler + rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-        if wall_collission(pd):
-            p_speler = pd
+        p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
     if key_states[sdl2.SDL_SCANCODE_S]:
-        pd = p_speler + rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-        if wall_collission(pd):
-            p_speler = pd
+        p_speler += rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
 
