@@ -111,7 +111,7 @@ def levelselect():
     window.show()
     renderer = sdl2.ext.Renderer(window)
     #afbeelding erin
-    resources = sdl2.ext.Resources(__file__, "textures")
+    resources = sdl2.ext.Resources(__file__, "resources")
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
     achtergrond = factory.from_image(resources.get_path("winkel_start.jpg"))
     errormessage = ""
