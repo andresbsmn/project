@@ -105,9 +105,25 @@ kleuren = [
 def reset_startwaarden():
     global p_speler
     global r_speler
+    # global render_pizza_in_world
+    # global pizza_collected
+    # global apple_collected
+    # global egg_collected
+    # global broccoli_collected
+    # global total_money_present
+    # global total_hearts_present
     r_speler = np.array([0, 1])
     p_speler = np.array([10.0, 15.0])
     renderer.clear
+#     ik denk dat dit ook moet gereset worden
+#     render_pizza_in_world = True
+#     pizza_collected = False
+#     apple_collected = False
+#     egg_collected = False
+#     broccoli_collected = False
+#     total_hearts_present = 3
+#     total_money_present = 0
+
 
 def startscherm():
     global world_map
