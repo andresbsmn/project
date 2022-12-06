@@ -47,6 +47,8 @@ r_cameravlak = np.dot(rotmin90, r_speler)
 # wordt op True gezet als het spel afgesloten moet worden
 moet_afsluiten = False
 is_texture = False
+global win_flags
+win_flags = sdl2.SDL_WINDOW_RESIZABLE #kan window resizen
 # de "wereldkaart". Dit is een 2d matrix waarin elke cel een type van muur voorstelt
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
 
@@ -62,38 +64,73 @@ kleuren = [
     sdl2.ext.Color(255, 255, 255),  # 7 = Wit
 ]
 
-
 def levelselect():
     global world_map
     global deadline
+    level = 1
+    world_map = maps[level]
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
-    window = sdl2.ext.Window("level selectie scherm", size=(BREEDTE, HOOGTE))
+    window = sdl2.ext.Window("level selectie scherm", size=(BREEDTE, HOOGTE), flags=win_flags)
     window.show()
     renderer = sdl2.ext.Renderer(window)
     # afbeelding erin
     resources = sdl2.ext.Resources(__file__, "textures")
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
-    achtergrond = factory.from_image(resources.get_path("winkel_start.jpg"))
+    shop_afbeelding = factory.from_image(resources.get_path("shop.jpg"))
     errormessage = ""
     message = f'voor level selectie druk "l" \n voor timer aan te passen druk "t"'
     keuze = ''
+    gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
+    font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
+    infofont = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=10, color=kleuren[0])
     moet_afsluiten = False
+    start_shopx = window.size[0]/4
+    start_shopy = window.size[1]-shop_afbeelding.size[1]
+    breedte_shop = window.size[0]/2
+    hoogte_shop = window.size[1]/2
+    lvlbuttonxstartwaarde = {}
+    witruimtetussenknop = (BREEDTE/aantal_mappen)/8
+    breedte_knop = BREEDTE/aantal_mappen-witruimtetussenknop*2
     while not moet_afsluiten:
         renderer.clear()
-        renderer.copy(achtergrond, dstrect=(0, 0, window.size[0], window.size[1]))
+        renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])  # witte achtergrond
+        for i in range(aantal_mappen):
+            x_start_knop = (BREEDTE/aantal_mappen)*i
+            renderer.draw_rect((x_start_knop+witruimtetussenknop,100,breedte_knop,100),kleuren[0])
+            lvlbuttonxstartwaarde[f'knop_{i+1}'] = x_start_knop+witruimtetussenknop
+        renderer.copy(shop_afbeelding, dstrect=(start_shopx, start_shopy, breedte_shop, hoogte_shop))
         if errormessage:  # lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
             message = f'{errormessage}'
-        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
         events = sdl2.ext.get_events()
         for event in events:
-            if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
+
+            if event.type == sdl2.SDL_MOUSEMOTION:
+                motion = event.motion
+                # print(motion.x, motion.xrel, motion.y, motion.yrel)  # 1ste en 3de nodig
+            elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
+                button = event.button.button
+                if button == sdl2.SDL_BUTTON_LEFT:
+                    # print(f'klik op {motion.x, motion.y}')
+                    for knop in lvlbuttonxstartwaarde:
+                        if lvlbuttonxstartwaarde[knop]<motion.x and lvlbuttonxstartwaarde[knop]+breedte_knop>motion.x:
+                            if motion.y > 100 and motion.y < 200:
+                                gekozenLevel = knop[-1]  # want naam knop is knop_<level>
+                                world_map = maps[int(gekozenLevel)]
+                                return world_map
+
+            elif event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
                 # afsluiten bij kruisje of escape
                 if key == sdl2.SDLK_ESCAPE:
+                    print(lvlbuttonxstartwaarde)
                     quit()
+                if key == sdl2.SDLK_s:
+                    keuze = "start"
+                    moet_afsluiten = True  # jump naar main achter de lus
+                    message = f'starting game...'
                 if key == sdl2.SDLK_l:
-                    message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven'
+                    message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven \n klik op "s" om de game te starten'
                     keuze = "level"
                 elif key == sdl2.SDLK_t:
                     message = f'kies een tijd door te scrollen'
@@ -101,23 +138,25 @@ def levelselect():
                 elif keuze == "level":
                     if key >= 48 and key <= 57:
                         try:
-                            world_map = maps[int(chr(key)) - 1]
-                            print(world_map)
-                            # return int(chr(key))
-                            world_map = maps[int(chr(key)) - 1]
-                            return world_map
+                            level = maps[int(chr(key)) - 1]
+                            world_map = maps[level]
+                            gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
                         except:
                             errormessage = f'je hebt een ongeldige waarde ingegeven \n gelieve een waarde tussen 1 en {aantal_mappen} in te geven'
+
             if keuze == "timer" and event.type == sdl2.SDL_MOUSEWHEEL:
                 deadline += event.wheel.y
                 message = f'de tijd is nu {deadline}'
+                gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
 
-                #
-                # break
         text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
+        gaminfotext = sdl2.ext.renderer.Texture(renderer, infofont.render_text(gameinfo))
         renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
+        renderer.copy(gaminfotext, dstrect=(0, window.size[1] - text.size[1], text.size[0], text.size[1]))
         renderer.present()
         # window.refresh()
+
+    return world_map  # returned de gekozen level
 
 
 def levelfailed(reden):
@@ -243,16 +282,18 @@ def verwerk_input(delta):
     if key_states[sdl2.SDL_SCANCODE_A]:  # komt overeen met D
         p_speler += rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
     if key_states[sdl2.SDL_SCANCODE_D]:
-        p_speler += rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        pd = p_speler + rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        if wall_collission(pd):
+            p_speler = pd
     if key_states[sdl2.SDL_SCANCODE_S]:
-        p_speler += rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
-
+        pd = p_speler + rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
+        if wall_collission(pd):
+            p_speler = pd
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
 
-
 def bereken_r_straal(r_speler, kolom):
-    # r_straal_kolom = d_camera * r_speler + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak
+    #r_straal_kolom = d_camera * r_speler + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak
 
     r_straal_kolom_x = d_camera * r_speler[0] + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak[0]
     r_straal_kolom_y = d_camera * r_speler[1] + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak[1]
@@ -261,7 +302,6 @@ def bereken_r_straal(r_speler, kolom):
     r_straal_x = r_straal_kolom_x / r_straal_kolom_norm
     r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
     return np.array([r_straal_x, r_straal_y])
-
 
 def raycast(p_speler, r_straal):
     global r_speler
@@ -594,4 +634,5 @@ if __name__ == '__main__':
     main()
     # profiler.disable() # sv
     # stats = pstats.Stats(profiler) # sv
+    # stats.dump_stats('data_prof') # sv
     # stats.dump_stats('data_prof') # sv
