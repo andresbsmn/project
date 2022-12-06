@@ -27,7 +27,7 @@ global laser_shot
 laser_shot = False
 global kaart_genomen
 kaart_genomen = True
-
+levelup = False
 render_pizza_in_world = True
 pizza_collected = False
 
@@ -103,13 +103,19 @@ kleuren = [
 ]
 
 
-def levelselect():
+def startscherm():
     global world_map
     global deadline
     global kaart_gekozen
-    level = 1
-    kaart_gekozen = 1
-    world_map = maps[level]
+    global levelup
+    if levelup:
+        levelup = False
+        level = kaart_gekozen
+        world_map[kaart_gekozen]
+    else:
+        level = 1
+        kaart_gekozen = 1
+        world_map = maps[level]
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
     window = sdl2.ext.Window("level selectie scherm", size=(BREEDTE, HOOGTE), flags=win_flags)
@@ -190,13 +196,12 @@ def levelselect():
                 key = event.key.keysym.sym
                 # afsluiten bij kruisje of escape
                 if key == sdl2.SDLK_ESCAPE:
-                    print(lvlbuttonxstartwaarde)
                     quit()
                 if key == sdl2.SDLK_s:
                     keuze = "start"
-                    moet_afsluiten = True  # jump naar main achter de lus
                     message = f'starting game...'
-                if key == sdl2.SDLK_l:
+                    moet_afsluiten = True  # jump naar main achter de lus
+                elif key == sdl2.SDLK_l:
                     message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven \n klik op "s" om de game te starten'
                     keuze = "level"
                 elif key == sdl2.SDLK_t:
@@ -227,6 +232,13 @@ def levelselect():
 
     return world_map  # returned de gekozen level
 
+def levelcompleted():
+    global kaart_gekozen
+    global levelup
+    levelup = True
+    kaart_gekozen += 1
+    sdl2.ext.quit()
+    main()
 
 def levelfailed(reden):
     global world_map
@@ -240,15 +252,23 @@ def levelfailed(reden):
     # afbeelding erin
     resources = sdl2.ext.Resources(__file__, "textures")
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
-    achtergrond = factory.from_image(resources.get_path("winkel_start.jpg"))
+
+    shop_afbeelding = factory.from_image(resources.get_path("shop.jpg"))
+    start_shopx = window.size[0] / 4
+    start_shopy = window.size[1] - shop_afbeelding.size[1]
+    breedte_shop = window.size[0] / 2
+    hoogte_shop = window.size[1] / 2
+
+    font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[3])
     errormessage = ""
     message = f'Game Over, {reden} \n druk op "r" op opnieuw te proberen'
     while True:
         renderer.clear()
-        renderer.copy(achtergrond, dstrect=(0, 0, window.size[0], window.size[1]))
+        renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])
+        renderer.copy(shop_afbeelding, dstrect=(start_shopx, start_shopy, breedte_shop, hoogte_shop))
+
         if errormessage:  # lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
             message = f'{errormessage}'
-        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[3])
         events = sdl2.ext.get_events()
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
@@ -316,6 +336,7 @@ def verwerk_input(delta):
         # aan het muiswiel draait.
         elif event.type == sdl2.SDL_MOUSEWHEEL:
             if event.wheel.y > 0:
+                levelcompleted()
                 # ...
                 continue
         # Wordt afgeleverd als de gebruiker de muis heeft bewogen.
@@ -370,7 +391,6 @@ def bereken_r_straal(r_speler, kolom):
     r_straal_x = r_straal_kolom_x / r_straal_kolom_norm
     r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
     return np.array([r_straal_x, r_straal_y])
-
 
 def raycast(p_speler, r_straal):
     global r_speler
@@ -471,7 +491,6 @@ def raycast(p_speler, r_straal):
     d_muur = round(d_muur, 12)
     return (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok)
 
-
 def create_textures():
     rek = factory.from_image(resources.get_path("rek.png"))
     kassa = factory.from_image(resources.get_path("kassa.png"))
@@ -495,7 +514,6 @@ def create_textures():
     ]
     return list_wall
 
-
 def render_wall(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur,
                 blok, list_wall_create):
     global is_horizontaal
@@ -512,11 +530,11 @@ def render_wall(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoor
     else:
         y1 = (HOOGTE - hoogte) / 2  # -1 toegevoegd
 
-    if is_texture == True:
+    if is_texture:
 
         breedte_textuur = muur.size[0]
         hoogte_textuur = muur.size[1]
-        if is_horizontaal == True:
+        if is_horizontaal:
             textuur_x = textuurcoordinaten_X[1]
         else:
             textuur_x = textuurcoordinaten_X[0]
@@ -563,30 +581,13 @@ def scannergun():
     # crosshair
     renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture.size[0], crosshair_texture.size[1]),
                   dstrect=(580, 577, crosshair_texture.size[0], crosshair_texture.size[1]))
-    if laser_shot == True:
+    if laser_shot:
         playsound("resources/Scanner_beep_3.mp3")
         renderer.copy(laser_texture, srcrect=(0, 0, laser_texture.size[0], laser_texture.size[1]),
                       dstrect=(581, 598, laser_texture.size[0], laser_texture.size[1]))
         laser_shot = False
         # functional scanner
         pizza_collected = check_if_object_scanned(pizza_x, pizza_y)
-
-
-def timer(delta, renderer, window, deadline):
-    global tijd_verstrekentot
-    tijd_deadline = deadline
-    tijd_verstrekentot += delta
-    message = f'je hebt nog {int(deadline - tijd_verstrekentot) + 1} seconden'
-    text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
-    if tijd_verstrekentot > tijd_deadline:
-        message = f'je tijd is op :('
-        text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
-        levelfailed("tijd was op")
-    else:
-        renderer.draw_rect(
-            (10, 600 + text.size[1] * 2, (tijd_verstrekentot / tijd_deadline) * text.size[0], text.size[1]), kleuren[7])
-
-    renderer.copy(text, dstrect=(10, 600 + text.size[1], text.size[0], text.size[1]))
 
 
 def create_sprites_hud():
@@ -619,7 +620,7 @@ def hud():
                   dstrect=(400, 0, hud_texture.size[0], hud_texture.size[1]))
 
     # pizza
-    if pizza_collected == True:
+    if pizza_collected:
         # pizza_collected: breedte = 35, hoogte = 35 (altijd hetzelfde vandaar als constante ingevuld en niet in een aparte variabele gestoken/pizza_collected.size[0] en [1] telkens oproepen)
         renderer.copy(pizza_texture, srcrect=(0, 0, 35, 35), dstrect=(420, 20, 35, 35))
     else:
@@ -628,7 +629,7 @@ def hud():
         renderer.copy(pizza_gray_texture, srcrect=(0, 0, 35, 35), dstrect=(420, 20, 35, 35))
 
     # apple
-    if apple_collected == True:
+    if apple_collected:
         # apple_texture: breedte = 35, hoogte = 35
         renderer.copy(apple_texture, srcrect=(0, 0, 35, 35), dstrect=(490, 20, 35, 35))
     else:
@@ -637,7 +638,7 @@ def hud():
         renderer.copy(apple_gray_texture, srcrect=(0, 0, 35, 35), dstrect=(490, 20, 35, 35))
 
     # egg
-    if egg_collected == True:
+    if egg_collected:
         # egg_texture: breedte = 30, hoogte = 40
         renderer.copy(egg_texture, srcrect=(0, 0, 30, 40), dstrect=(562.5, 17.5, 30, 40))
     else:
@@ -646,7 +647,7 @@ def hud():
         renderer.copy(egg_gray_texture, srcrect=(0, 0, 30, 40), dstrect=(562.5, 17.5, 30, 40))
 
     # broccoli
-    if broccoli_collected == True:
+    if broccoli_collected:
         # broccoli_texture: breedte = 42, hoogte = 45
         renderer.copy(broccoli_texture, srcrect=(0, 0, 42, 45), dstrect=(625, 16, 42, 45))
     else:
@@ -655,7 +656,7 @@ def hud():
         renderer.copy(broccoli_gray_texture, srcrect=(0, 0, 42, 45), dstrect=(625, 16, 42, 45))
 
     # hearts
-    if player_hit == True:
+    if player_hit:
         total_hearts_present -= 1
         player_hit = False
 
@@ -664,11 +665,12 @@ def hud():
         renderer.copy(heart_texture, srcrect=(0, 0, heart_texture.size[0], heart_texture.size[1]),
                       dstrect=(1090, 30, heart_texture.size[0], heart_texture.size[1]))
     else:
+        levelfailed("ran out of hearts")
         print("game over")
         # game_over = True
 
     # money
-    if money_collected == True:
+    if money_collected:
         total_money_present += 1
         money_collected = False
         # money_collected = False
@@ -697,7 +699,7 @@ def kaart_weergeven():
     # print(map_weergave.size) #1403, 1412
 
     map_weergave = map_weergave_list[kaart_gekozen]
-    if kaart_genomen == True:
+    if kaart_genomen:
         # mogelijke optimalisatie de hoogte en breedtes als variabelen opslaan of als getallen invullen ipv size opvragen
         renderer.copy(gsm, srcrect=(0, 0, gsm.size[0], gsm.size[1]),
                       dstrect=(18, 20, gsm.size[0] * 1.2, gsm.size[1] * 1.2))
@@ -754,7 +756,7 @@ def main():
     global tijd_verstrekentot
     tijd_verstrekentot = 0
     fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
-    world_map = levelselect()
+    world_map = startscherm()
 
     # print(world_map)
     # Initialiseer de SDL2 bibliotheek
@@ -832,7 +834,7 @@ def main():
         scannergun()
         hud()
 
-        if kaart_genomen == True:
+        if kaart_genomen:  # == True is nutteloos bij if
             kaart_weergeven()
 
         # Verwissel de rendering context met de frame buffer
