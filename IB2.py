@@ -102,15 +102,19 @@ kleuren = [
     sdl2.ext.Color(255, 255, 255),  # 7 = Wit
 ]
 
+def reset_startwaarden():
+    global p_speler
+    p_speler = np.array([10.0, 15.0])
 
 def startscherm():
     global world_map
     global deadline
     global kaart_gekozen
     global levelup
+    global level
     if levelup:
         levelup = False
-        level = kaart_gekozen
+        kaart_gekozen = level
         world_map[kaart_gekozen]
     else:
         level = 1
@@ -128,7 +132,10 @@ def startscherm():
     errormessage = ""
     message = f'om te starten klik "s" \n voor level selectie druk "l" \n voor timer aan te passen druk "t" \n of maak gebruik van de knoppen'
     keuze = ''
-    gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
+    if not levelup:
+        gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
+    else:
+        gaminfo = f'congrats! new level {level} \n je hebt {deadline} seconden'
     font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
     infofont = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=10, color=kleuren[0])
     moet_afsluiten = False
@@ -146,7 +153,7 @@ def startscherm():
         for i in range(aantal_mappen):
             x_start_knop = ((BREEDTE/aantal_mappen)*i)+witruimtetussenknop
             renderer.draw_rect((x_start_knop,150,breedte_knop,100),kleuren[0])
-            lvlbuttonxstartwaarde[f'knop_{i+1}'] = x_start_knop+witruimtetussenknop
+            lvlbuttonxstartwaarde[f'knop_{i+1}'] = x_start_knop
             knoptext = f'level {i+1}'
             knopmessage = sdl2.ext.renderer.Texture(renderer, font.render_text(knoptext))
             renderer.copy(knopmessage, dstrect=(x_start_knop,150,breedte_knop,100))
@@ -184,13 +191,14 @@ def startscherm():
                             deadline += change
                             gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
                     # kijkt of er op een lvl knop is geklikt
-                    elif 100 < motion.y < 200:
+                    elif 150 < motion.y < 250:
                         for knop in lvlbuttonxstartwaarde:
                             if lvlbuttonxstartwaarde[knop] < motion.x < lvlbuttonxstartwaarde[knop]+breedte_knop:
-                                gekozenlevel = int(knop[-1])  # want naam knop is knop_<level>
+                                gekozenlevel = int(knop[-1])-1  # want naam knop is knop_<level>
+                                level = gekozenlevel + 1
                                 world_map = maps[gekozenlevel]
                                 kaart_gekozen = gekozenlevel
-                                return world_map
+                                gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
 
             elif event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
@@ -214,6 +222,7 @@ def startscherm():
                             level = maps[int(chr(key)) - 1]
                             world_map = maps[level]
                             gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
+                            keuze = ""
                         except:
                             errormessage = f'je hebt een ongeldige waarde ingegeven \n gelieve een waarde tussen 1 en {aantal_mappen} in te geven'
 
@@ -233,17 +242,18 @@ def startscherm():
     return world_map  # returned de gekozen level
 
 def levelcompleted():
-    global kaart_gekozen
+    global level
     global levelup
+    reset_startwaarden()
     levelup = True
-    kaart_gekozen += 1
+    level += 1
     sdl2.ext.quit()
     main()
 
 def levelfailed(reden):
     global world_map
     # waarden resetten
-    p_speler = np.array([10.0, 15.0])
+    reset_startwaarden()
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
     window = sdl2.ext.Window("level mislukt", size=(BREEDTE, HOOGTE))
