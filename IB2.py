@@ -639,48 +639,39 @@ def kaart_weergeven():
             positie_pion_x, positie_pion_y, positie_persoon_sprite.size[0] / 7, positie_persoon_sprite.size[1] / 7))
 
 def sprite_renderer(sprite_x, sprite_y, sprite):
-    #zbuffer later nog toevoegen voor overlappingen, en per kolom
-    #global broccoli_texture #, hoogte
-    #p_broccoli_x = 2.5
-    #p_broccoli_y = 14.5
-    p_sprite_x_nieuw = sprite_x-p_speler[0]
-    p_sprite_y_nieuw =sprite_y -  p_speler[1]
-    # cameramatrix
-    camera_matrix = np.array(
-        [[r_cameravlak[0], r_speler[0]],
-         [r_cameravlak[1], r_speler[1]]]
-    )
+    # zbuffer later nog toevoegen voor overlappingen, en per kolom
 
+    p_sprite_x_nieuw = sprite_x - p_speler[0]
+    p_sprite_y_nieuw = sprite_y - p_speler[1]
     # determinant van cameramatrix
     determinant_m = r_cameravlak[0] * r_speler[1] - r_cameravlak[1] * r_speler[0]
 
-    # adjunct van cameramatrix
-    adjunct_m = np.array(
-        [[r_speler[1], (-1 * r_speler[0])],
-         [(-1 * r_cameravlak[1]), r_cameravlak[0]]]
-    )
+    # for sprite_kolom in range(0, breedte_sprite):
 
-    breedte_sprite  = broccoli_texture.size[0]
-    #for sprite_kolom in range(0, breedte_sprite):
+    # breedte_sprite_scherm = (breedte_sprite_wereld/hoogte_sprite_wereld)* hoogte_sprite_scherm #"nodig?want zal 1 zijn per kolom maar hoe weten of nog"
+    # renderer.copy(broccoli_texture, srcrect=(0, 0, breedte_sprite_wereld, hoogte_sprite_wereld), dstrect=((((a+1)/2)*BREEDTE)-breedte_sprite_scherm/2, HOOGTE/2, 1vc b , hoogte_sprite_scherm))
+    u_cameracoordinaten = ((r_speler[1] / determinant_m) * p_sprite_x_nieuw) + (
+                (-r_speler[0] / determinant_m) * p_sprite_y_nieuw)
+    v_cameracoordinaten = ((-r_cameravlak[1] / determinant_m) * p_sprite_x_nieuw) + (
+                (r_cameravlak[0] / determinant_m) * p_sprite_y_nieuw)
+    a = u_cameracoordinaten / v_cameracoordinaten  # positie op x as scherm, dus kolom
 
-
-            #breedte_sprite_scherm = (breedte_sprite_wereld/hoogte_sprite_wereld)* hoogte_sprite_scherm #"nodig?want zal 1 zijn per kolom maar hoe weten of nog"
-            #renderer.copy(broccoli_texture, srcrect=(0, 0, breedte_sprite_wereld, hoogte_sprite_wereld), dstrect=((((a+1)/2)*BREEDTE)-breedte_sprite_scherm/2, HOOGTE/2, 1vc b , hoogte_sprite_scherm))
-    u_cameracoordinaten = ((r_speler[1]/determinant_m)*p_sprite_x_nieuw)+((-r_speler[0]/determinant_m)*p_sprite_y_nieuw)
-    v_cameracoordinaten = ((-r_cameravlak[1]/determinant_m)*p_sprite_x_nieuw)+ ((r_cameravlak[0]/determinant_m)*p_sprite_y_nieuw)
-    a = u_cameracoordinaten/v_cameracoordinaten #positie op x as scherm, dus kolom
-    if (a>=-1) and (a<=1) and (v_cameracoordinaten>=0):
+    if (a >= -1) and (a <= 1) and (v_cameracoordinaten >= 0):
+        kolom_midden_sprite = (((a + 1) / 2) * BREEDTE)
         hoogte_sprite_wereld = sprite.size[1]
         breedte_sprite_wereld = sprite.size[0]
-        #range in schermcoordinaten van sprite: ((a+1)/2)*BREEDTE - en + breedte_sprite_scherm/2
 
-        #hoogte_muur_scherm = hoogte
-        #hoogte_sprite_scherm = (hoogte_sprite_wereld/100 ) *hoogte_muur_scherm  #hoogte muur wereld is altijd 1 dus in schermcoordinaten:
-        d_object_kolom_speler = math.sqrt(((sprite_x-p_speler[0])**2)+((sprite_y-p_speler[1])**2))
-        hoogte_sprite_scherm = HOOGTE * (1 / (d_object_kolom_speler *5))
-        breedte_sprite_scherm = (breedte_sprite_wereld/hoogte_sprite_wereld)* hoogte_sprite_scherm #"nodig?want zal 1 zijn per kolom maar hoe weten of nog"
-        beginpunt_x = (((a+1)/2)*BREEDTE)-breedte_sprite_scherm/2
-        renderer.copy(sprite, srcrect=(0, 0, breedte_sprite_wereld, hoogte_sprite_wereld), dstrect=(beginpunt_x, (HOOGTE/2)-(hoogte_sprite_scherm/2), breedte_sprite_scherm, hoogte_sprite_scherm))
+        d_object_kolom_speler = math.sqrt(((sprite_x - p_speler[0]) ** 2) + ((sprite_y - p_speler[1]) ** 2))
+        hoogte_sprite_scherm = HOOGTE * (1 / (d_object_kolom_speler * 5))
+        breedte_sprite_scherm = (
+                                            breedte_sprite_wereld / hoogte_sprite_wereld) * hoogte_sprite_scherm  # "nodig?want zal 1 zijn per kolom maar hoe weten of nog"
+        beginpunt_sprite_x = kolom_midden_sprite - (breedte_sprite_scherm / 2)
+
+        for kolom_texture_scherm in range(0, int(breedte_sprite_scherm + 0.5)):
+            kolom = kolom_texture_scherm + int(beginpunt_sprite_x + 0.5)
+            kolom_texture = (kolom_texture_scherm / breedte_sprite_scherm) * breedte_sprite_wereld
+            renderer.copy(sprite, srcrect=(kolom_texture, 0, 1, hoogte_sprite_wereld),
+                          dstrect=(kolom, (HOOGTE / 2) - (hoogte_sprite_scherm / 2), 1, hoogte_sprite_scherm))
 
 
 # checking if we hit an object with our scanner
