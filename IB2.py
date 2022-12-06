@@ -639,7 +639,7 @@ def kaart_weergeven():
             positie_pion_x, positie_pion_y, positie_persoon_sprite.size[0] / 7, positie_persoon_sprite.size[1] / 7))
 
 def sprite_renderer(sprite_x, sprite_y, sprite):
-    # zbuffer later nog toevoegen voor overlappingen, en per kolom
+    # zbuffer later nog toevoegen voor overlappingen,
 
     p_sprite_x_nieuw = sprite_x - p_speler[0]
     p_sprite_y_nieuw = sprite_y - p_speler[1]
