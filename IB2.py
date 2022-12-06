@@ -42,10 +42,20 @@ total_money_present = 0
 money_collected = True
 moneysprite = ""
 
-pizza_x = 0 #407.5
-pizza_y = 0 #299.5
+
+#coordinaten sprites
+pizza_x_coordinaten, pizza_y_coordinaten  = [4, 1.5, 14.5, 7],  [5.5, 14.5, 13.5, 3.5] #
+apple_x_coordinaten,apple_y_coordinaten  = [6.5, 9, 16, 2], [12.5, 6.5, 9, 7] #
+egg_x_coordinaten,egg_y_coordinaten  = [12, 12.5, 5, 7.5], [4.5, 10.5, 11, 2.5] #
+broccoli_x_coordinaten,broccoli_y_coordinaten  = [9, 10.5, 6.5, 15.5], [7.5, 2, 15.5, 8.5] #
+munt1_x_coordinaten, munt1_y_coordinaten = [0, 1, 0, 3], [0, 1, 0, 3]
+munt2_x_coordinaten, munt2_y_coordinaten = [0, 1, 0, 3], [0, 1, 0, 3]
+munt3_x_coordinaten, munt3_y_coordinaten = [0, 1, 0, 3], [0, 1, 0, 3]
+munt4_x_coordinaten, munt4_y_coordinaten = [0, 1, 0, 3], [0, 1, 0, 3]
+
+
 tijd_verstrekentot = 0 #variabele aanmaken
-deadline = 10
+deadline = 100
 # positie van de speler
 p_speler = np.array([9.5,15.5])
 
@@ -69,26 +79,10 @@ moet_afsluiten = False
 is_texture = False
 # de "wereldkaart". Dit is een 2d matrix waarin elke cel een type van muur voorstelt
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
-#positie van de cornflakes in wereldcoördinaten
-p_cornflakes_wereld = np.array([1, 2])
 
 
-#cameramatrix
-camera_matrix = np.array(
-    [[r_cameravlak[0], r_speler[0]],
-     [r_cameravlak[1], r_speler[1]]]
-)
 
-#determinant van cameramatrix
-determinant_m = r_cameravlak[0] * r_speler[1] - r_cameravlak[1] * r_speler[0]
 
-#adjunct van cameramatrix
-adjunct_m = np.array(
-    [[r_speler[1], (-1 * r_speler[0])],
-     [(-1 * r_cameravlak[1]), r_cameravlak[0]]]
-)
-#cameracoördinaten bepalen van cornflakes
-p_cornflakes_camera = (1/determinant_m) * adjunct_m * p_cornflakes_wereld
 # Vooraf gedefinieerde kleuren
 kleuren = [
     sdl2.ext.Color(0, 0, 0),  # 0 = Zwart
@@ -517,6 +511,7 @@ def timer(delta, renderer, window, deadline):
 
     renderer.copy(text,dstrect=(10,600+ text.size[1], text.size[0], text.size[1]))
 
+
 def create_sprites_hud():
     #global hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture
     hud_texture = factory.from_image(resources.get_path("hud.png"))
@@ -643,6 +638,51 @@ def kaart_weergeven():
                       srcrect=(0, 0, positie_persoon_sprite.size[0], positie_persoon_sprite.size[1]), dstrect=(
             positie_pion_x, positie_pion_y, positie_persoon_sprite.size[0] / 7, positie_persoon_sprite.size[1] / 7))
 
+def sprite_renderer(sprite_x, sprite_y, sprite):
+    #zbuffer later nog toevoegen voor overlappingen, en per kolom
+    #global broccoli_texture #, hoogte
+    #p_broccoli_x = 2.5
+    #p_broccoli_y = 14.5
+    p_sprite_x_nieuw = sprite_x-p_speler[0]
+    p_sprite_y_nieuw =sprite_y -  p_speler[1]
+    # cameramatrix
+    camera_matrix = np.array(
+        [[r_cameravlak[0], r_speler[0]],
+         [r_cameravlak[1], r_speler[1]]]
+    )
+
+    # determinant van cameramatrix
+    determinant_m = r_cameravlak[0] * r_speler[1] - r_cameravlak[1] * r_speler[0]
+
+    # adjunct van cameramatrix
+    adjunct_m = np.array(
+        [[r_speler[1], (-1 * r_speler[0])],
+         [(-1 * r_cameravlak[1]), r_cameravlak[0]]]
+    )
+
+    breedte_sprite  = broccoli_texture.size[0]
+    #for sprite_kolom in range(0, breedte_sprite):
+
+
+            #breedte_sprite_scherm = (breedte_sprite_wereld/hoogte_sprite_wereld)* hoogte_sprite_scherm #"nodig?want zal 1 zijn per kolom maar hoe weten of nog"
+            #renderer.copy(broccoli_texture, srcrect=(0, 0, breedte_sprite_wereld, hoogte_sprite_wereld), dstrect=((((a+1)/2)*BREEDTE)-breedte_sprite_scherm/2, HOOGTE/2, 1vc b , hoogte_sprite_scherm))
+    u_cameracoordinaten = ((r_speler[1]/determinant_m)*p_sprite_x_nieuw)+((-r_speler[0]/determinant_m)*p_sprite_y_nieuw)
+    v_cameracoordinaten = ((-r_cameravlak[1]/determinant_m)*p_sprite_x_nieuw)+ ((r_cameravlak[0]/determinant_m)*p_sprite_y_nieuw)
+    a = u_cameracoordinaten/v_cameracoordinaten #positie op x as scherm, dus kolom
+    if (a>=-1) and (a<=1) and (v_cameracoordinaten>=0):
+        hoogte_sprite_wereld = sprite.size[1]
+        breedte_sprite_wereld = sprite.size[0]
+        #range in schermcoordinaten van sprite: ((a+1)/2)*BREEDTE - en + breedte_sprite_scherm/2
+
+        #hoogte_muur_scherm = hoogte
+        #hoogte_sprite_scherm = (hoogte_sprite_wereld/100 ) *hoogte_muur_scherm  #hoogte muur wereld is altijd 1 dus in schermcoordinaten:
+        d_object_kolom_speler = math.sqrt(((sprite_x-p_speler[0])**2)+((sprite_y-p_speler[1])**2))
+        hoogte_sprite_scherm = HOOGTE * (1 / (d_object_kolom_speler *5))
+        breedte_sprite_scherm = (breedte_sprite_wereld/hoogte_sprite_wereld)* hoogte_sprite_scherm #"nodig?want zal 1 zijn per kolom maar hoe weten of nog"
+        beginpunt_x = (((a+1)/2)*BREEDTE)-breedte_sprite_scherm/2
+        renderer.copy(sprite, srcrect=(0, 0, breedte_sprite_wereld, hoogte_sprite_wereld), dstrect=(beginpunt_x, (HOOGTE/2)-(hoogte_sprite_scherm/2), breedte_sprite_scherm, hoogte_sprite_scherm))
+
+
 # checking if we hit an object with our scanner
 def check_if_object_scanned(scanobject_x, scanobject_y):
     global render_pizza_in_world
@@ -680,6 +720,17 @@ def main():
     global kaart_gekozen
     global laser_shot, total_hearts_present, heart1_present, heart2_present, heart3_present, player_hit, total_money_present, pizza_collected, money_collected, moneysprite, heartsprite
     sdl2.ext.init()
+
+    global pizza_x, pizza_y, apple_x, apple_y, egg_x, egg_y, broccoli_x, broccoli_y, munt1_x, munt1_y, munt2_x, munt2_y, munt3_x, munt3_y, munt4_x, munt4_y
+
+    pizza_x, pizza_y = pizza_x_coordinaten[kaart_gekozen], pizza_y_coordinaten[kaart_gekozen]  # 299.5
+    apple_x, apple_y = apple_x_coordinaten[kaart_gekozen], apple_y_coordinaten[kaart_gekozen]
+    egg_x, egg_y = egg_x_coordinaten[kaart_gekozen], egg_y_coordinaten[kaart_gekozen]
+    broccoli_x, broccoli_y = broccoli_x_coordinaten[kaart_gekozen], broccoli_y_coordinaten[kaart_gekozen]
+    munt1_x, munt1_y = munt1_x_coordinaten[kaart_gekozen], munt1_y_coordinaten[kaart_gekozen]
+    munt2_x, munt2_y = munt2_x_coordinaten[kaart_gekozen], munt2_y_coordinaten[kaart_gekozen]
+    munt3_x, munt3_y = munt3_x_coordinaten[kaart_gekozen], munt3_y_coordinaten[kaart_gekozen]
+    munt4_x, munt4_y = munt4_x_coordinaten[kaart_gekozen], munt4_y_coordinaten[kaart_gekozen]
 
     # Maak een venster aan om de game te renderen
     window = sdl2.ext.Window("Project Ingenieursbeleving 2", size=(BREEDTE, HOOGTE))
@@ -734,6 +785,15 @@ def main():
             (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur,blok) = raycast(p_speler, r_straal)
             render_wall(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok, list_wall_create)
 
+        sprite_renderer(pizza_x, pizza_y, pizza_texture)
+        sprite_renderer(apple_x, apple_y, apple_texture)
+        sprite_renderer(egg_x, egg_y, egg_texture)
+        sprite_renderer(broccoli_x, broccoli_y, broccoli_texture)
+        moneysprite_1 = moneysprites[0]
+        sprite_renderer(munt1_x, munt1_y, moneysprite_1)
+        sprite_renderer(munt2_x, munt2_y, moneysprite_1)
+        sprite_renderer(munt3_x, munt3_y, moneysprite_1)
+        sprite_renderer(munt4_x, munt4_y, moneysprite_1)
 
         end_time = time.time()
         delta = end_time - start_time
