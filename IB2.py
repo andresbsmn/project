@@ -147,7 +147,8 @@ def startscherm():
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
     shop_afbeelding = factory.from_image(resources.get_path("shop.jpg"))
     errormessage = ""
-    message = f'om te starten klik "s" \n voor level selectie druk "l" \n voor timer aan te passen druk "t" \n of maak gebruik van de knoppen'
+    # message = f'om te starten klik "s" \n voor level selectie druk "l" \n voor timer aan te passen druk "t" \n of maak gebruik van de knoppen'
+    message = f' welkom bij onze winkel!!! \n om te starten klik "s" \n navigeren kan met de muis of met de pijltjes'
     keuze = ''
     if not levelup:
         gameinfo = f'gekozen map level {level+1} \n je hebt {deadline} seconden'
@@ -165,6 +166,7 @@ def startscherm():
     witruimtetussenknop = (BREEDTE/aantal_mappen)/8
     breedte_knop = BREEDTE/aantal_mappen-witruimtetussenknop*2
     while not moet_afsluiten:
+        gameinfo = f'gekozen map level {level + 1} \n je hebt {deadline} seconden'
         renderer.clear()
         renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])  # witte achtergrond
         # start knoppen level-selectie
@@ -210,7 +212,6 @@ def startscherm():
                             change = -1
                         if geklikt:
                             deadline += change
-                            gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
                     # kijkt of er op een lvl knop is geklikt
                     elif 150 < motion.y < 250:
                         for knop in lvlbuttonxstartwaarde:
@@ -219,14 +220,22 @@ def startscherm():
                                 level = gekozenlevel
                                 world_map = maps[gekozenlevel]
                                 kaart_gekozen = gekozenlevel
-                                gameinfo = f'gekozen map level {level+1} \n je hebt {deadline} seconden'
+
 
             elif event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                # afsluiten bij kruisje of escape
-                if key == sdl2.SDLK_ESCAPE:
+                # levels met pijltjes
+                if key == 1073741904:  #  1073741904 = linker pijltje; 1073741903 = rechter pijltje
+                    level-=1
+                    if level < 0:
+                        level = 3
+                if key == 1073741903:  #  1073741904 = linker pijltje; 1073741903 = rechter pijltje
+                    level+=1
+                    if level > 3:
+                        level = 0
+                elif key == sdl2.SDLK_ESCAPE:
                     quit()
-                if key == sdl2.SDLK_s:
+                elif key == sdl2.SDLK_s:
                     keuze = "start"
                     message = f'starting game...'
                     moet_afsluiten = True  # jump naar main achter de lus
@@ -242,7 +251,6 @@ def startscherm():
                             kaart_gekozen = (int(chr(key)) - 1)
                             level = int(chr(key)) - 1
                             world_map = maps[level]
-                            gameinfo = f'gekozen map level {level+1} \n je hebt {deadline} seconden'
                             keuze = ""
                         except:
                             errormessage = f'je hebt een ongeldige waarde ingegeven \n gelieve een waarde tussen 1 en {aantal_mappen} in te geven'
@@ -251,7 +259,6 @@ def startscherm():
                 if deadline > 5 or event.wheel.y>0:
                     deadline += event.wheel.y
                     # message = f'de tijd is nu {deadline}'
-                    gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
 
         text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
         gaminfotext = sdl2.ext.renderer.Texture(renderer, infofont.render_text(gameinfo))
