@@ -115,15 +115,14 @@ def reset_startwaarden():
     r_speler = np.array([0, 1])
     p_speler = np.array([10.0, 15.0])
     renderer.clear
-#     ik denk dat dit ook moet gereset worden
-#     render_pizza_in_world = True
-#     pizza_collected = False
-#     apple_collected = False
-#     egg_collected = False
-#     broccoli_collected = False
-#     total_hearts_present = 3
-#     total_money_present = 0
-
+    #     ik denk dat dit ook moet gereset worden
+    #     render_pizza_in_world = True
+    #     pizza_collected = False
+    #     apple_collected = False
+    #     egg_collected = False
+    #     broccoli_collected = False
+    #     total_hearts_present = 3
+    #     total_money_present = 0
 
 def startscherm():
     global world_map
@@ -171,7 +170,10 @@ def startscherm():
         # start knoppen level-selectie
         for i in range(aantal_mappen):
             x_start_knop = ((BREEDTE/aantal_mappen)*i)+witruimtetussenknop
-            renderer.draw_rect((x_start_knop,150,breedte_knop,100),kleuren[0])
+            if level == i:
+                renderer.draw_rect((x_start_knop, 150, breedte_knop, 100), kleuren[3])
+            else:
+                renderer.draw_rect((x_start_knop,150,breedte_knop,100),kleuren[0])
             lvlbuttonxstartwaarde[f'knop_{i+1}'] = x_start_knop
             knoptext = f'level {i+1}'
             knopmessage = sdl2.ext.renderer.Texture(renderer, font.render_text(knoptext))
@@ -633,13 +635,11 @@ def render_fps(fps, renderer, window):
     text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
     renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 200, text.size[0], text.size[1]))
 
-
 def scannergun_sprites_create():
     scannergun_texture = factory.from_image(resources.get_path("scanner.png"))
     crosshair_texture = factory.from_image(resources.get_path("crosshair_white.png"))
     laser_texture = factory.from_image(resources.get_path("scanner_laser2.png"))
     return scannergun_texture, crosshair_texture, laser_texture
-
 
 def scannergun():
     global laser_shot, laser_shot_rent
@@ -659,7 +659,6 @@ def scannergun():
         laser_shot = False
         # functional scanner
         pizza_collected = check_if_object_scanned(pizza_x, pizza_y)
-
 
 def create_sprites_hud():
     # global hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture
@@ -682,7 +681,6 @@ def create_sprites_hud():
     heartsprite3 = factory.from_image(resources.get_path("heart3.png"))
     heartsprites = [heartsprite1, heartsprite2, heartsprite3]
     return hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites
-
 
 def hud():
     global player_hit, render_pizza_in_world, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_hearts_present, heartsprite, player_hit, total_money_present, money_collected, moneysprite
@@ -751,7 +749,6 @@ def hud():
         renderer.copy(money_texture, srcrect=(0, 0, money_texture.size[0], money_texture.size[1]),
                       dstrect=(885, 35, money_texture.size[0], money_texture.size[1]))
 
-
 def create_kaart_sprites():
     map0 = factory.from_image(resources.get_path("map0.jpg"))
     map1 = factory.from_image(resources.get_path("map1.jpg"))
@@ -762,7 +759,6 @@ def create_kaart_sprites():
     positie_persoon_sprite = factory.from_image(resources.get_path("pion_bolletje.png"))
     tekst_gsm = factory.from_image(resources.get_path("Store_tekst_gsm.jpg"))
     return map_weergave_list, gsm, positie_persoon_sprite, tekst_gsm
-
 
 def kaart_weergeven():
     global map_weergave_list, gsm, positie_persoon_sprite, tekst_gsm, kaart_gekozen
@@ -794,14 +790,12 @@ def kaart_weergeven():
                       srcrect=(0, 0, positie_persoon_sprite.size[0], positie_persoon_sprite.size[1]), dstrect=(
                 positie_pion_x, positie_pion_y, positie_persoon_sprite.size[0] / 7, positie_persoon_sprite.size[1] / 7))
 
-
 # checking if we hit an object with our scanner
 def check_if_object_scanned(scanobject_x, scanobject_y):
     global render_pizza_in_world
     if 380 <= scanobject_x <= 435 and 277 <= scanobject_y <= 322:
         render_pizza_in_world = False
         return True
-
 
 def timer(delta, renderer, window, deadline):
     global tijd_verstrekentot
@@ -820,7 +814,6 @@ def timer(delta, renderer, window, deadline):
     # renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), window.size[1]/3, text.size[0], text.size[1]))
     renderer.copy(text,
                   dstrect=(10, text.size[1], text.size[0], text.size[1]))
-
 
 def main():
     global fps_font
@@ -914,7 +907,6 @@ def main():
         window.refresh()
     # Sluit SDL2 af
     sdl2.ext.quit()
-
 
 if __name__ == '__main__':
     # comments met #sv naast wegdoen als je wilt kijken naar snakeviz
