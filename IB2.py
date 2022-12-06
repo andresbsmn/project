@@ -108,6 +108,7 @@ def levelselect():
     global deadline
     global kaart_gekozen
     level = 1
+    kaart_gekozen = 1
     world_map = maps[level]
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
@@ -119,7 +120,7 @@ def levelselect():
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
     shop_afbeelding = factory.from_image(resources.get_path("shop.jpg"))
     errormessage = ""
-    message = f'voor level selectie druk "l" \n voor timer aan te passen druk "t"'
+    message = f'om te starten klik "s" \n voor level selectie druk "l" \n voor timer aan te passen druk "t" \n of maak gebruik van de knoppen'
     keuze = ''
     gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
     font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
@@ -135,16 +136,27 @@ def levelselect():
     while not moet_afsluiten:
         renderer.clear()
         renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])  # witte achtergrond
+        # start knoppen level-selectie
         for i in range(aantal_mappen):
-            x_start_knop = (BREEDTE/aantal_mappen)*i
-            renderer.draw_rect((x_start_knop+witruimtetussenknop,100,breedte_knop,100),kleuren[0])
+            x_start_knop = ((BREEDTE/aantal_mappen)*i)+witruimtetussenknop
+            renderer.draw_rect((x_start_knop,150,breedte_knop,100),kleuren[0])
             lvlbuttonxstartwaarde[f'knop_{i+1}'] = x_start_knop+witruimtetussenknop
+            knoptext = f'level {i+1}'
+            knopmessage = sdl2.ext.renderer.Texture(renderer, font.render_text(knoptext))
+            renderer.copy(knopmessage, dstrect=(x_start_knop,150,breedte_knop,100))
         renderer.copy(shop_afbeelding, dstrect=(start_shopx, start_shopy, breedte_shop, hoogte_shop))
+        # einde knoppen level-selectie
+
+        # start knoppen timer
+        renderer.draw_rect((BREEDTE / 8, (1/2) * HOOGTE, 50, 50), kleuren[0])
+        renderer.copy(sdl2.ext.renderer.Texture(renderer, font.render_text("+")), dstrect=(BREEDTE / 8, (1/2) * HOOGTE, 50, 50))
+        renderer.draw_rect((BREEDTE/8,(2/3)*HOOGTE,50,50),kleuren[0])
+        renderer.copy(sdl2.ext.renderer.Texture(renderer, font.render_text("-")),
+                      dstrect=(BREEDTE/8,(2/3)*HOOGTE,50,50))
         if errormessage:  # lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
             message = f'{errormessage}'
         events = sdl2.ext.get_events()
         for event in events:
-
             if event.type == sdl2.SDL_MOUSEMOTION:
                 motion = event.motion
                 # print(motion.x, motion.xrel, motion.y, motion.yrel)  # 1ste en 3de nodig
@@ -152,12 +164,26 @@ def levelselect():
                 button = event.button.button
                 if button == sdl2.SDL_BUTTON_LEFT:
                     # print(f'klik op {motion.x, motion.y}')
-                    for knop in lvlbuttonxstartwaarde:
-                        if lvlbuttonxstartwaarde[knop]<motion.x and lvlbuttonxstartwaarde[knop]+breedte_knop>motion.x:
-                            if motion.y > 100 and motion.y < 200:
-                                gekozenLevel = int(knop[-1])  # want naam knop is knop_<level>
-                                world_map = maps[gekozenLevel]
-                                kaart_gekozen = gekozenLevel
+                    # kijkt of er op  timer knop is geklikt
+                    if BREEDTE / 8 < motion.x < ((BREEDTE / 8) + 50):
+                        geklikt = False
+                        change = 0
+                        if 0.5*HOOGTE+50 > motion.y > 0.5*HOOGTE:  # + knop
+                            geklikt = True
+                            change = 1
+                        if (2/3)*HOOGTE < motion.y < (2/3)*HOOGTE+50 and deadline > 5:
+                            geklikt = True
+                            change = -1
+                        if geklikt:
+                            deadline += change
+                            gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
+                    # kijkt of er op een lvl knop is geklikt
+                    elif 100 < motion.y < 200:
+                        for knop in lvlbuttonxstartwaarde:
+                            if lvlbuttonxstartwaarde[knop] < motion.x < lvlbuttonxstartwaarde[knop]+breedte_knop:
+                                gekozenlevel = int(knop[-1])  # want naam knop is knop_<level>
+                                world_map = maps[gekozenlevel]
+                                kaart_gekozen = gekozenlevel
                                 return world_map
 
             elif event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
@@ -187,9 +213,10 @@ def levelselect():
                             errormessage = f'je hebt een ongeldige waarde ingegeven \n gelieve een waarde tussen 1 en {aantal_mappen} in te geven'
 
             if keuze == "timer" and event.type == sdl2.SDL_MOUSEWHEEL:
-                deadline += event.wheel.y
-                message = f'de tijd is nu {deadline}'
-                gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
+                if deadline > 5 or event.wheel.y>0:
+                    deadline += event.wheel.y
+                    # message = f'de tijd is nu {deadline}'
+                    gameinfo = f'gekozen map level {level} \n je hebt {deadline} seconden'
 
         text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
         gaminfotext = sdl2.ext.renderer.Texture(renderer, infofont.render_text(gameinfo))
