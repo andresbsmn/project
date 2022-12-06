@@ -103,7 +103,7 @@ def startscherm():
     global deadline
     global kaart_gekozen
     global levelup
-    global level
+    global level #
     if levelup:
         levelup = False
         kaart_gekozen = level
