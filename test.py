@@ -330,6 +330,7 @@ def startscherm(keuze):
         renderer.copy(gaminfotext, dstrect=(0, window.size[1] - text.size[1], text.size[0], text.size[1]))
         renderer.present()
         # window.refresh()
+    sdl2.ext.quit()
     main()
 
 def levelcompleted():
