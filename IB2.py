@@ -414,6 +414,7 @@ def verwerk_input(delta):
         # aan het muiswiel draait.
         elif event.type == sdl2.SDL_MOUSEWHEEL:
             if event.wheel.y > 0:
+                levelcompleted()
                 # ...
                 continue
         # Wordt afgeleverd als de gebruiker de muis heeft bewogen.
