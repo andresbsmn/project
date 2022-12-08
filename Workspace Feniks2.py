@@ -824,7 +824,7 @@ def kaart_weergeven():
                 positie_pion_x, positie_pion_y, positie_persoon_sprite.size[0] / 7, positie_persoon_sprite.size[1] / 7))
 
 
-def sprite_renderer(sprite_x, sprite_y, sprite, z_buffer):
+def sprite_renderer(sprite_x, sprite_y, sprite, z_buffer,scale):
     # zbuffer later nog toevoegen voor overlappingen, en per kolom
 
     p_sprite_x_nieuw = sprite_x - p_speler[0]
@@ -848,7 +848,7 @@ def sprite_renderer(sprite_x, sprite_y, sprite, z_buffer):
         breedte_sprite_wereld = sprite.size[0]
 
         d_object_kolom_speler = math.sqrt(((sprite_x - p_speler[0]) ** 2) + ((sprite_y - p_speler[1]) ** 2))
-        hoogte_sprite_scherm = HOOGTE * (1 / (d_object_kolom_speler * 5))
+        hoogte_sprite_scherm = HOOGTE * (1 / (d_object_kolom_speler * 5))*scale
         breedte_sprite_scherm = (breedte_sprite_wereld / hoogte_sprite_wereld) * hoogte_sprite_scherm  # "nodig?want zal 1 zijn per kolom maar hoe weten of nog"
         beginpunt_sprite_x = kolom_midden_sprite - (breedte_sprite_scherm / 2)
 
@@ -885,21 +885,21 @@ def timer(delta, renderer, window, deadline):
     # renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), window.size[1]/3, text.size[0], text.size[1]))
     renderer.copy(text,
                   dstrect=(10, text.size[1], text.size[0], text.size[1]))
-
+#start deel Feniks
 def noord(clerk_x):
-   clerk_x-=0.10
+   clerk_x-=0.05
    return round(clerk_x,2)
 
 def oost(clerk_y):
-    clerk_y+=0.10
+    clerk_y+=0.05
     return round(clerk_y,2)
 
 def west(clerk_y):
-    clerk_y-=0.10
+    clerk_y-=0.05
     return round(clerk_y,2)
 
 def zuid(clerk_x):
-    clerk_x+=0.10
+    clerk_x+=0.05
     return round(clerk_x,2)
 
 #start waarden npc map 2
@@ -960,19 +960,19 @@ def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geene loop want geen
 
     if (kaart_gekozen==3): #loop map 4
         global clerk_x3, clerk_y3
-        while (clerk_x3 !=2.0) and (clerk_y3 ==9.5):
+        if (clerk_x3 !=2.0) and (clerk_y3 ==9.5):
             clerk_x3=noord(clerk_x3)
             return clerk_x3,clerk_y3
-        while (clerk_x3 ==2.0) and (clerk_y3 !=2.0):
+        if (clerk_x3 ==2.0) and (clerk_y3 !=2.0):
             clerk_y3=west(clerk_y3)
             return clerk_x3, clerk_y3
-        while (clerk_x3 !=15.5) and (clerk_y3 ==2.0):
+        if (clerk_x3 !=15.5) and (clerk_y3 ==2.0):
             clerk_x3=zuid(clerk_x3)
             return clerk_x3, clerk_y3
-        while (clerk_x3 == 15.5) and (clerk_y3 !=9.5):
+        if (clerk_x3 == 15.5) and (clerk_y3 !=9.5):
             clerk_y3 = oost(clerk_y3)
             return clerk_x3, clerk_y3
-
+#einde deel Feniks
 def main():
     global fps_font
     global tijd_verstrekentot
@@ -1055,19 +1055,19 @@ def main():
             z_buffer.append(d_muur)
             render_wall(renderer, window, kolom, d_muur, k_muur, is_texture,textuurcoordinaten_X_zondermaalbreedtetextuur, blok, list_wall_create)
 
-        sprite_renderer(pizza_x, pizza_y, pizza_texture, z_buffer)
-        sprite_renderer(apple_x, apple_y, apple_texture, z_buffer)
-        sprite_renderer(egg_x, egg_y, egg_texture, z_buffer)
-        sprite_renderer(broccoli_x, broccoli_y, broccoli_texture, z_buffer)
+        sprite_renderer(pizza_x, pizza_y, pizza_texture, z_buffer,1)
+        sprite_renderer(apple_x, apple_y, apple_texture, z_buffer,1)
+        sprite_renderer(egg_x, egg_y, egg_texture, z_buffer,1)
+        sprite_renderer(broccoli_x, broccoli_y, broccoli_texture, z_buffer,1)
         moneysprite_1 = moneysprites[0]
-        sprite_renderer(munt1_x, munt1_y, moneysprite_1, z_buffer)
-        sprite_renderer(munt2_x, munt2_y, moneysprite_1, z_buffer)
-        sprite_renderer(munt3_x, munt3_y, moneysprite_1, z_buffer)
-        sprite_renderer(munt4_x, munt4_y, moneysprite_1, z_buffer)
-        if kaart_gekozen!=0:
+        sprite_renderer(munt1_x, munt1_y, moneysprite_1, z_buffer,1)
+        sprite_renderer(munt2_x, munt2_y, moneysprite_1, z_buffer,1)
+        sprite_renderer(munt3_x, munt3_y, moneysprite_1, z_buffer,1)
+        sprite_renderer(munt4_x, munt4_y, moneysprite_1, z_buffer,1)
+        if kaart_gekozen!=0:   #start deel Feniks
             clerk_x, clerk_y = clerk_positie(kaart_gekozen)  # fhook
             print(clerk_x,clerk_y)
-            sprite_renderer(clerk_x,clerk_y,clerk_sprite,z_buffer)    #fhook
+            sprite_renderer(clerk_x,clerk_y,clerk_sprite,z_buffer,4)    #fhook  einde deel Feniks
         end_time = time.time()
         delta = end_time - start_time
 
