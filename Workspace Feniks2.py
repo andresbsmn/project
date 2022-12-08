@@ -912,7 +912,7 @@ clerk_y2=6.0
 clerk_x3=15.5
 clerk_y3=9.5
 
-def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft gene loop want geen vijand.   clerk_x1,clerk_y1,clerk_x2,clerk_y2,clerk_x3,clerk_y3
+def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geene loop want geen vijand.   clerk_x1,clerk_y1,clerk_x2,clerk_y2,clerk_x3,clerk_y3
     global clerk_x1, clerk_y1, clerk_x2, clerk_y2, clerk_x3, clerk_y3
     if (kaart_gekozen==1) : #loop map 2
         if (clerk_x1!=7.0) and (clerk_y1 ==4.0 ):
