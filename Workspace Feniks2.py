@@ -887,20 +887,20 @@ def timer(delta, renderer, window, deadline):
                   dstrect=(10, text.size[1], text.size[0], text.size[1]))
 
 def noord(clerk_x):
-   clerk_x-=0.05
-   return clerk_x
+   clerk_x-=0.10
+   return round(clerk_x,2)
 
 def oost(clerk_y):
-    clerk_y+=0.05
-    return clerk_y
+    clerk_y+=0.10
+    return round(clerk_y,2)
 
 def west(clerk_y):
-    clerk_y-=0.05
-    return clerk_y
+    clerk_y-=0.10
+    return round(clerk_y,2)
 
 def zuid(clerk_x):
-    clerk_x+=0.05
-    return clerk_x
+    clerk_x+=0.10
+    return round(clerk_x,2)
 
 #start waarden npc map 2
 clerk_x1=15.0
@@ -911,60 +911,66 @@ clerk_y2=6.0
 #start waarden npc map 4
 clerk_x3=15.5
 clerk_y3=9.5
-
+i=True
 def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geene loop want geen vijand.   clerk_x1,clerk_y1,clerk_x2,clerk_y2,clerk_x3,clerk_y3
-    global clerk_x1, clerk_y1, clerk_x2, clerk_y2, clerk_x3, clerk_y3
-    if (kaart_gekozen==1) : #loop map 2
-        if (clerk_x1!=7.0) and (clerk_y1 ==4.0 ):
+    if (kaart_gekozen==1): #loop map 2
+        global clerk_x1, clerk_y1,i
+        if (clerk_x1>7.5) and (clerk_y1 ==4.0) :  #A
             clerk_x1=noord(clerk_x1)
+            i=True
             return clerk_x1,clerk_y1
-        if (clerk_x1 ==7.0) and (clerk_y1 !=15.0):
+        if (clerk_x1 ==7.5) and (clerk_y1 <15.5) and (i==True): #B
             clerk_y1=oost(clerk_y1)
             return clerk_x1, clerk_y1
-        if (clerk_x1 !=4.0) and (clerk_y1 ==15.0):
+        if (clerk_x1 > 4.5) and (clerk_y1 ==15.5):  #C
             clerk_x1=noord(clerk_x1)
+            i=False
             return clerk_x1, clerk_y1
-        if (clerk_x1 ==4.0) and (clerk_y1 !=5.0):
+        if (clerk_x1 ==4.5) and (clerk_y1 > 5.5):  #D
             clerk_y1=west(clerk_y1)
-        if (clerk_x1 !=6.0) and (clerk_y1 ==5.0):
+            return clerk_x1,clerk_y1
+        if (clerk_x1 < 6.5) and (clerk_y1 ==5.5):  #E
             clerk_x1=zuid(clerk_x1)
             return clerk_x1, clerk_y1
-        if (clerk_x1 ==6.0) and (clerk_y1 !=2.0):
-            clerk_y1=oosten(clerk_y1)
+        if (clerk_x1 ==6.5) and (clerk_y1 >2.0):   #F
+            clerk_y1=west(clerk_y1)
             return clerk_x1, clerk_y1
-        if (clerk_x1 !=15.0) and (clerk_y1 ==2.0):
+        if (clerk_x1 <15.0) and (clerk_y1 ==2.0):  #G
             clerk_x1=zuid(clerk_x1)
             return clerk_x1, clerk_y1
-        if (clerk_x1 ==15.0) and (clerk_y1 !=4.0):
+        if (clerk_x1 ==15.0) and (clerk_y1 <4.0):  #H
             clerk_y1=oost(clerk_y1)
+            i=True
             return clerk_x1, clerk_y1
 
-    if  (kaart_gekozen==2):  #loop map 3
+    if (kaart_gekozen==2):  #loop map 3
+        global clerk_x2, clerk_y2
         if (clerk_x2!=5.0) and (clerk_y2==6.0):
                 clerk_x2=noord(clerk_x2)
                 return clerk_x2,clerk_y2
         if (clerk_x2==5.0) and (clerk_y2!=2.0):
             clerk_y2=west(clerk_y2)
             return clerk_x2,clerk_y2
-        if (clerk_x2!=12.0) and (clerk_y2==2.0):
+        if (clerk_x2!=12.5) and (clerk_y2==2.0):
             clerk_x2=zuid(clerk_x2)
             return clerk_x2,clerk_y2
-        if (clerk_x2==12.0) and (clerk_y2!=6.0):
+        if (clerk_x2==12.5) and (clerk_y2!=6.0):
             clerk_y2=oost(clerk_y2)
             return clerk_x2,clerk_y2
 
     if (kaart_gekozen==3): #loop map 4
-        if (clerk_x3 !=2.0) and (clerk_y3 ==9.5):
+        global clerk_x3, clerk_y3
+        while (clerk_x3 !=2.0) and (clerk_y3 ==9.5):
             clerk_x3=noord(clerk_x3)
             return clerk_x3,clerk_y3
-        if (clerk_x3 ==2.0) and (clerk_y3 !=2.0):
+        while (clerk_x3 ==2.0) and (clerk_y3 !=2.0):
             clerk_y3=west(clerk_y3)
             return clerk_x3, clerk_y3
-        if (clerk_x3 !=15.5) and (clerk_y3 ==2.0):
+        while (clerk_x3 !=15.5) and (clerk_y3 ==2.0):
             clerk_x3=zuid(clerk_x3)
             return clerk_x3, clerk_y3
-        if (clerk_x3 ==15.5) and (clerk_y3 !=9.5):
-            clerk_y3=oost(clerk_y3)
+        while (clerk_x3 == 15.5) and (clerk_y3 !=9.5):
+            clerk_y3 = oost(clerk_y3)
             return clerk_x3, clerk_y3
 
 def main():
@@ -991,7 +997,7 @@ def main():
     munt2_x, munt2_y = munt2_x_coordinaten[kaart_gekozen], munt2_y_coordinaten[kaart_gekozen]
     munt3_x, munt3_y = munt3_x_coordinaten[kaart_gekozen], munt3_y_coordinaten[kaart_gekozen]
     munt4_x, munt4_y = munt4_x_coordinaten[kaart_gekozen], munt4_y_coordinaten[kaart_gekozen]
-    clerk_x,clerk_y=clerk_positie(kaart_gekozen)   #fhook
+
 
     # Maak een venster aan om de game te renderen
     window = sdl2.ext.Window("Project Ingenieursbeleving 2", size=(BREEDTE, HOOGTE))
@@ -1059,6 +1065,8 @@ def main():
         sprite_renderer(munt3_x, munt3_y, moneysprite_1, z_buffer)
         sprite_renderer(munt4_x, munt4_y, moneysprite_1, z_buffer)
         if kaart_gekozen!=0:
+            clerk_x, clerk_y = clerk_positie(kaart_gekozen)  # fhook
+            print(clerk_x,clerk_y)
             sprite_renderer(clerk_x,clerk_y,clerk_sprite,z_buffer)    #fhook
         end_time = time.time()
         delta = end_time - start_time
