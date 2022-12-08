@@ -110,26 +110,29 @@ def loadornew():
     font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
     stoppen = False
     message = f'je hebt een save aan level:{level+1}'
-    start_shopx = window.size[0] / 4
-    start_shopy = window.size[1] - shop_afbeelding.size[1]
-    breedte_shop = window.size[0] / 2
-    hoogte_shop = window.size[1] / 2
-    lvlbuttonxstartwaarde = {}
+    start_shopx = BREEDTE / 4
+    breedte_shop = BREEDTE / 2
+    hoogte_shop = (breedte_shop / shop_afbeelding.size[0]) * shop_afbeelding.size[1]
+    start_shopy = HOOGTE - hoogte_shop
     witruimtetussenknop = (BREEDTE / aantal_mappen) / 8
-    breedte_knop = BREEDTE / aantal_mappen - witruimtetussenknop * 2
     while not stoppen:
         renderer.clear()
         renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])  # witte achtergrond
-        # start knoppen timer
-        renderer.draw_rect((BREEDTE / 8, (1 / 2) * HOOGTE, 50, 50), kleuren[0])
+        renderer.copy(shop_afbeelding, dstrect=(start_shopx, start_shopy, breedte_shop, hoogte_shop))
+        # start knoppen
+        renderer.draw_rect((start_shopx, start_shopy - 250, breedte_shop, 100), kleuren[0])
         renderer.copy(sdl2.ext.renderer.Texture(renderer, font.render_text("new game")),
-                      dstrect=(BREEDTE / 8, (1 / 2) * HOOGTE, 50, 50))
-        renderer.draw_rect((BREEDTE / 8, (2 / 3) * HOOGTE, 50, 50), kleuren[0])
+                      dstrect=(start_shopx, start_shopy - 250, breedte_shop, 100))
+        renderer.draw_rect((start_shopx, start_shopy-100, breedte_shop, 100), kleuren[0])
         renderer.copy(sdl2.ext.renderer.Texture(renderer, font.render_text("load game")),
-                      dstrect=(BREEDTE / 8, (2 / 3) * HOOGTE, 50, 50))
+                      dstrect=(start_shopx, start_shopy-100, breedte_shop, 100))
         events = sdl2.ext.get_events()
         for event in events:
-            if event.type == sdl2.SDL_MOUSEMOTION:
+            if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
+                key = event.key.keysym.sym
+                if key == sdl2.SDLK_ESCAPE:
+                    quit()
+            elif event.type == sdl2.SDL_MOUSEMOTION:
                 motion = event.motion
                 # print(motion.x, motion.xrel, motion.y, motion.yrel)  # 1ste en 3de nodig
             elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
