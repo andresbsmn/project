@@ -16,8 +16,8 @@ level = 0
 global testboolean
 testboolean = True
 # Constanten
-BREEDTE = 800
-HOOGTE =  600
+BREEDTE = 1200#800
+HOOGTE = 900#600
 # var aanmaken
 global deadline
 global win_flags
@@ -220,10 +220,10 @@ def startscherm(keuze):
     font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
     infofont = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=10, color=kleuren[0])
     moet_afsluiten = False
-    start_shopx = window.size[0] / 4
-    start_shopy = window.size[1] - shop_afbeelding.size[1]
-    breedte_shop = window.size[0] / 2
-    hoogte_shop = window.size[1] / 2
+    start_shopx = BREEDTE / 4
+    breedte_shop = BREEDTE / 2
+    hoogte_shop = (breedte_shop / shop_afbeelding.size[0]) * shop_afbeelding.size[1]
+    start_shopy = HOOGTE - hoogte_shop
     lvlbuttonxstartwaarde = {}
     witruimtetussenknop = (BREEDTE / aantal_mappen) / 8
     breedte_knop = BREEDTE / aantal_mappen - witruimtetussenknop * 2
@@ -352,10 +352,10 @@ def levelcompleted():
     resources = sdl2.ext.Resources(__file__, "textures")
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
     shop_afbeelding = factory.from_image(resources.get_path("shop.jpg"))
-    start_shopx = window.size[0] / 4
-    start_shopy = window.size[1] - shop_afbeelding.size[1]
-    breedte_shop = window.size[0] / 2
-    hoogte_shop = window.size[1] / 2
+    start_shopx = BREEDTE / 4
+    breedte_shop = BREEDTE / 2
+    hoogte_shop = (breedte_shop / shop_afbeelding.size[0]) * shop_afbeelding.size[1]
+    start_shopy = HOOGTE - hoogte_shop
 
     font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[3])
     errormessage = ""
@@ -396,10 +396,10 @@ def levelfailed(reden):
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
 
     shop_afbeelding = factory.from_image(resources.get_path("shop.jpg"))
-    start_shopx = window.size[0] / 4
-    start_shopy = window.size[1] - shop_afbeelding.size[1]
-    breedte_shop = window.size[0] / 2
-    hoogte_shop = window.size[1] / 2
+    start_shopx = BREEDTE / 4
+    breedte_shop = BREEDTE / 2
+    hoogte_shop = (breedte_shop / shop_afbeelding.size[0]) * shop_afbeelding.size[1]
+    start_shopy = HOOGTE - hoogte_shop
 
     font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[3])
     errormessage = ""
