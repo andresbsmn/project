@@ -2,6 +2,7 @@ import cProfile
 import math
 import time
 import pickle
+
 import sdl2
 import snakeviz
 
@@ -13,23 +14,24 @@ from playsound import playsound
 persistantfile = "save.pkl"
 keuzealgemaakt = False
 level = 0
+global testboolean
 testboolean = True
 # Constanten
-BREEDTE = 1200#800
-HOOGTE = 900#600
+BREEDTE = 800
+HOOGTE =  600
 # var aanmaken
-# global deadline
-# global win_flags
+global deadline
+global win_flags
 win_flags = sdl2.SDL_WINDOW_RESIZABLE #kan window resizen
 #
 # Globale variabelen
 #
-# global is_horizontaal
-# global renderer
-# global list_wall_create
-# global laser_shot
+global is_horizontaal
+global renderer
+global list_wall_create
+global laser_shot
 laser_shot = False
-# global kaart_genomen
+global kaart_genomen
 kaart_genomen = True
 
 levelup = False
@@ -45,7 +47,7 @@ total_hearts_present = 3
 player_hit = False
 resources = sdl2.ext.Resources(__file__, "textures")
 
-total_money_present = 0
+total_money_present = 1
 money_collected = False
 moneysprite = ""
 
@@ -109,29 +111,26 @@ def loadornew():
     font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
     stoppen = False
     message = f'je hebt een save aan level:{level+1}'
-    start_shopx = BREEDTE / 4
-    breedte_shop = BREEDTE / 2
-    hoogte_shop = (breedte_shop / shop_afbeelding.size[0]) * shop_afbeelding.size[1]
-    start_shopy = HOOGTE - hoogte_shop
+    start_shopx = window.size[0] / 4
+    start_shopy = window.size[1] - shop_afbeelding.size[1]
+    breedte_shop = window.size[0] / 2
+    hoogte_shop = window.size[1] / 2
+    lvlbuttonxstartwaarde = {}
     witruimtetussenknop = (BREEDTE / aantal_mappen) / 8
+    breedte_knop = BREEDTE / aantal_mappen - witruimtetussenknop * 2
     while not stoppen:
         renderer.clear()
         renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])  # witte achtergrond
-        renderer.copy(shop_afbeelding, dstrect=(start_shopx, start_shopy, breedte_shop, hoogte_shop))
-        # start knoppen
-        renderer.draw_rect((start_shopx, start_shopy - 250, breedte_shop, 100), kleuren[0])
+        # start knoppen timer
+        renderer.draw_rect((BREEDTE / 8, (1 / 2) * HOOGTE, 50, 50), kleuren[0])
         renderer.copy(sdl2.ext.renderer.Texture(renderer, font.render_text("new game")),
-                      dstrect=(start_shopx, start_shopy - 250, breedte_shop, 100))
-        renderer.draw_rect((start_shopx, start_shopy-100, breedte_shop, 100), kleuren[0])
+                      dstrect=(BREEDTE / 8, (1 / 2) * HOOGTE, 50, 50))
+        renderer.draw_rect((BREEDTE / 8, (2 / 3) * HOOGTE, 50, 50), kleuren[0])
         renderer.copy(sdl2.ext.renderer.Texture(renderer, font.render_text("load game")),
-                      dstrect=(start_shopx, start_shopy-100, breedte_shop, 100))
+                      dstrect=(BREEDTE / 8, (2 / 3) * HOOGTE, 50, 50))
         events = sdl2.ext.get_events()
         for event in events:
-            if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
-                key = event.key.keysym.sym
-                if key == sdl2.SDLK_ESCAPE:
-                    quit()
-            elif event.type == sdl2.SDL_MOUSEMOTION:
+            if event.type == sdl2.SDL_MOUSEMOTION:
                 motion = event.motion
                 # print(motion.x, motion.xrel, motion.y, motion.yrel)  # 1ste en 3de nodig
             elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
@@ -139,11 +138,11 @@ def loadornew():
                 if button == sdl2.SDL_BUTTON_LEFT:
                     # print(f'klik op {motion.x, motion.y}')
                     # kijkt of er op  timer knop is geklikt
-                    if start_shopx < motion.x < start_shopx + breedte_shop:
-                        if start_shopy - 150 > motion.y > start_shopy - 250:  # new game knop
+                    if BREEDTE / 8 < motion.x < ((BREEDTE / 8) + 50):
+                        if 0.5 * HOOGTE + 50 > motion.y > 0.5 * HOOGTE:  # new game knop
                             startscherm("new_game")
                             stoppen = True
-                        if  start_shopy-100< motion.y < start_shopy :
+                        if (2 / 3) * HOOGTE < motion.y < (2 / 3) * HOOGTE + 50 and deadline > 5:
                             startscherm("load_game")
                             stoppen = True
 
@@ -222,10 +221,10 @@ def startscherm(keuze):
     font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
     infofont = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=10, color=kleuren[0])
     moet_afsluiten = False
-    start_shopx = BREEDTE / 4
-    breedte_shop = BREEDTE / 2
-    hoogte_shop = (breedte_shop / shop_afbeelding.size[0]) * shop_afbeelding.size[1]
-    start_shopy = HOOGTE - hoogte_shop
+    start_shopx = window.size[0] / 4
+    start_shopy = window.size[1] - shop_afbeelding.size[1]
+    breedte_shop = window.size[0] / 2
+    hoogte_shop = window.size[1] / 2
     lvlbuttonxstartwaarde = {}
     witruimtetussenknop = (BREEDTE / aantal_mappen) / 8
     breedte_knop = BREEDTE / aantal_mappen - witruimtetussenknop * 2
@@ -354,10 +353,10 @@ def levelcompleted():
     resources = sdl2.ext.Resources(__file__, "textures")
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
     shop_afbeelding = factory.from_image(resources.get_path("shop.jpg"))
-    start_shopx = BREEDTE / 4
-    breedte_shop = BREEDTE / 2
-    hoogte_shop = (breedte_shop / shop_afbeelding.size[0]) * shop_afbeelding.size[1]
-    start_shopy = HOOGTE - hoogte_shop
+    start_shopx = window.size[0] / 4
+    start_shopy = window.size[1] - shop_afbeelding.size[1]
+    breedte_shop = window.size[0] / 2
+    hoogte_shop = window.size[1] / 2
 
     font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[3])
     errormessage = ""
@@ -398,10 +397,10 @@ def levelfailed(reden):
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
 
     shop_afbeelding = factory.from_image(resources.get_path("shop.jpg"))
-    start_shopx = BREEDTE / 4
-    breedte_shop = BREEDTE / 2
-    hoogte_shop = (breedte_shop / shop_afbeelding.size[0]) * shop_afbeelding.size[1]
-    start_shopy = HOOGTE - hoogte_shop
+    start_shopx = window.size[0] / 4
+    start_shopy = window.size[1] - shop_afbeelding.size[1]
+    breedte_shop = window.size[0] / 2
+    hoogte_shop = window.size[1] / 2
 
     font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[3])
     errormessage = ""
@@ -462,8 +461,6 @@ def save(option):
 def printvariables():
     print("printing variables positie, richting, level \n",p_speler, r_speler, level+1)
 
-
-
 def rotatie(alfa, vector):
     # alfa moet in radialen!!!!
     rotatie_matrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
@@ -480,6 +477,7 @@ def wall_collission(pd):
 
 
 def verwerk_input(delta):
+    global testboolean
     global moet_afsluiten
     global r_speler
     global r_cameravlak
@@ -565,7 +563,6 @@ def verwerk_input(delta):
             p_speler = pd
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
-
 
 def bereken_r_straal(r_speler, kolom):
     # r_straal_kolom = d_camera * r_speler + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak
@@ -879,14 +876,13 @@ def hud():
         total_money_present += 1
         money_collected = False
         # money_collected = False
-    if total_money_present == 0:
+    elif total_money_present == 0:
         total_money_present += 1
     if total_money_present:
         money_texture = moneysprites[(total_money_present - 1)]
 
         renderer.copy(money_texture, srcrect=(0, 0, money_texture.size[0], money_texture.size[1]),
                       dstrect=(885, 35, money_texture.size[0], money_texture.size[1]))
-
 
 def create_kaart_sprites():
     map0 = factory.from_image(resources.get_path("map0.jpg"))
@@ -898,7 +894,6 @@ def create_kaart_sprites():
     positie_persoon_sprite = factory.from_image(resources.get_path("pion_bolletje.png"))
     tekst_gsm = factory.from_image(resources.get_path("Store_tekst_gsm.jpg"))
     return map_weergave_list, gsm, positie_persoon_sprite, tekst_gsm
-
 
 def kaart_weergeven():
     global map_weergave_list, gsm, positie_persoon_sprite, tekst_gsm, kaart_gekozen
@@ -929,7 +924,6 @@ def kaart_weergeven():
         renderer.copy(positie_persoon_sprite,
                       srcrect=(0, 0, positie_persoon_sprite.size[0], positie_persoon_sprite.size[1]), dstrect=(
                 positie_pion_x, positie_pion_y, positie_persoon_sprite.size[0] / 7, positie_persoon_sprite.size[1] / 7))
-
 
 def sprite_renderer(sprite_x, sprite_y, sprite, z_buffer):
     # zbuffer later nog toevoegen voor overlappingen, en per kolom
@@ -993,7 +987,6 @@ def timer(delta, renderer, window, deadline):
     renderer.copy(text,
                   dstrect=(10, text.size[1], text.size[0], text.size[1]))
 
-
 def main():
     global fps_font
     global tijd_verstrekentot
@@ -1002,9 +995,9 @@ def main():
         save("load")
         keuzealgemaakt = True
         loadornew()
+    # startscherm("new_game")
     tijd_verstrekentot = 0
     fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
-    # startscherm()
 
     # print(world_map)
     # Initialiseer de SDL2 bibliotheek
@@ -1057,7 +1050,6 @@ def main():
 
     # Blijf frames renderen tot we het signaal krijgen dat we moeten afsluiten
     while not moet_afsluiten:
-
         # Onthoud de huidige tijd
         start_time = time.time()
 
@@ -1076,7 +1068,6 @@ def main():
             if r_straal[0] == 0 or r_straal[1] == 0:
                 z_buffer.append(100)
                 continue
-
             (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok) = raycast(p_speler,r_straal)
             z_buffer.append(d_muur)
             render_wall(renderer, window, kolom, d_muur, k_muur, is_texture,textuurcoordinaten_X_zondermaalbreedtetextuur, blok, list_wall_create)
@@ -1093,7 +1084,6 @@ def main():
 
         end_time = time.time()
         delta = end_time - start_time
-
         verwerk_input(delta)
         timer(delta, renderer, window, deadline)
         # Teken gemiddelde fps van de laatste 20 frames
