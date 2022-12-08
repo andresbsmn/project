@@ -13,24 +13,23 @@ from playsound import playsound
 persistantfile = "save.pkl"
 keuzealgemaakt = False
 level = 0
-global testboolean
 testboolean = True
 # Constanten
 BREEDTE = 1200#800
 HOOGTE = 900#600
 # var aanmaken
-global deadline
-global win_flags
+# global deadline
+# global win_flags
 win_flags = sdl2.SDL_WINDOW_RESIZABLE #kan window resizen
 #
 # Globale variabelen
 #
-global is_horizontaal
-global renderer
-global list_wall_create
-global laser_shot
+# global is_horizontaal
+# global renderer
+# global list_wall_create
+# global laser_shot
 laser_shot = False
-global kaart_genomen
+# global kaart_genomen
 kaart_genomen = True
 
 levelup = False
@@ -140,11 +139,11 @@ def loadornew():
                 if button == sdl2.SDL_BUTTON_LEFT:
                     # print(f'klik op {motion.x, motion.y}')
                     # kijkt of er op  timer knop is geklikt
-                    if BREEDTE / 8 < motion.x < ((BREEDTE / 8) + 50):
-                        if 0.5 * HOOGTE + 50 > motion.y > 0.5 * HOOGTE:  # new game knop
+                    if start_shopx < motion.x < start_shopx + breedte_shop:
+                        if start_shopy - 150 > motion.y > start_shopy - 250:  # new game knop
                             startscherm("new_game")
                             stoppen = True
-                        if (2 / 3) * HOOGTE < motion.y < (2 / 3) * HOOGTE + 50 and deadline > 5:
+                        if  start_shopy-100< motion.y < start_shopy :
                             startscherm("load_game")
                             stoppen = True
 
