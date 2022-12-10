@@ -941,7 +941,7 @@ def sprite_loop_teller():
 global angle
 angle=0
 def nearest_octant(ang):
-    return (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)   # (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
+    return (((round(((ang)/np.pi)/0.5))/4)*(2*np.pi)) % (2*np.pi)   # (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
 
 
 def clerk_sprite_selector(): #fhook
