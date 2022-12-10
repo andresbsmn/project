@@ -30,7 +30,7 @@ global list_wall_create
 # global laser_shot
 laser_shot = False
 # global kaart_genomen
-kaart_genomen = True
+kaart_genomen = False
 
 levelup = False
 render_pizza_in_world = True
@@ -166,6 +166,7 @@ def loadornew():
     start_shopy = HOOGTE - hoogte_shop
     witruimtetussenknop = (BREEDTE / aantal_mappen) / 8
     while not stoppen:
+        #font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
         renderer.clear()
         renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])  # witte achtergrond
         renderer.copy(shop_afbeelding, dstrect=(start_shopx, start_shopy, breedte_shop, hoogte_shop))
@@ -199,6 +200,7 @@ def loadornew():
                             stoppen = True
 
                     # kijkt of er op een lvl knop is geklik
+        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
         text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
         renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
         renderer.present()
@@ -289,7 +291,7 @@ def startscherm(keuze):
     witruimtetussenknop = (BREEDTE / aantal_mappen) / 8
     breedte_knop = BREEDTE / aantal_mappen - witruimtetussenknop * 2
     while not moet_afsluiten:
-        gameinfo = f'gekozen map level {level + 1} \n je hebt {deadline} seconden'
+        gameinfo = f'gekozen map level {level + 1} \n je hebt {deadline_min} min en {deadline_sec} seconden'
         renderer.clear()
         renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])  # witte achtergrond
         # start knoppen level-selectie
@@ -331,7 +333,7 @@ def startscherm(keuze):
                         if 0.5 * HOOGTE + 50 > motion.y > 0.5 * HOOGTE:  # + knop
                             geklikt = True
                             change = 1
-                        if (2 / 3) * HOOGTE < motion.y < (2 / 3) * HOOGTE + 50 and deadline > 5:
+                        if (2 / 3) * HOOGTE < motion.y < (2 / 3) * HOOGTE + 50 and (deadline_sec > 5 or deadline_min>=1):
                             geklikt = True
                             change = -1
                         if geklikt:
@@ -395,7 +397,7 @@ def startscherm(keuze):
                             errormessage = f'je hebt een ongeldige waarde ingegeven \n gelieve een waarde tussen 1 en {aantal_mappen} in te geven'
 
             if keuze == "timer" and event.type == sdl2.SDL_MOUSEWHEEL:
-                if deadline > 5 or deadline_min >=1 or event.wheel.y > 0:
+                if deadline_sec > 5 or deadline_min >=1 or event.wheel.y > 0:
                     if deadline_sec == 0 and event.wheel.y < 0:
                         deadline_sec = 59 + (event.wheel.y + 1)
                         deadline_min -= 1
@@ -417,7 +419,7 @@ def startscherm(keuze):
         renderer.copy(gaminfotext, dstrect=(0, HOOGTE - text.size[1], text.size[0], text.size[1]))
         renderer.present()
         # window.refresh()
-        return world_map  # returned de gekozen level, kwn waar dit moet staan, voorlopig hier
+        #return world_map  # returned de gekozen level, kwn waar dit moet staan, voorlopig hier
     sdl2.ext.quit()
     main()
 
@@ -893,6 +895,7 @@ def scannergun():
 # Initialiseer timer
 timer_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size = 20, color=kleuren[7])
 def timer(delta, renderer, window, deadline_min, deadline_sec):
+    timer_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
     global tijd_verstrekentot
     tijd_verstrekentot += delta
     total_sec = (deadline_min * 60) + deadline_sec
@@ -1274,6 +1277,7 @@ def main():
     global beginpunt_broccoli
     global breedte_broccoli
     global hoogte_broccoli
+    global z_buffer
     # global money_rendered
     # Maak een venster aan om de game te renderen
     window = sdl2.ext.Window("Project Ingenieursbeleving 2", size=(BREEDTE, HOOGTE))
@@ -1334,8 +1338,8 @@ def main():
                         textuurcoordinaten_X_zondermaalbreedtetextuur, blok, list_wall_create)
 
         (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok) = raycast(p_speler,r_straal)
-            z_buffer.append(d_muur)
-            render_wall(renderer, window, kolom, d_muur, k_muur, is_texture,textuurcoordinaten_X_zondermaalbreedtetextuur, blok, list_wall_create)
+        z_buffer.append(d_muur)
+        render_wall(renderer, window, kolom, d_muur, k_muur, is_texture,textuurcoordinaten_X_zondermaalbreedtetextuur, blok, list_wall_create)
 
 
         volgorde_sprite_renderer()
