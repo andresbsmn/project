@@ -1199,7 +1199,7 @@ def money_collector(tuple, afstand_tot_money):
     return(collect_money)
 
 def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_object_kolom_speler,scale,sprite_bew):
-    # zbuffer later nog toevoegen voor overlappingen, en per kolom
+    # zbuffer lateer nog toevoegen voor overlappingen, en per kolom
     #waarden op nul zetten, zodat 0 returned als geen kolom weergegeven
     global angle #Feniks
     sprite_rendered = False
