@@ -938,31 +938,33 @@ def sprite_loop_teller():
     else:
         teller=0
     return teller
-angle=0
+global angle
+angle=float(0)
 def nearest_octal(ang):
-    return (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
+    return (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi))   # (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
 def clerk_sprite_selector(): #fhook
     global angle
-    rounded_angle=nearest_octal(angle)
+    rounded_angle=angle #nearest_octal(angle)
+    print(rounded_angle)
     t=sprite_loop_teller()
-    if(rounded_angle==0): #rechts
+    if(rounded_angle>=np.pi*(-1/8) and rounded_angle<=np.pi*(1/8)): #rechts       rounded_angle==0
         return sprite_rechts[t]
-    elif(rounded_angle==(1/4)*np.pi):  #rechtsvoor
+    elif(rounded_angle>np.pi*(1/8) and rounded_angle<np.pi*(3/8)):  #rechtsvoor     rounded_angle==(1/4)*np.pi
         return sprite_rechts_voor[t]
-    elif (rounded_angle==(1/2)*np.pi): # voor
+    elif (rounded_angle>=np.pi*(3/8) and rounded_angle<=np.pi*(5/8)): # voor     rounded_angle==(1/2)*np.pi
         return sprite_voor[t]
-    elif (rounded_angle==(3/4)*np.pi): # links voor
+    elif (rounded_angle>np.pi*(5/8) and rounded_angle<np.pi*(7/8)): # linksvoor  rounded_angle==(3/4)*np.pi
         return sprite_links_voor[t]
-    elif (rounded_angle==np.pi) or (rounded_angle==-np.pi) : # links
+    elif (rounded_angle>=-np.pi and rounded_angle<=np.pi*(-7/8)) or (rounded_angle>=np.pi*(7/8) and rounded_angle<=np.pi)  : # links      (rounded_angle==np.pi) or (rounded_angle==-np.pi)
         return sprite_links[t]
-    elif (rounded_angle==(-3/4)*np.pi): # linksachter
+    elif (rounded_angle>np.pi*(-7/8) and rounded_angle<np.pi*(-5/8)): # linksachter       rounded_angle==(-3/4)*np.pi
         return sprite_links_achter[t]
-    elif (rounded_angle==(-1/2)*np.pi): #achter
+    elif (rounded_angle>=np.pi*(-5/8) and rounded_angle<=np.pi*(-3/8)): #achter             rounded_angle==(-1/2)*np.pi
         return sprite_achter[t]
-    elif (rounded_angle==(-1/4)*np.pi): #rechtsachter
+    elif (rounded_angle>np.pi*(-3/8) and rounded_angle<np.pi*(-1/8)): #rechtsachter       rounded_angle==(-1/4)*np.pi
         return sprite_rechts_achter[t]
-global clerk_sprite
-clerk_string=clerk_sprite_selector()
+
+#clerk_string=clerk_sprite_selector()  #foplosser
 
 
 #eind nieuwe code Feniks
@@ -988,11 +990,11 @@ def create_sprites_hud():
     heartsprite3 = factory.from_image(resources.get_path("heart3.png"))
     heartsprites = [heartsprite1, heartsprite2, heartsprite3]
     gsmsprite = factory.from_image(resources.get_path("gsm.png"))
-    clerk_sprite = factory.from_image(resources.get_path(clerk_string))  # aangepast door Feniks
-    print("grootte: ", clerk_sprite.size)
-    print(clerk_string)
+    #clerk_sprite = factory.from_image(resources.get_path(clerk_string))  # aangepast door Feniks foplosser
+    #print("grootte: ", clerk_sprite.size)
+    #print(clerk_string)
 
-    return hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld,clerk_sprite
+    return hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld
 
 
 def hud():
@@ -1448,9 +1450,9 @@ def main():
 
     # textures aanmaken
     list_wall_create = create_textures()
-    global hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld,clerk_sprite
+    global hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld #foplosser
     # sprites hud aanmeken
-    hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld,clerk_sprite = create_sprites_hud()
+    hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld = create_sprites_hud()
     global scannergun_sprite, map_weergave_list, gsm, positie_persoon_sprite, tekst_gsm
 
     # sprites kaart aanmaken
@@ -1492,8 +1494,12 @@ def main():
         (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok) = raycast(p_speler,r_straal)
         z_buffer.append(d_muur)
         render_wall(renderer, window, kolom, d_muur, k_muur, is_texture,textuurcoordinaten_X_zondermaalbreedtetextuur, blok, list_wall_create)
-
-
+        if (kaart_gekozen!=0):
+            global clerk_sprite
+            clerk_string = clerk_sprite_selector()
+            print(clerk_string)
+            clerk_sprite = factory.from_image(resources.get_path(clerk_string))  # aangepast door Feniks foplosser
+            print("grootte: ", clerk_sprite.size)
         volgorde_sprite_renderer()
         scannergun()
         munt_collected()
