@@ -1,3 +1,5 @@
+#f
+
 import cProfile
 import math
 import time
@@ -143,8 +145,8 @@ heart_hoogte = 25
 money_breedtes = [25, 48, 72, 97]
 money_hoogte = 18
 #0 : pizza, #1: apple, egg, broccoli, gsmsprite
-sprite_breedtes = [35, 35, 30 , 42, 35, 150]
-sprite_hoogtes = [35, 35, 40, 45, 55, 110]
+sprite_breedtes = [35, 35, 30 , 42, 35,150, 100]
+sprite_hoogtes = [35, 35, 40, 45, 55,110, 100]
 
 #0: 'empty', #1 rek, kassa, frigo, melkfrigo, roodrek, slager, winkelmuur, bakker
 textures_breedtes = ["empty", 1490, 1300, 1180, 1310, 340, 800, 510, 680]
@@ -576,6 +578,7 @@ def exit_level_action():
     level += 1
     sdl2.ext.quit()
     main()
+
 def verwerk_input(delta):
     global moet_afsluiten
     global r_speler
@@ -958,7 +961,7 @@ def clerk_sprite_selector(): #fhook
         return sprite_achter[t]
     elif (rounded_angle==(-1/4)*np.pi): #rechtsachter
         return sprite_rechts_achter[t]
-
+global clerk_sprite
 clerk_string=clerk_sprite_selector()
 
 
@@ -986,6 +989,7 @@ def create_sprites_hud():
     heartsprites = [heartsprite1, heartsprite2, heartsprite3]
     gsmsprite = factory.from_image(resources.get_path("gsm.png"))
     clerk_sprite = factory.from_image(resources.get_path(clerk_string))  # aangepast door Feniks
+    print("grootte: ", clerk_sprite.size)
     print(clerk_string)
 
     return hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld,clerk_sprite
@@ -1109,7 +1113,7 @@ def volgorde_sprite_renderer():
     global money1_rendered, money2_rendered, money3_rendered, money4_rendered, money1_collected, money2_collected, money3_collected, money4_collected
     global d_pizza_kolom_speler, d_apple_kolom_speler, d_broccoli_kolom_speler, d_egg_kolom_speler, tuple_pizza, tuple_apple, tuple_broccoli, tuple_egg
     global d_munt1_kolom_speler,d_munt2_kolom_speler ,d_munt3_kolom_speler ,d_munt4_kolom_speler
-    global tuple_munt1, tuple_munt2,tuple_munt3,tuple_munt4
+    global tuple_munt1, tuple_munt2,tuple_munt3,tuple_munt4, tuple_clerk, clerk_sprite
     d_pizza_kolom_speler = math.sqrt(((pizza_x - p_speler[0]) ** 2) + (pizza_y - p_speler[1]) ** 2)
     d_apple_kolom_speler = math.sqrt(((apple_x - p_speler[0]) ** 2) + (apple_y - p_speler[1]) ** 2)
     d_broccoli_kolom_speler = math.sqrt(((broccoli_x - p_speler[0]) ** 2) + (broccoli_y - p_speler[1]) ** 2)
@@ -1162,7 +1166,8 @@ def volgorde_sprite_renderer():
             if d_gsm_kolom_speler <= 0.5 and begintpunt_gsm != 0:
                 collect_gsm()
         elif list_afstanden[i]== d_clerk_kolom_speler and kaart_gekozen!=0:
-            sprite_renderer(clerk_x, clerk_y, clerk_sprite, z_buffer, 5, True)
+            tuple_clerk = sprite_renderer(clerk_x, clerk_y, clerk_sprite,6, z_buffer,d_clerk_kolom_speler, 5, True)
+
 
 def munt_collected():
     global money1_collected, money1_rendered, money2_collected, money2_rendered, money3_collected, money3_rendered, money4_collected, money4_rendered
@@ -1229,7 +1234,7 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
         hoogte_sprite_wereld = sprite_hoogtes[nummber_sprite]
         breedte_sprite_wereld = sprite_breedtes[nummber_sprite]
 
-        hoogte_sprite_scherm = HOOGTE * (1 / (d_object_kolom_speler * 5))
+        hoogte_sprite_scherm = HOOGTE * (1 / (d_object_kolom_speler * 5)) * scale
         breedte_sprite_scherm = (breedte_sprite_wereld / hoogte_sprite_wereld) * hoogte_sprite_scherm  # "nodig?want zal 1 zijn per kolom maar hoe weten of nog"
         beginpunt_sprite_x = kolom_midden_sprite - (breedte_sprite_scherm / 2)
 
@@ -1443,7 +1448,7 @@ def main():
 
     # textures aanmaken
     list_wall_create = create_textures()
-    global hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld
+    global hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld,clerk_sprite
     # sprites hud aanmeken
     hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld,clerk_sprite = create_sprites_hud()
     global scannergun_sprite, map_weergave_list, gsm, positie_persoon_sprite, tekst_gsm
