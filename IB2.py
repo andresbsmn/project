@@ -43,6 +43,7 @@ heartsprite = "heart3.png"
 total_hearts_present = 3
 
 player_hit = False
+clerk_dead=False  #fhook
 resources = sdl2.ext.Resources(__file__, "textures")
 
 total_money_present = 0
@@ -915,7 +916,53 @@ def timer(delta, renderer, window, deadline_min, deadline_sec):
     # renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), window.size[1]/3, text.size[0], text.size[1]))
     renderer.copy(text, dstrect=(705, 35, text.size[0], text.size[1]))
 
+#nieuwe code van Feniks
+teller=0
 
+sprite_voor=["voor1.png","voor2.png","voor3.png"]  #0,1,2
+sprite_achter=["achter1.png","achter2.png","achter3.png"]
+sprite_links=["links1.png","links2.png","links3.png"]
+sprite_rechts=["rechts1.png","rechts2.png","rechts3.png"]
+sprite_links_voor=["links_voor1.png","links_voor2.png","links_voor3.png"]
+sprite_links_achter=["links_achter1.png","links_achter2.png","links_achter3.png"]
+sprite_rechts_voor=["rechts_voor1.png","rechts_voor2.png","rechts_voor3.png"]
+sprite_rechts_achter=["rechts_achter1.png","rechts_achter2.png","rechts_achter3.png"]
+teller=0
+def sprite_loop_teller():
+    global teller
+    if teller<2:
+        teller+=1
+    else:
+        teller=0
+    return teller
+angle=0
+def nearest_octal(ang):
+    return (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
+def clerk_sprite_selector(): #fhook
+    global angle
+    rounded_angle=nearest_octal(angle)
+    t=sprite_loop_teller()
+    if(rounded_angle==0): #rechts
+        return sprite_rechts[t]
+    elif(rounded_angle==(1/4)*np.pi):  #rechtsvoor
+        return sprite_rechts_voor[t]
+    elif (rounded_angle==(1/2)*np.pi): # voor
+        return sprite_voor[t]
+    elif (rounded_angle==(3/4)*np.pi): # links voor
+        return sprite_links_voor[t]
+    elif (rounded_angle==np.pi) or (rounded_angle==-np.pi) : # links
+        return sprite_links[t]
+    elif (rounded_angle==(-3/4)*np.pi): # linksachter
+        return sprite_links_achter[t]
+    elif (rounded_angle==(-1/2)*np.pi): #achter
+        return sprite_achter[t]
+    elif (rounded_angle==(-1/4)*np.pi): #rechtsachter
+        return sprite_rechts_achter[t]
+
+clerk_string=clerk_sprite_selector()
+
+
+#eind nieuwe code Feniks
 def create_sprites_hud():
     # global hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture
     hud_texture = factory.from_image(resources.get_path("hud.png"))
@@ -938,8 +985,10 @@ def create_sprites_hud():
     heartsprite3 = factory.from_image(resources.get_path("heart3.png"))
     heartsprites = [heartsprite1, heartsprite2, heartsprite3]
     gsmsprite = factory.from_image(resources.get_path("gsm.png"))
+    clerk_sprite = factory.from_image(resources.get_path(clerk_string))  # aangepast door Feniks
+    print(clerk_string)
 
-    return hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld
+    return hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld,clerk_sprite
 
 
 def hud():
@@ -1070,43 +1119,50 @@ def volgorde_sprite_renderer():
     d_munt3_kolom_speler = math.sqrt(((munt3_x - p_speler[0]) ** 2) + (munt3_y - p_speler[1]) ** 2)
     d_munt4_kolom_speler = math.sqrt(((munt4_x - p_speler[0]) ** 2) + (munt4_y - p_speler[1]) ** 2)
     d_gsm_kolom_speler =   math.sqrt(((gsm_x - p_speler[0])**2)+(gsm_y - p_speler[1])**2)
-    list_afstanden = [d_pizza_kolom_speler, d_apple_kolom_speler, d_broccoli_kolom_speler, d_egg_kolom_speler, d_munt1_kolom_speler, d_munt2_kolom_speler, d_munt3_kolom_speler, d_munt4_kolom_speler, d_gsm_kolom_speler]
+
+    if kaart_gekozen!=0:
+        clerk_x, clerk_y= clerk_positie(kaart_gekozen)
+        d_clerk_kolom_speler= math.sqrt(((clerk_x - p_speler[0])**2)+(clerk_y - p_speler[1])**2)
+        list_afstanden = [d_pizza_kolom_speler, d_apple_kolom_speler, d_broccoli_kolom_speler, d_egg_kolom_speler,d_munt1_kolom_speler, d_munt2_kolom_speler, d_munt3_kolom_speler, d_munt4_kolom_speler,d_gsm_kolom_speler,d_clerk_kolom_speler]
+    else:
+        list_afstanden = [d_pizza_kolom_speler, d_apple_kolom_speler, d_broccoli_kolom_speler, d_egg_kolom_speler, d_munt1_kolom_speler, d_munt2_kolom_speler, d_munt3_kolom_speler, d_munt4_kolom_speler, d_gsm_kolom_speler]
+
     list_afstanden.sort()
     list_afstanden.reverse()
     for i in range(0, len(list_afstanden)):
         #tuple bevat: beginpunt x, breedte sprite scherm, hoogte sprite scherm en sprite rendered (boolean)
         if list_afstanden[i] == d_pizza_kolom_speler and pizza_collected==False:
-            tuple_pizza = sprite_renderer(pizza_x, pizza_y, pizza_texture,0, z_buffer, d_pizza_kolom_speler)
+            tuple_pizza = sprite_renderer(pizza_x, pizza_y, pizza_texture,0, z_buffer, d_pizza_kolom_speler,1,False)
 
 
         elif list_afstanden[i] == d_apple_kolom_speler and apple_collected==False:
-            tuple_apple = sprite_renderer(apple_x, apple_y, apple_texture,1, z_buffer, d_apple_kolom_speler)
+            tuple_apple = sprite_renderer(apple_x, apple_y, apple_texture,1, z_buffer, d_apple_kolom_speler,1,False)
 
         elif list_afstanden[i] == d_egg_kolom_speler and egg_collected==False:
-            tuple_egg= sprite_renderer(egg_x, egg_y, egg_texture,2, z_buffer, d_egg_kolom_speler)
+            tuple_egg= sprite_renderer(egg_x, egg_y, egg_texture,2, z_buffer, d_egg_kolom_speler,1,False)
 
         elif list_afstanden[i] == d_broccoli_kolom_speler and broccoli_collected==False:
-            tuple_broccoli = sprite_renderer(broccoli_x, broccoli_y, broccoli_texture,3, z_buffer, d_broccoli_kolom_speler)
+            tuple_broccoli = sprite_renderer(broccoli_x, broccoli_y, broccoli_texture,3, z_buffer, d_broccoli_kolom_speler,1,False)
 
         elif list_afstanden[i] == d_munt1_kolom_speler and money1_collected==False:
-            tuple_munt1 = sprite_renderer(munt1_x, munt1_y, money_sprite1_wereld, 5,z_buffer, d_munt1_kolom_speler)
+            tuple_munt1 = sprite_renderer(munt1_x, munt1_y, money_sprite1_wereld, 5,z_buffer, d_munt1_kolom_speler,1,False)
 
         elif list_afstanden[i] == d_munt2_kolom_speler and money2_collected==False:
-            tuple_munt2 = sprite_renderer(munt2_x, munt2_y, money_sprite1_wereld,5, z_buffer, d_munt2_kolom_speler)
+            tuple_munt2 = sprite_renderer(munt2_x, munt2_y, money_sprite1_wereld,5, z_buffer, d_munt2_kolom_speler,1,False)
 
         elif list_afstanden[i] == d_munt3_kolom_speler and money3_collected==False:
-            tuple_munt3 = sprite_renderer(munt3_x, munt3_y, money_sprite1_wereld, 5,z_buffer, d_munt3_kolom_speler)
+            tuple_munt3 = sprite_renderer(munt3_x, munt3_y, money_sprite1_wereld, 5,z_buffer, d_munt3_kolom_speler,1,False)
 
         elif list_afstanden[i] == d_munt4_kolom_speler and money4_collected==False:
-            tuple_munt4 = sprite_renderer(munt4_x, munt4_y, money_sprite1_wereld,5, z_buffer, d_munt4_kolom_speler)
+            tuple_munt4 = sprite_renderer(munt4_x, munt4_y, money_sprite1_wereld,5, z_buffer, d_munt4_kolom_speler,1,False)
 
         elif list_afstanden[i] == d_gsm_kolom_speler and kaart_genomen ==False:
-            tuple_gsm = sprite_renderer(gsm_x, gsm_y, gsmsprite,4, z_buffer, d_gsm_kolom_speler)
+            tuple_gsm = sprite_renderer(gsm_x, gsm_y, gsmsprite,4, z_buffer, d_gsm_kolom_speler,1,False)
             begintpunt_gsm = tuple_gsm[0]
             if d_gsm_kolom_speler <= 0.5 and begintpunt_gsm != 0:
                 collect_gsm()
-
-
+        elif list_afstanden[i]== d_clerk_kolom_speler and kaart_gekozen!=0:
+            sprite_renderer(clerk_x, clerk_y, clerk_sprite, z_buffer, 5, True)
 
 def munt_collected():
     global money1_collected, money1_rendered, money2_collected, money2_rendered, money3_collected, money3_rendered, money4_collected, money4_rendered
@@ -1142,17 +1198,18 @@ def money_collector(tuple, afstand_tot_money):
         collect_money = True
     return(collect_money)
 
-def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_object_kolom_speler):
+def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_object_kolom_speler,scale,sprite_bew):
     # zbuffer later nog toevoegen voor overlappingen, en per kolom
     #waarden op nul zetten, zodat 0 returned als geen kolom weergegeven
+    global angle #Feniks
     sprite_rendered = False
     beginpunt_sprite_x = 0
     #d_object_kolom_speler = 0
     breedte_sprite_scherm = 0
     hoogte_sprite_scherm = 0
 
-    p_sprite_x_nieuw = sprite_x - p_speler[0]
-    p_sprite_y_nieuw = sprite_y - p_speler[1]
+    p_sprite_x_nieuw = sprite_x - p_speler[0]  #dx
+    p_sprite_y_nieuw = sprite_y - p_speler[1]  #dy
     # determinant van cameramatrix
     determinant_m = r_cameravlak[0] * r_speler[1] - r_cameravlak[1] * r_speler[0]
 
@@ -1164,6 +1221,8 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
     if v_cameracoordinaten==0:
         v_cameracoordinaten+=0.00001
     a = u_cameracoordinaten / v_cameracoordinaten  # positie op x as scherm, dus kolom
+    if (sprite_bew==True): #Feniks
+        angle=math.atan2(p_sprite_y_nieuw,p_sprite_x_nieuw) #Feniks
 
     if (a >= -1) and (a <= 1) and (v_cameracoordinaten >= 0):
         kolom_midden_sprite = (((a + 1) / 2) * BREEDTE)
@@ -1193,6 +1252,94 @@ def check_if_object_scanned(scanobject_x, scanobject_y):
         render_pizza_in_world = False
         return True
 
+#start deel Feniks
+def noord(clerk_x):
+   clerk_x-=0.05
+   return round(clerk_x,2)
+
+def oost(clerk_y):
+    clerk_y+=0.05
+    return round(clerk_y,2)
+
+def west(clerk_y):
+    clerk_y-=0.05
+    return round(clerk_y,2)
+
+def zuid(clerk_x):
+    clerk_x+=0.05
+    return round(clerk_x,2)
+
+#start waarden npc map 2
+clerk_x1=15.0
+clerk_y1=4.0
+#start waarden npc map 3
+clerk_x2=12.0
+clerk_y2=6.0
+#start waarden npc map 4
+clerk_x3=15.5
+clerk_y3=9.5
+clerk_check=True
+def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geene loop want geen vijand.   clerk_x1,clerk_y1,clerk_x2,clerk_y2,clerk_x3,clerk_y3
+    if (kaart_gekozen==1): #loop map 2
+        global clerk_x1, clerk_y1,clerk_check
+        if (clerk_x1>7.5) and (clerk_y1 ==4.0) :  #A
+            clerk_x1=noord(clerk_x1)
+            clerk_check=True
+            return clerk_x1,clerk_y1
+        elif (clerk_x1 ==7.5) and (clerk_y1 <15.5) and (clerk_check==True): #B
+            clerk_y1=oost(clerk_y1)
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 > 4.5) and (clerk_y1 ==15.5):  #C
+            clerk_x1=noord(clerk_x1)
+            clerk_check=False
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 ==4.5) and (clerk_y1 > 5.5):  #D
+            clerk_y1=west(clerk_y1)
+            return clerk_x1,clerk_y1
+        elif (clerk_x1 < 6.5) and (clerk_y1 ==5.5):  #E
+            clerk_x1=zuid(clerk_x1)
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 ==6.5) and (clerk_y1 >2.0):   #F
+            clerk_y1=west(clerk_y1)
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 <15.0) and (clerk_y1 ==2.0):  #G
+            clerk_x1=zuid(clerk_x1)
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 ==15.0) and (clerk_y1 <4.0):  #H
+            clerk_y1=oost(clerk_y1)
+            clerk_check=True
+            return clerk_x1, clerk_y1
+
+    if (kaart_gekozen==2):  #loop map 3
+        global clerk_x2, clerk_y2
+        if (clerk_x2!=5.0) and (clerk_y2==6.0):
+                clerk_x2=noord(clerk_x2)
+                return clerk_x2,clerk_y2
+        elif (clerk_x2==5.0) and (clerk_y2!=2.0):
+            clerk_y2=west(clerk_y2)
+            return clerk_x2,clerk_y2
+        elif (clerk_x2!=12.5) and (clerk_y2==2.0):
+            clerk_x2=zuid(clerk_x2)
+            return clerk_x2,clerk_y2
+        elif (clerk_x2==12.5) and (clerk_y2!=6.0):
+            clerk_y2=oost(clerk_y2)
+            return clerk_x2,clerk_y2
+
+    if (kaart_gekozen==3): #loop map 4
+        global clerk_x3, clerk_y3
+        if (clerk_x3 !=2.0) and (clerk_y3 ==9.5):
+            clerk_x3=noord(clerk_x3)
+            return clerk_x3,clerk_y3
+        elif (clerk_x3 ==2.0) and (clerk_y3 !=2.0):
+            clerk_y3=west(clerk_y3)
+            return clerk_x3, clerk_y3
+        elif (clerk_x3 !=15.5) and (clerk_y3 ==2.0):
+            clerk_x3=zuid(clerk_x3)
+            return clerk_x3, clerk_y3
+        elif (clerk_x3 == 15.5) and (clerk_y3 !=9.5):
+            clerk_y3 = oost(clerk_y3)
+            return clerk_x3, clerk_y3
+#einde deel Feniks
 
 def check_if_level_completed():
 
@@ -1298,7 +1445,7 @@ def main():
     list_wall_create = create_textures()
     global hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld
     # sprites hud aanmeken
-    hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld = create_sprites_hud()
+    hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites, gsmsprite, money_sprite1_wereld,clerk_sprite = create_sprites_hud()
     global scannergun_sprite, map_weergave_list, gsm, positie_persoon_sprite, tekst_gsm
 
     # sprites kaart aanmaken
