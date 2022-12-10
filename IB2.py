@@ -939,29 +939,29 @@ def sprite_loop_teller():
         teller=0
     return teller
 global angle
-angle=float(0)
-def nearest_octal(ang):
-    return (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi))   # (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
+angle=0
+def nearest_octant(ang):
+    return (((round(((ang)/np.pi)/0.25))/8)*(2*np.pi))% (2*np.pi)   # (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
 def clerk_sprite_selector(): #fhook
     global angle
-    rounded_angle=angle #nearest_octal(angle)
+    rounded_angle=nearest_octal(angle)
     print(rounded_angle)
     t=sprite_loop_teller()
-    if(rounded_angle>=np.pi*(-1/8) and rounded_angle<=np.pi*(1/8)): #rechts       rounded_angle==0
+    if(rounded_angle==0): #rechts       rounded_angle==0   rounded_angle>=np.pi*(-1/8) and rounded_angle<=np.pi*(1/8)
         return sprite_rechts[t]
-    elif(rounded_angle>np.pi*(1/8) and rounded_angle<np.pi*(3/8)):  #rechtsvoor     rounded_angle==(1/4)*np.pi
+    elif(rounded_angle==1):  #rechtsvoor     rounded_angle==(1/4)*np.pi  rounded_angle>np.pi*(1/8) and rounded_angle<np.pi*(3/8)
         return sprite_rechts_voor[t]
-    elif (rounded_angle>=np.pi*(3/8) and rounded_angle<=np.pi*(5/8)): # voor     rounded_angle==(1/2)*np.pi
+    elif (rounded_angle==2): # voor     rounded_angle==(1/2)*np.pi rounded_angle>=np.pi*(3/8) and rounded_angle<=np.pi*(5/8)
         return sprite_voor[t]
-    elif (rounded_angle>np.pi*(5/8) and rounded_angle<np.pi*(7/8)): # linksvoor  rounded_angle==(3/4)*np.pi
+    elif (rounded_angle==3): # linksvoor  rounded_angle==(3/4)*np.pi rounded_angle>np.pi*(5/8) and rounded_angle<np.pi*(7/8)
         return sprite_links_voor[t]
-    elif (rounded_angle>=-np.pi and rounded_angle<=np.pi*(-7/8)) or (rounded_angle>=np.pi*(7/8) and rounded_angle<=np.pi)  : # links      (rounded_angle==np.pi) or (rounded_angle==-np.pi)
+    elif (rounded_angle==4)  : # links      (rounded_angle==np.pi) or (rounded_angle==-np.pi) (rounded_angle>=-np.pi and rounded_angle<=np.pi*(-7/8)) or (rounded_angle>=np.pi*(7/8) and rounded_angle<=np.pi)
         return sprite_links[t]
-    elif (rounded_angle>np.pi*(-7/8) and rounded_angle<np.pi*(-5/8)): # linksachter       rounded_angle==(-3/4)*np.pi
+    elif (rounded_angle==5): # linksachter       rounded_angle==(-3/4)*np.pi    rounded_angle>np.pi*(-7/8) and rounded_angle<np.pi*(-5/8)
         return sprite_links_achter[t]
-    elif (rounded_angle>=np.pi*(-5/8) and rounded_angle<=np.pi*(-3/8)): #achter             rounded_angle==(-1/2)*np.pi
+    elif (rounded_angle==6): #achter             rounded_angle==(-1/2)*np.pi       rounded_angle>=np.pi*(-5/8) and rounded_angle<=np.pi*(-3/8)
         return sprite_achter[t]
-    elif (rounded_angle>np.pi*(-3/8) and rounded_angle<np.pi*(-1/8)): #rechtsachter       rounded_angle==(-1/4)*np.pi
+    elif (rounded_angle==7): #rechtsachter       rounded_angle==(-1/4)*np.pi rounded_angle>np.pi*(-3/8) and rounded_angle<np.pi*(-1/8)
         return sprite_rechts_achter[t]
 
 #clerk_string=clerk_sprite_selector()  #foplosser
