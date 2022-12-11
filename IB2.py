@@ -523,14 +523,14 @@ def levelfailed(reden):
 
 def save(option):
     global level
-    global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_hearts_present, total_money_present, level, tijd_verstrekentot
+    global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_hearts_present, total_money_present, level, tijd_verstrekentot, kaart_genomen
     # waarden_speler = {'positie': p_speler, 'richting': r_speler, 'pizza':pizza_collected, 'appel': apple_collected, 'egg':egg_collected,'broccoli':broccoli_collected,'hearts':total_hearts_present,'money':total_money_present}
     # waarden_wereld = { 'level': level,'time':tijd_verstrekentot}
     if option == "save":
         tesaven_waarden = {'p_speler': p_speler, 'r_speler': r_speler, 'pizza_collected': pizza_collected,
                            'apple_collected': apple_collected, 'egg_collected': egg_collected, 'broccoli_collected': broccoli_collected,
                            'total_hearts_present': total_hearts_present, 'total_money_present': total_money_present,
-                           'level': level, 'tijd_verstrekentot': tijd_verstrekentot
+                           'level': level, 'tijd_verstrekentot': tijd_verstrekentot, 'kaart_genomen': kaart_genomen,
                            }
         outfile = open(persistantfile, 'wb')
         pickle.dump(tesaven_waarden, outfile)
