@@ -255,7 +255,7 @@ def startscherm(keuze):
         resetwaarden = {'p_speler': np.array([9.5, 15.5]), 'r_speler': np.array([0, 1]), 'pizza_collected': False,
                            'apple_collected': False, 'egg_collected': False,
                            'broccoli_collected': False,
-                           'total_hearts_present': 3, 'total_money_present': 1,
+                           'total_hearts_present': 3, 'money1_aantal': 0,'money2_aantal':0,'money3_aantal':0,'money4_aantal':0
                            'level': 0, 'tijd_verstrekentot': False
                            }
         save("save")
@@ -584,7 +584,7 @@ def save(option):
     if option == "save":
         tesaven_waarden = {'p_speler': p_speler, 'r_speler': r_speler, 'pizza_collected': pizza_collected,
                            'apple_collected': apple_collected, 'egg_collected': egg_collected, 'broccoli_collected': broccoli_collected,
-                           'total_hearts_present': total_hearts_present, 'total_money_present': total_money_present,
+                           'total_hearts_present': total_hearts_present, 'money1_aantal': money1_aantal,'money2_aantal':money2_aantal,'money3_aantal':money3_aantal,'money4_aantal':money4_aantal,
                            'level': level, 'tijd_verstrekentot': tijd_verstrekentot, 'kaart_genomen': kaart_genomen,
                            }
         outfile = open(persistantfile, 'wb')
