@@ -1312,6 +1312,16 @@ def check_if_object_scanned(scanobject_x, scanobject_y):
         render_pizza_in_world = False
         return True
 
+def player_hit_by_clerk():
+    global player_hit
+    global p_speler
+    clerk_x, clerk_y = clerk_positie(kaart_gekozen)
+    d_clerk = math.sqrt((p_speler[0] - clerk_x) ** 2 + (p_speler[1] - clerk_y) ** 2)
+    if d_clerk <= 0.5:
+        player_hit = True
+        p_speler = np.array([9.5, 15.5])
+
+
 #start deel Feniks
 def noord(clerk_x):
    clerk_x-=0.05
@@ -1571,7 +1581,7 @@ def main():
         render_fps(fps, renderer, window)
 
         hud()
-
+        player_hit_by_clerk()
         if kaart_genomen == True:
             kaart_weergeven()
 
