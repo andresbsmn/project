@@ -941,10 +941,12 @@ def sprite_loop_teller():
 global angle
 angle=0
 def nearest_octant(ang):
-    return (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi))% (2*np.pi)   # (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
+    return (((round(((ang)/np.pi)/0.5))/4)*(2*np.pi)) % (2*np.pi)   # (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
+
+
 def clerk_sprite_selector(): #fhook
     global angle
-    rounded_angle=nearest_octant(angle)
+    rounded_angle=round(nearest_octant(angle))
     print(rounded_angle)
     t=sprite_loop_teller()
     if(rounded_angle==0): #rechts       rounded_angle==0   rounded_angle>=np.pi*(-1/8) and rounded_angle<=np.pi*(1/8)
@@ -1167,8 +1169,9 @@ def volgorde_sprite_renderer():
             begintpunt_gsm = tuple_gsm[0]
             if d_gsm_kolom_speler <= 0.5 and begintpunt_gsm != 0:
                 collect_gsm()
-        elif list_afstanden[i]== d_clerk_kolom_speler and kaart_gekozen!=0:
-            tuple_clerk = sprite_renderer(clerk_x, clerk_y, clerk_sprite,6, z_buffer,d_clerk_kolom_speler, 5, True)
+        if kaart_gekozen!=0:
+            if list_afstanden[i]== d_clerk_kolom_speler:
+                tuple_clerk = sprite_renderer(clerk_x, clerk_y, clerk_sprite,6, z_buffer,d_clerk_kolom_speler, 5, True)
 
 
 def munt_collected():
@@ -1229,7 +1232,7 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
         v_cameracoordinaten+=0.00001
     a = u_cameracoordinaten / v_cameracoordinaten  # positie op x as scherm, dus kolom
     if (sprite_bew==True): #Feniks
-        angle=math.atan2(p_sprite_y_nieuw,p_sprite_x_nieuw) #Feniks
+        angle=float(math.atan2(p_sprite_y_nieuw,p_sprite_x_nieuw)) #Feniks
 
     if (a >= -1) and (a <= 1) and (v_cameracoordinaten >= 0):
         kolom_midden_sprite = (((a + 1) / 2) * BREEDTE)
@@ -1499,7 +1502,6 @@ def main():
             clerk_string = clerk_sprite_selector()
             print(clerk_string)
             clerk_sprite = factory.from_image(resources.get_path(clerk_string))  # aangepast door Feniks foplosser
-            print("grootte: ", clerk_sprite.size)
         volgorde_sprite_renderer()
         scannergun()
         munt_collected()
