@@ -242,7 +242,7 @@ def startscherm(keuze):
     global deadline_min, deadline_sec
     global kaart_gekozen
     global levelup
-    global level
+    global level,money1_aantal,money2_aantal,money3_aantal,money4_aantal
     #if levelup:
     #    levelup = False
     #    kaart_gekozen = level
@@ -255,7 +255,7 @@ def startscherm(keuze):
         resetwaarden = {'p_speler': np.array([9.5, 15.5]), 'r_speler': np.array([0, 1]), 'pizza_collected': False,
                            'apple_collected': False, 'egg_collected': False,
                            'broccoli_collected': False,
-                           'total_hearts_present': 3, 'money1_aantal': 0,'money2_aantal':0,'money3_aantal':0,'money4_aantal':0,
+                           'total_hearts_present': 3, 'money1_aantal': 0,'money2_aantal':0,'money3_aantal':0,'money4_aantal':0
                            'level': 0, 'tijd_verstrekentot': False
                            }
         save("save")
@@ -577,14 +577,14 @@ def levelfailed(reden):
         # window.refresh()
 
 def save(option):
-    global level
+    global level,money1_aantal,money2_aantal,money3_aantal,money4_aantal
     global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_hearts_present, total_money_present, level, tijd_verstrekentot, kaart_genomen
     # waarden_speler = {'positie': p_speler, 'richting': r_speler, 'pizza':pizza_collected, 'appel': apple_collected, 'egg':egg_collected,'broccoli':broccoli_collected,'hearts':total_hearts_present,'money':total_money_present}
     # waarden_wereld = { 'level': level,'time':tijd_verstrekentot}
     if option == "save":
         tesaven_waarden = {'p_speler': p_speler, 'r_speler': r_speler, 'pizza_collected': pizza_collected,
                            'apple_collected': apple_collected, 'egg_collected': egg_collected, 'broccoli_collected': broccoli_collected,
-                           'total_hearts_present': total_hearts_present, 'money1_aantal': money1_aantal,'money2_aantal':money2_aantal,'money3_aantal':money3_aantal,'money4_aantal':money4_aantal,
+                           'total_hearts_present': total_hearts_present, 'money1_aantal': money1_aantal,'money2_aantal':money2_aantal,'money3_aantal':money3_aantal,'money4_aantal':money4_aantal
                            'level': level, 'tijd_verstrekentot': tijd_verstrekentot, 'kaart_genomen': kaart_genomen,
                            }
         outfile = open(persistantfile, 'wb')
