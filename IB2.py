@@ -255,7 +255,7 @@ def startscherm(keuze):
         resetwaarden = {'p_speler': np.array([9.5, 15.5]), 'r_speler': np.array([0, 1]), 'pizza_collected': False,
                            'apple_collected': False, 'egg_collected': False,
                            'broccoli_collected': False,
-                           'total_hearts_present': 3, 'money1_aantal': 0,'money2_aantal':0,'money3_aantal':0,'money4_aantal':0
+                           'total_hearts_present': 3, 'money1_aantal': 0,'money2_aantal':0,'money3_aantal':0,'money4_aantal':0,
                            'level': 0, 'tijd_verstrekentot': False
                            }
         save("save")
