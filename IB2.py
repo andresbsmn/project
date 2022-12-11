@@ -826,7 +826,7 @@ def raycast(p_speler, r_straal):
                     break
 
     d_muur = d_muur * np.dot(r_speler, r_straal)
-    d_muur = round(d_muur, 12)
+    #d_muur = round(d_muur, 12)
     return (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok)
 
 
