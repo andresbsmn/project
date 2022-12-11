@@ -152,6 +152,9 @@ sprite_hoogtes = [35, 35, 40, 45, 55,110, 100]
 textures_breedtes = ["empty", 1490, 1300, 1180, 1310, 340, 800, 510, 680]
 textures_hoogtes = ["empty", 1490, 1300, 1050, 1350, 380, 730 , 510, 670]
 
+
+personal_records = [0, 0, 0, 0]
+
 def loadornew():
     sdl2.ext.init()
     window = sdl2.ext.Window("start", size=(BREEDTE, HOOGTE))
@@ -222,7 +225,7 @@ def reset_startwaarden():
     # global total_money_present
     # global total_hearts_present
     r_speler = np.array([0, 1])
-    p_speler = np.array([10.0, 15.0])
+    p_speler = np.array([9.5, 15.5])
     renderer.clear
     #     ik denk dat dit ook moet gereset worden
     #     render_pizza_in_world = True
@@ -265,6 +268,7 @@ def startscherm(keuze):
     world_map = maps[kaart_gekozen]
     if keuze == "load_game":
         return
+
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
     window = sdl2.ext.Window("level selectie scherm", size=(BREEDTE, HOOGTE), flags=win_flags)
@@ -426,55 +430,106 @@ def startscherm(keuze):
     sdl2.ext.quit()
     main()
 
-def levelcompleted():
+def exit_level_action():
     global level
+    # print(level)
     global levelup
     if level == 3:
-        message = f'congrats!!! you beat the game \n klik op "s" om opnieuw te beginnen'
+        message_congrats = f'Proficiat! Alle levels zijn voltooid!'
         level = 0
     else:
-        message = f'congrats!!! you cleared level {level+1}, \n druk op "s" om verder te spelen'
+        message_congrats = f'Proficiat! Level is voltooid!'
         level += 1
         levelup = True
     reset_startwaarden()
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
-    window = sdl2.ext.Window("levelup", size=(BREEDTE, HOOGTE))
+    window = sdl2.ext.Window("level voltooid", size=(BREEDTE, HOOGTE))
     window.show()
     renderer = sdl2.ext.Renderer(window)
     # afbeelding erin
-    resources = sdl2.ext.Resources(__file__, "textures")
+    resources = sdl2.ext.Resources(__file__, "resources")
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
-    shop_afbeelding = factory.from_image(resources.get_path("shop.jpg"))
-    start_shopx = BREEDTE / 4
-    breedte_shop = BREEDTE / 2
-    hoogte_shop = (breedte_shop / shop_afbeelding.size[0]) * shop_afbeelding.size[1]
-    start_shopy = HOOGTE - hoogte_shop
+    achtergrond = factory.from_image(resources.get_path("kassa_ticket_res2.png"))
 
-    font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[3])
-    errormessage = ""
+    message_it_took = f'Tijd die je nodig had:'
+
+    time_needed_min = int(tijd_verstrekentot // 60)
+    time_needed_sec = int((tijd_verstrekentot / 60 - time_needed_min) * 60)
+    message_time_needed = f'{time_needed_min} minuten en {time_needed_sec} seconden.'
+
+    if personal_records[kaart_gekozen] > int(tijd_verstrekentot) or personal_records[kaart_gekozen] == 0:
+        personal_records[kaart_gekozen] = int(tijd_verstrekentot)
+        message_record = f'Een nieuw record!'
+    elif personal_records[kaart_gekozen] == int(tijd_verstrekentot):
+        message_record = f'Je verbeterde bijna je record!'
+    else:
+        message_record = f'Je hebt het level al sneller voltooid!'
+
+    message_current = f'Je huidig record is:'
+
+    current_record_min = int(personal_records[kaart_gekozen] // 60)
+    current_record_sec = int((personal_records[kaart_gekozen] / 60 - current_record_min) * 60)
+    message_current_record = f'{current_record_min} minuten en {current_record_sec} seconden.'
+
+    message_you_had = f'Je had nog:'
+
+    message_lives = f'Levens over.'
+
+    message_return = f'Druk op "m" om verder te gaan. '
+
     while True:
         renderer.clear()
-        renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])
-        renderer.copy(shop_afbeelding, dstrect=(start_shopx, start_shopy, breedte_shop, hoogte_shop))
-
-        if errormessage:  # lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
-            message = f'{errormessage}'
+        renderer.copy(achtergrond, dstrect=(0, 0, 1200, 900))
+        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[7])
         events = sdl2.ext.get_events()
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                if key == sdl2.SDLK_s:
-                    # message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven'
+                if key == sdl2.SDLK_m:
                     renderer.clear()
                     sdl2.ext.quit()
                     startscherm("level_up")
                 if key == sdl2.SDLK_ESCAPE:
                     quit()
 
-        text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
-        renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
+        if personal_records[kaart_gekozen] > tijd_verstrekentot or personal_records[kaart_gekozen] == 0:
+            personal_records[kaart_gekozen] = tijd_verstrekentot
+
+        text_congrats = sdl2.ext.renderer.Texture(renderer, font.render_text(message_congrats))
+        renderer.copy(text_congrats, dstrect=(26, 20, text_congrats.size[0], 31))
+
+        text_it_took = sdl2.ext.renderer.Texture(renderer, font.render_text(message_it_took))
+        renderer.copy(text_it_took, dstrect=(26, 101, text_it_took.size[0], 31))
+
+        text_time_needed = sdl2.ext.renderer.Texture(renderer, font.render_text(message_time_needed))
+        renderer.copy(text_time_needed,
+                      dstrect=((700 - text_time_needed.size[0]) / 2, 152, text_time_needed.size[0], 31))
+
+        text_record = sdl2.ext.renderer.Texture(renderer, font.render_text(message_record))
+        renderer.copy(text_record, dstrect=((700 - text_record.size[0]) / 2, 203, text_record.size[0], 31))
+
+        text_current = sdl2.ext.renderer.Texture(renderer, font.render_text(message_current))
+        # print(text_current.size[0])
+        renderer.copy(text_current, dstrect=((26, 254, text_current.size[0], 31)))
+
+        text_current_record = sdl2.ext.renderer.Texture(renderer, font.render_text(message_current_record))
+        renderer.copy(text_current_record, dstrect=((143, 305, text_current_record.size[0], 31)))
+
+        text_you_had = sdl2.ext.renderer.Texture(renderer, font.render_text(message_you_had))
+        renderer.copy(text_you_had, dstrect=((26, 386, text_you_had.size[0], 31)))
+
+        lives_texture = factory.from_image(resources.get_path(heartsprite))
+        renderer.copy(lives_texture, srcrect=(0, 0, lives_texture.size[0] * 1.5, 37.5),
+                      dstrect=((700 - lives_texture.size[0] * 1.5) / 2, 431, lives_texture.size[0] * 1.5, 37.5))
+
+        text_lives = sdl2.ext.renderer.Texture(renderer, font.render_text(message_lives))
+        renderer.copy(text_lives, dstrect=((251, 482, text_lives.size[0], 31)))
+
+        text_return = sdl2.ext.renderer.Texture(renderer, font.render_text(message_return))
+        renderer.copy(text_return, dstrect=((71, 691, text_return.size[0], 31)))
         renderer.present()
+        # window.refresh()
 
 def levelfailed(reden):
     global world_map
@@ -570,14 +625,7 @@ def wall_collission(pd):
     else:
         return True
 
-def exit_level_action():
-    global level
-    global levelup
-    reset_startwaarden()
-    levelup = True
-    level += 1
-    sdl2.ext.quit()
-    main()
+
 
 def verwerk_input(delta):
     global moet_afsluiten
@@ -605,7 +653,9 @@ def verwerk_input(delta):
             key = event.key.keysym.sym
 
             if key == sdl2.SDLK_e and exit_allowed == True:
+                playsound("resources/Cash_register.mp3")
                 exit_level = True
+
             # hier nog alles van limitaties ook aanpassen
             if key == sdl2.SDLK_ESCAPE:
                 moet_afsluiten = True
@@ -625,7 +675,7 @@ def verwerk_input(delta):
         # aan het muiswiel draait.
         elif event.type == sdl2.SDL_MOUSEWHEEL:
             if event.wheel.y > 0:
-                levelcompleted()
+                exit_level_action()
                 # ...
                 continue
         # Wordt afgeleverd als de gebruiker de muis heeft bewogen.
@@ -1359,9 +1409,9 @@ def check_if_level_completed():
     #print(p_speler[1])
     #print(p_kassa_by_level_y[kaart_gekozen - 1])
     #print(d_kassa)
-    if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0 and d_kassa <= 2.5:
+    if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0 and d_kassa <= 1.5:
         exit_allowed = True
-        exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
+        exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
         message = f'Druk op "e" om het level te voltooien.'
         exit_message = sdl2.ext.renderer.Texture(renderer, exit_message_font.render_text(message))
         renderer.copy(exit_message, dstrect=(400, 400, exit_message.size[0], exit_message.size[1]))
@@ -1544,7 +1594,7 @@ def main():
 if __name__ == '__main__':
     # comments met #sv naast wegdoen als je wilt kijken naar snakeviz
     # profiler = cProfile.Profile() # sv
-    # profiler.enable() # sv
+    # profiler.enable() # svh
     main()
     # profiler.disable() # sv
     # stats = pstats.Stats(profiler) # sv
