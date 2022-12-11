@@ -1,5 +1,0 @@
-numba
-numpy
-Pillow
-PySDL2
-pysdl2-dll
