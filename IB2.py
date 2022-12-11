@@ -990,30 +990,36 @@ def sprite_loop_teller():
     return teller
 global angle
 angle=0
-def nearest_octant(ang):
-    return (((round(((ang)/np.pi)/0.5))/4)*(2*np.pi)) % (2*np.pi)   # (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
+def nearest_octant(ang):      #if (angle%(np.pi/8)>0.5):
+    if (ang<0):
+        res= 8+int(angle/(np.pi/8)+0.5)
+    else:
+        res=int(angle/(np.pi/8)+0.5)
+    if res==8:
+        res=0
+    return res  # (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
 
 
 def clerk_sprite_selector(): #fhook
     global angle
-    rounded_angle=round(nearest_octant(angle))
+    rounded_angle=nearest_octant(angle)
     print(rounded_angle)
     t=sprite_loop_teller()
-    if(rounded_angle==0): #rechts       rounded_angle==0   rounded_angle>=np.pi*(-1/8) and rounded_angle<=np.pi*(1/8)
+    if (rounded_angle == 0):  # rechts       rounded_angle==0   rounded_angle>=np.pi*(-1/8) and rounded_angle<=np.pi*(1/8)
         return sprite_rechts[t]
-    elif(rounded_angle==1):  #rechtsvoor     rounded_angle==(1/4)*np.pi  rounded_angle>np.pi*(1/8) and rounded_angle<np.pi*(3/8)
+    elif (rounded_angle == 7):  # rechtsvoor     rounded_angle==(1/4)*np.pi  rounded_angle>np.pi*(1/8) and rounded_angle<np.pi*(3/8)
         return sprite_rechts_voor[t]
-    elif (rounded_angle==2): # voor     rounded_angle==(1/2)*np.pi rounded_angle>=np.pi*(3/8) and rounded_angle<=np.pi*(5/8)
+    elif (rounded_angle == 6):  # voor     rounded_angle==(1/2)*np.pi rounded_angle>=np.pi*(3/8) and rounded_angle<=np.pi*(5/8)
         return sprite_voor[t]
-    elif (rounded_angle==3): # linksvoor  rounded_angle==(3/4)*np.pi rounded_angle>np.pi*(5/8) and rounded_angle<np.pi*(7/8)
+    elif (rounded_angle == 5):  # linksvoor  rounded_angle==(3/4)*np.pi rounded_angle>np.pi*(5/8) and rounded_angle<np.pi*(7/8)
         return sprite_links_voor[t]
-    elif (rounded_angle==4)  : # links      (rounded_angle==np.pi) or (rounded_angle==-np.pi) (rounded_angle>=-np.pi and rounded_angle<=np.pi*(-7/8)) or (rounded_angle>=np.pi*(7/8) and rounded_angle<=np.pi)
+    elif (rounded_angle == 4):  # links      (rounded_angle==np.pi) or (rounded_angle==-np.pi) (rounded_angle>=-np.pi and rounded_angle<=np.pi*(-7/8)) or (rounded_angle>=np.pi*(7/8) and rounded_angle<=np.pi)
         return sprite_links[t]
-    elif (rounded_angle==5): # linksachter       rounded_angle==(-3/4)*np.pi    rounded_angle>np.pi*(-7/8) and rounded_angle<np.pi*(-5/8)
+    elif (rounded_angle == 3):  # linksachter       rounded_angle==(-3/4)*np.pi    rounded_angle>np.pi*(-7/8) and rounded_angle<np.pi*(-5/8)
         return sprite_links_achter[t]
-    elif (rounded_angle==6): #achter             rounded_angle==(-1/2)*np.pi       rounded_angle>=np.pi*(-5/8) and rounded_angle<=np.pi*(-3/8)
+    elif (rounded_angle == 2):  # achter             rounded_angle==(-1/2)*np.pi       rounded_angle>=np.pi*(-5/8) and rounded_angle<=np.pi*(-3/8)
         return sprite_achter[t]
-    elif (rounded_angle==7): #rechtsachter       rounded_angle==(-1/4)*np.pi rounded_angle>np.pi*(-3/8) and rounded_angle<np.pi*(-1/8)
+    elif (rounded_angle == 1):  # rechtsachter       rounded_angle==(-1/4)*np.pi rounded_angle>np.pi*(-3/8) and rounded_angle<np.pi*(-1/8)
         return sprite_rechts_achter[t]
 
 #clerk_string=clerk_sprite_selector()  #foplosser
@@ -1323,10 +1329,11 @@ def player_hit_by_clerk():
         p_speler = np.array([9.5, 15.5])
 
 
+
 #start deel Feniks
 def noord(clerk_x):
-   clerk_x-=0.05
-   return round(clerk_x,2)
+    clerk_x-=0.05
+    return round(clerk_x,2)
 
 def oost(clerk_y):
     clerk_y+=0.05
@@ -1350,6 +1357,7 @@ clerk_y2=6.0
 clerk_x3=15.5
 clerk_y3=9.5
 clerk_check=True
+
 def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geene loop want geen vijand.   clerk_x1,clerk_y1,clerk_x2,clerk_y2,clerk_x3,clerk_y3
     if (kaart_gekozen==1): #loop map 2
         global clerk_x1, clerk_y1,clerk_check
