@@ -16,4 +16,4 @@ Om de applicatie te laten werken zijn nodige libraries nodig:
 -pysdl2-dll
 -numpy 
 -playsound
--pickle
+
