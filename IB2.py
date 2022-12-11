@@ -1104,6 +1104,7 @@ def hud():
                       dstrect=(1090, 30, heart_breedtes[aantal], heart_hoogte))
     else:
         print("game over")
+        levelfailed("Levens zijn op!")
         # game_over = True
 
     # money
