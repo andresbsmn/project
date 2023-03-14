@@ -2,6 +2,7 @@ import math
 import time
 import pickle
 import sdl2
+import serial
 import numpy as np
 import sdl2.ext
 
@@ -692,21 +693,35 @@ def verwerk_input(delta):
         pd = p_speler + (r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
+        else:
+            buzzer()
     if key_states[sdl2.SDL_SCANCODE_A]:  # komt overeen met D
         pd = p_speler + rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
+        else:
+            buzzer()
     if key_states[sdl2.SDL_SCANCODE_D]:
         pd = p_speler + rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
+        else:
+            buzzer()
     if key_states[sdl2.SDL_SCANCODE_S]:
         pd = p_speler + rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
+        else:
+            buzzer()
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
 
+def buzzer():
+    ser = serial.Serial('COM7', 9600, timeout=1)  # open serial port
+    ser.write(b'1')
+    time.sleep(1)
+    ser.write(b'0')
+    ser.close()
 
 def bereken_r_straal(r_speler, kolom):
 
