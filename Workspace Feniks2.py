@@ -40,7 +40,7 @@ broccoli_collected = False
 total_hearts_present = 3
 
 player_hit = False
-
+clerk_dead= False
 total_money_present = 0
 money_collected = True
 moneysprite = ""
@@ -55,6 +55,7 @@ munt1_x_coordinaten, munt1_y_coordinaten = [10, 2, 3, 8], [10, 2, 12, 11]
 munt2_x_coordinaten, munt2_y_coordinaten = [2, 1, 0, 3], [7, 1, 0, 3]
 munt3_x_coordinaten, munt3_y_coordinaten = [12, 1, 0, 3], [1, 1, 0, 3]
 munt4_x_coordinaten, munt4_y_coordinaten = [3, 1, 0, 3], [1, 1, 0, 3]
+
 
 tijd_verstrekentot = 0  # variabele aanmaken
 deadline = 100
@@ -687,7 +688,53 @@ def timer(delta, renderer, window, deadline):
             (10, 600 + text.size[1] * 2, (tijd_verstrekentot / tijd_deadline) * text.size[0], text.size[1]), kleuren[7])
 
     renderer.copy(text, dstrect=(10, 600 + text.size[1], text.size[0], text.size[1]))
+#nieuwe code van Feniks
+teller=0
 
+sprite_voor=["voor1.png","voor2.png","voor3.png"]  #0,1,2
+sprite_achter=["achter1.png","achter2.png","achter3.png"]
+sprite_links=["links1.png","links2.png","links3.png"]
+sprite_rechts=["rechts1.png","rechts2.png","rechts3.png"]
+sprite_links_voor=["links_voor1.png","links_voor2.png","links_voor3.png"]
+sprite_links_achter=["links_achter1.png","links_achter2.png","links_achter3.png"]
+sprite_rechts_voor=["rechts_voor1.png","rechts_voor2.png","rechts_voor3.png"]
+sprite_rechts_achter=["rechts_achter1.png","rechts_achter2.png","rechts_achter3.png"]
+teller=0
+def sprite_loop_teller():
+    global teller
+    if teller<2:
+        teller+=1
+    else:
+        teller=0
+    return teller
+angle=0
+def nearest_octal(ang):
+    return (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
+def clerk_sprite_selector(): #fhook
+    global angle
+    rounded_angle=nearest_octal(angle)
+    t=sprite_loop_teller()
+    if(rounded_angle==0): #rechts
+        return sprite_rechts[t]
+    elif(rounded_angle==(1/4)*np.pi):  #rechtsvoor
+        return sprite_rechts_voor[t]
+    elif (rounded_angle==(1/2)*np.pi): # voor
+        return sprite_voor[t]
+    elif (rounded_angle==(3/4)*np.pi): # links voor
+        return sprite_links_voor[t]
+    elif (rounded_angle==np.pi) or (rounded_angle==-np.pi) : # links
+        return sprite_links[t]
+    elif (rounded_angle==(-3/4)*np.pi): # linksachter
+        return sprite_links_achter[t]
+    elif (rounded_angle==(-1/2)*np.pi): #achter
+        return sprite_achter[t]
+    elif (rounded_angle==(-1/4)*np.pi): #rechtsachter
+        return sprite_rechts_achter[t]
+
+clerk_string=clerk_sprite_selector()
+
+
+#eind nieuwe code Feniks
 
 def create_sprites_hud():
     # global hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture
@@ -709,7 +756,8 @@ def create_sprites_hud():
     heartsprite2 = factory.from_image(resources.get_path("heart2.png"))
     heartsprite3 = factory.from_image(resources.get_path("heart3.png"))
     heartsprites = [heartsprite1, heartsprite2, heartsprite3]
-    return hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites
+    clerk_sprite= factory.from_image(resources.get_path(clerk_string))  #aangepast door Feniks
+    return hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites,clerk_sprite #aangepast door Feniks
 
 
 def hud():
@@ -822,11 +870,11 @@ def kaart_weergeven():
                 positie_pion_x, positie_pion_y, positie_persoon_sprite.size[0] / 7, positie_persoon_sprite.size[1] / 7))
 
 
-def sprite_renderer(sprite_x, sprite_y, sprite, z_buffer):
+def sprite_renderer(sprite_x, sprite_y, sprite, z_buffer,scale,sprite_bew):   #dingen aan veranderd door Feniks
     # zbuffer later nog toevoegen voor overlappingen, en per kolom
-
-    p_sprite_x_nieuw = sprite_x - p_speler[0]
-    p_sprite_y_nieuw = sprite_y - p_speler[1]
+    global angle  #Feniks
+    p_sprite_x_nieuw = sprite_x - p_speler[0]  #dx
+    p_sprite_y_nieuw = sprite_y - p_speler[1]  #dy
     # determinant van cameramatrix
     determinant_m = r_cameravlak[0] * r_speler[1] - r_cameravlak[1] * r_speler[0]
 
@@ -839,14 +887,16 @@ def sprite_renderer(sprite_x, sprite_y, sprite, z_buffer):
     v_cameracoordinaten = ((-r_cameravlak[1] / determinant_m) * p_sprite_x_nieuw) + (
             (r_cameravlak[0] / determinant_m) * p_sprite_y_nieuw)
     a = u_cameracoordinaten / v_cameracoordinaten  # positie op x as scherm, dus kolom
-
+    if (sprite_bew==True): #Feniks
+        angle=math.atan2(p_sprite_y_nieuw,p_sprite_x_nieuw)
+        print(angle)   #Feniks
     if (a >= -1) and (a <= 1) and (v_cameracoordinaten >= 0):
         kolom_midden_sprite = (((a + 1) / 2) * BREEDTE)
         hoogte_sprite_wereld = sprite.size[1]
         breedte_sprite_wereld = sprite.size[0]
 
         d_object_kolom_speler = math.sqrt(((sprite_x - p_speler[0]) ** 2) + ((sprite_y - p_speler[1]) ** 2))
-        hoogte_sprite_scherm = HOOGTE * (1 / (d_object_kolom_speler * 5))
+        hoogte_sprite_scherm = HOOGTE * (1 / (d_object_kolom_speler * 5))*scale
         breedte_sprite_scherm = (breedte_sprite_wereld / hoogte_sprite_wereld) * hoogte_sprite_scherm  # "nodig?want zal 1 zijn per kolom maar hoe weten of nog"
         beginpunt_sprite_x = kolom_midden_sprite - (breedte_sprite_scherm / 2)
 
@@ -883,8 +933,94 @@ def timer(delta, renderer, window, deadline):
     # renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), window.size[1]/3, text.size[0], text.size[1]))
     renderer.copy(text,
                   dstrect=(10, text.size[1], text.size[0], text.size[1]))
+#start deel Feniks
+def noord(clerk_x):
+   clerk_x-=0.05
+   return round(clerk_x,2)
 
+def oost(clerk_y):
+    clerk_y+=0.05
+    return round(clerk_y,2)
 
+def west(clerk_y):
+    clerk_y-=0.05
+    return round(clerk_y,2)
+
+def zuid(clerk_x):
+    clerk_x+=0.05
+    return round(clerk_x,2)
+
+#start waarden npc map 2
+clerk_x1=15.0
+clerk_y1=4.0
+#start waarden npc map 3
+clerk_x2=12.0
+clerk_y2=6.0
+#start waarden npc map 4
+clerk_x3=15.5
+clerk_y3=9.5
+i=True
+def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geene loop want geen vijand.   clerk_x1,clerk_y1,clerk_x2,clerk_y2,clerk_x3,clerk_y3
+    if (kaart_gekozen==1): #loop map 2
+        global clerk_x1, clerk_y1,i
+        if (clerk_x1>7.5) and (clerk_y1 ==4.0) :  #A
+            clerk_x1=noord(clerk_x1)
+            i=True
+            return clerk_x1,clerk_y1
+        elif (clerk_x1 ==7.5) and (clerk_y1 <15.5) and (i==True): #B
+            clerk_y1=oost(clerk_y1)
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 > 4.5) and (clerk_y1 ==15.5):  #C
+            clerk_x1=noord(clerk_x1)
+            i=False
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 ==4.5) and (clerk_y1 > 5.5):  #D
+            clerk_y1=west(clerk_y1)
+            return clerk_x1,clerk_y1
+        elif (clerk_x1 < 6.5) and (clerk_y1 ==5.5):  #E
+            clerk_x1=zuid(clerk_x1)
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 ==6.5) and (clerk_y1 >2.0):   #F
+            clerk_y1=west(clerk_y1)
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 <15.0) and (clerk_y1 ==2.0):  #G
+            clerk_x1=zuid(clerk_x1)
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 ==15.0) and (clerk_y1 <4.0):  #H
+            clerk_y1=oost(clerk_y1)
+            i=True
+            return clerk_x1, clerk_y1
+
+    if (kaart_gekozen==2):  #loop map 3
+        global clerk_x2, clerk_y2
+        if (clerk_x2!=5.0) and (clerk_y2==6.0):
+                clerk_x2=noord(clerk_x2)
+                return clerk_x2,clerk_y2
+        elif (clerk_x2==5.0) and (clerk_y2!=2.0):
+            clerk_y2=west(clerk_y2)
+            return clerk_x2,clerk_y2
+        elif (clerk_x2!=12.5) and (clerk_y2==2.0):
+            clerk_x2=zuid(clerk_x2)
+            return clerk_x2,clerk_y2
+        elif (clerk_x2==12.5) and (clerk_y2!=6.0):
+            clerk_y2=oost(clerk_y2)
+            return clerk_x2,clerk_y2
+
+    if (kaart_gekozen==3): #loop map 4
+        global clerk_x3, clerk_y3
+        if (clerk_x3 !=2.0) and (clerk_y3 ==9.5):
+            clerk_x3=noord(clerk_x3)
+            return clerk_x3,clerk_y3
+        elif (clerk_x3 ==2.0) and (clerk_y3 !=2.0):
+            clerk_y3=west(clerk_y3)
+            return clerk_x3, clerk_y3
+        elif (clerk_x3 !=15.5) and (clerk_y3 ==2.0):
+            clerk_x3=zuid(clerk_x3)
+            return clerk_x3, clerk_y3
+        elif (clerk_x3 == 15.5) and (clerk_y3 !=9.5):
+            clerk_y3 = oost(clerk_y3)
+            return clerk_x3, clerk_y3
+#einde deel Feniks
 def main():
     global fps_font
     global tijd_verstrekentot
@@ -910,6 +1046,7 @@ def main():
     munt3_x, munt3_y = munt3_x_coordinaten[kaart_gekozen], munt3_y_coordinaten[kaart_gekozen]
     munt4_x, munt4_y = munt4_x_coordinaten[kaart_gekozen], munt4_y_coordinaten[kaart_gekozen]
 
+
     # Maak een venster aan om de game te renderen
     window = sdl2.ext.Window("Project Ingenieursbeleving 2", size=(BREEDTE, HOOGTE))
     window.show()
@@ -929,7 +1066,7 @@ def main():
     list_wall_create = create_textures()
     global hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites
     # sprites hud aanmeken
-    hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites = create_sprites_hud()
+    hud_texture, pizza_texture, pizza_gray_texture, apple_texture, apple_gray_texture, egg_texture, egg_gray_texture, broccoli_texture, broccoli_gray_texture, moneysprites, heartsprites,clerk_sprite = create_sprites_hud() #Feniks
     global scannergun_sprite, map_weergave_list, gsm, positie_persoon_sprite, tekst_gsm
 
     # sprites kaart aanmaken
@@ -965,17 +1102,20 @@ def main():
             (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok) = raycast(p_speler,r_straal)
             z_buffer.append(d_muur)
             render_wall(renderer, window, kolom, d_muur, k_muur, is_texture,textuurcoordinaten_X_zondermaalbreedtetextuur, blok, list_wall_create)
-
-        sprite_renderer(pizza_x, pizza_y, pizza_texture, z_buffer)
-        sprite_renderer(apple_x, apple_y, apple_texture, z_buffer)
-        sprite_renderer(egg_x, egg_y, egg_texture, z_buffer)
-        sprite_renderer(broccoli_x, broccoli_y, broccoli_texture, z_buffer)
+        #aangepast door Feniks
+        sprite_renderer(pizza_x, pizza_y, pizza_texture, z_buffer,1,False)
+        sprite_renderer(apple_x, apple_y, apple_texture, z_buffer,1,False)
+        sprite_renderer(egg_x, egg_y, egg_texture, z_buffer,1,False)
+        sprite_renderer(broccoli_x, broccoli_y, broccoli_texture, z_buffer,1,False)
         moneysprite_1 = moneysprites[0]
-        sprite_renderer(munt1_x, munt1_y, moneysprite_1, z_buffer)
-        sprite_renderer(munt2_x, munt2_y, moneysprite_1, z_buffer)
-        sprite_renderer(munt3_x, munt3_y, moneysprite_1, z_buffer)
-        sprite_renderer(munt4_x, munt4_y, moneysprite_1, z_buffer)
+        sprite_renderer(munt1_x, munt1_y, moneysprite_1, z_buffer,1,False)
+        sprite_renderer(munt2_x, munt2_y, moneysprite_1, z_buffer,1,False)
+        sprite_renderer(munt3_x, munt3_y, moneysprite_1, z_buffer,1,False)
+        sprite_renderer(munt4_x, munt4_y, moneysprite_1, z_buffer,1,False)
+        if kaart_gekozen!=0:   #start deel Feniks
+            clerk_x, clerk_y = clerk_positie(kaart_gekozen)  # fhook
 
+            sprite_renderer(clerk_x,clerk_y,clerk_sprite,z_buffer,5,True)    #fhook  einde deel Feniks
         end_time = time.time()
         delta = end_time - start_time
 

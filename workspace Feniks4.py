@@ -5,6 +5,7 @@ import math
 import time
 import pickle
 import sdl2
+import serial
 import snakeviz
 
 import numpy as np
@@ -152,9 +153,6 @@ sprite_hoogtes = [35, 35, 40, 45, 55,110, 100]
 textures_breedtes = ["empty", 1490, 1300, 1180, 1310, 340, 800, 510, 680]
 textures_hoogtes = ["empty", 1490, 1300, 1050, 1350, 380, 730 , 510, 670]
 
-
-personal_records = [0, 0, 0, 0]
-
 def loadornew():
     sdl2.ext.init()
     window = sdl2.ext.Window("start", size=(BREEDTE, HOOGTE))
@@ -225,7 +223,7 @@ def reset_startwaarden():
     # global total_money_present
     # global total_hearts_present
     r_speler = np.array([0, 1])
-    p_speler = np.array([9.5, 15.5])
+    p_speler = np.array([10.0, 15.0])
     renderer.clear
     #     ik denk dat dit ook moet gereset worden
     #     render_pizza_in_world = True
@@ -242,7 +240,7 @@ def startscherm(keuze):
     global deadline_min, deadline_sec
     global kaart_gekozen
     global levelup
-    global level,money1_aantal,money2_aantal,money3_aantal,money4_aantal
+    global level
     #if levelup:
     #    levelup = False
     #    kaart_gekozen = level
@@ -255,7 +253,7 @@ def startscherm(keuze):
         resetwaarden = {'p_speler': np.array([9.5, 15.5]), 'r_speler': np.array([0, 1]), 'pizza_collected': False,
                            'apple_collected': False, 'egg_collected': False,
                            'broccoli_collected': False,
-                           'total_hearts_present': 3, 'money1_aantal': 0,'money2_aantal':0,'money3_aantal':0,'money4_aantal':0
+                           'total_hearts_present': 3, 'total_money_present': 1,
                            'level': 0, 'tijd_verstrekentot': False
                            }
         save("save")
@@ -268,7 +266,6 @@ def startscherm(keuze):
     world_map = maps[kaart_gekozen]
     if keuze == "load_game":
         return
-
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
     window = sdl2.ext.Window("level selectie scherm", size=(BREEDTE, HOOGTE), flags=win_flags)
@@ -430,106 +427,55 @@ def startscherm(keuze):
     sdl2.ext.quit()
     main()
 
-def exit_level_action():
+def levelcompleted():
     global level
-    # print(level)
     global levelup
     if level == 3:
-        message_congrats = f'Proficiat! Alle levels zijn voltooid!'
+        message = f'congrats!!! you beat the game \n klik op "s" om opnieuw te beginnen'
         level = 0
     else:
-        message_congrats = f'Proficiat! Level is voltooid!'
+        message = f'congrats!!! you cleared level {level+1}, \n druk op "s" om verder te spelen'
         level += 1
         levelup = True
     reset_startwaarden()
     sdl2.ext.init()
     # Maak een venster aan om de game te renderen, wordt na functie ook afgesloten
-    window = sdl2.ext.Window("level voltooid", size=(BREEDTE, HOOGTE))
+    window = sdl2.ext.Window("levelup", size=(BREEDTE, HOOGTE))
     window.show()
     renderer = sdl2.ext.Renderer(window)
     # afbeelding erin
-    resources = sdl2.ext.Resources(__file__, "resources")
+    resources = sdl2.ext.Resources(__file__, "textures")
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
-    achtergrond = factory.from_image(resources.get_path("kassa_ticket_res2.png"))
+    shop_afbeelding = factory.from_image(resources.get_path("shop.jpg"))
+    start_shopx = BREEDTE / 4
+    breedte_shop = BREEDTE / 2
+    hoogte_shop = (breedte_shop / shop_afbeelding.size[0]) * shop_afbeelding.size[1]
+    start_shopy = HOOGTE - hoogte_shop
 
-    message_it_took = f'Tijd die je nodig had:'
-
-    time_needed_min = int(tijd_verstrekentot // 60)
-    time_needed_sec = int((tijd_verstrekentot / 60 - time_needed_min) * 60)
-    message_time_needed = f'{time_needed_min} minuten en {time_needed_sec} seconden.'
-
-    if personal_records[kaart_gekozen] > int(tijd_verstrekentot) or personal_records[kaart_gekozen] == 0:
-        personal_records[kaart_gekozen] = int(tijd_verstrekentot)
-        message_record = f'Een nieuw record!'
-    elif personal_records[kaart_gekozen] == int(tijd_verstrekentot):
-        message_record = f'Je verbeterde bijna je record!'
-    else:
-        message_record = f'Je hebt het level al sneller voltooid!'
-
-    message_current = f'Je huidig record is:'
-
-    current_record_min = int(personal_records[kaart_gekozen] // 60)
-    current_record_sec = int((personal_records[kaart_gekozen] / 60 - current_record_min) * 60)
-    message_current_record = f'{current_record_min} minuten en {current_record_sec} seconden.'
-
-    message_you_had = f'Je had nog:'
-
-    message_lives = f'Levens over.'
-
-    message_return = f'Druk op "m" om verder te gaan. '
-
+    font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[3])
+    errormessage = ""
     while True:
         renderer.clear()
-        renderer.copy(achtergrond, dstrect=(0, 0, 1200, 900))
-        font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[7])
+        renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])
+        renderer.copy(shop_afbeelding, dstrect=(start_shopx, start_shopy, breedte_shop, hoogte_shop))
+
+        if errormessage:  # lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
+            message = f'{errormessage}'
         events = sdl2.ext.get_events()
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                if key == sdl2.SDLK_m:
+                if key == sdl2.SDLK_s:
+                    # message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven'
                     renderer.clear()
                     sdl2.ext.quit()
                     startscherm("level_up")
                 if key == sdl2.SDLK_ESCAPE:
                     quit()
 
-        if personal_records[kaart_gekozen] > tijd_verstrekentot or personal_records[kaart_gekozen] == 0:
-            personal_records[kaart_gekozen] = tijd_verstrekentot
-
-        text_congrats = sdl2.ext.renderer.Texture(renderer, font.render_text(message_congrats))
-        renderer.copy(text_congrats, dstrect=(26, 20, text_congrats.size[0], 31))
-
-        text_it_took = sdl2.ext.renderer.Texture(renderer, font.render_text(message_it_took))
-        renderer.copy(text_it_took, dstrect=(26, 101, text_it_took.size[0], 31))
-
-        text_time_needed = sdl2.ext.renderer.Texture(renderer, font.render_text(message_time_needed))
-        renderer.copy(text_time_needed,
-                      dstrect=((700 - text_time_needed.size[0]) / 2, 152, text_time_needed.size[0], 31))
-
-        text_record = sdl2.ext.renderer.Texture(renderer, font.render_text(message_record))
-        renderer.copy(text_record, dstrect=((700 - text_record.size[0]) / 2, 203, text_record.size[0], 31))
-
-        text_current = sdl2.ext.renderer.Texture(renderer, font.render_text(message_current))
-        # print(text_current.size[0])
-        renderer.copy(text_current, dstrect=((26, 254, text_current.size[0], 31)))
-
-        text_current_record = sdl2.ext.renderer.Texture(renderer, font.render_text(message_current_record))
-        renderer.copy(text_current_record, dstrect=((143, 305, text_current_record.size[0], 31)))
-
-        text_you_had = sdl2.ext.renderer.Texture(renderer, font.render_text(message_you_had))
-        renderer.copy(text_you_had, dstrect=((26, 386, text_you_had.size[0], 31)))
-
-        lives_texture = factory.from_image(resources.get_path(heartsprite))
-        renderer.copy(lives_texture, srcrect=(0, 0, lives_texture.size[0] * 1.5, 37.5),
-                      dstrect=((700 - lives_texture.size[0] * 1.5) / 2, 431, lives_texture.size[0] * 1.5, 37.5))
-
-        text_lives = sdl2.ext.renderer.Texture(renderer, font.render_text(message_lives))
-        renderer.copy(text_lives, dstrect=((251, 482, text_lives.size[0], 31)))
-
-        text_return = sdl2.ext.renderer.Texture(renderer, font.render_text(message_return))
-        renderer.copy(text_return, dstrect=((71, 691, text_return.size[0], 31)))
+        text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
+        renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
         renderer.present()
-        # window.refresh()
 
 def levelfailed(reden):
     global world_map
@@ -577,14 +523,14 @@ def levelfailed(reden):
         # window.refresh()
 
 def save(option):
-    global level,money1_aantal,money2_aantal,money3_aantal,money4_aantal
+    global level
     global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_hearts_present, total_money_present, level, tijd_verstrekentot, kaart_genomen
     # waarden_speler = {'positie': p_speler, 'richting': r_speler, 'pizza':pizza_collected, 'appel': apple_collected, 'egg':egg_collected,'broccoli':broccoli_collected,'hearts':total_hearts_present,'money':total_money_present}
     # waarden_wereld = { 'level': level,'time':tijd_verstrekentot}
     if option == "save":
         tesaven_waarden = {'p_speler': p_speler, 'r_speler': r_speler, 'pizza_collected': pizza_collected,
                            'apple_collected': apple_collected, 'egg_collected': egg_collected, 'broccoli_collected': broccoli_collected,
-                           'total_hearts_present': total_hearts_present, 'money1_aantal': money1_aantal,'money2_aantal':money2_aantal,'money3_aantal':money3_aantal,'money4_aantal':money4_aantal
+                           'total_hearts_present': total_hearts_present, 'total_money_present': total_money_present,
                            'level': level, 'tijd_verstrekentot': tijd_verstrekentot, 'kaart_genomen': kaart_genomen,
                            }
         outfile = open(persistantfile, 'wb')
@@ -625,7 +571,14 @@ def wall_collission(pd):
     else:
         return True
 
-
+def exit_level_action():
+    global level
+    global levelup
+    reset_startwaarden()
+    levelup = True
+    level += 1
+    sdl2.ext.quit()
+    main()
 
 def verwerk_input(delta):
     global moet_afsluiten
@@ -653,9 +606,7 @@ def verwerk_input(delta):
             key = event.key.keysym.sym
 
             if key == sdl2.SDLK_e and exit_allowed == True:
-                playsound("resources/Cash_register.mp3")
                 exit_level = True
-
             # hier nog alles van limitaties ook aanpassen
             if key == sdl2.SDLK_ESCAPE:
                 moet_afsluiten = True
@@ -675,7 +626,7 @@ def verwerk_input(delta):
         # aan het muiswiel draait.
         elif event.type == sdl2.SDL_MOUSEWHEEL:
             if event.wheel.y > 0:
-                exit_level_action()
+                levelcompleted()
                 # ...
                 continue
         # Wordt afgeleverd als de gebruiker de muis heeft bewogen.
@@ -705,21 +656,35 @@ def verwerk_input(delta):
         pd = p_speler + (r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
+        else:
+            buzzer()
     if key_states[sdl2.SDL_SCANCODE_A]:  # komt overeen met D
         pd = p_speler + rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
+        else:
+            buzzer()
     if key_states[sdl2.SDL_SCANCODE_D]:
         pd = p_speler + rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
+        else:
+            buzzer()
     if key_states[sdl2.SDL_SCANCODE_S]:
         pd = p_speler + rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
+        else:
+            buzzer()
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
 
+def buzzer():
+    ser = serial.Serial('COM7', 9600, timeout=1)  # open serial port
+    ser.write(b'1')
+    time.sleep(1)
+    ser.write(b'0')
+    ser.close()
 
 def bereken_r_straal(r_speler, kolom):
     # r_straal_kolom = d_camera * r_speler + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak
@@ -826,7 +791,7 @@ def raycast(p_speler, r_straal):
                     break
 
     d_muur = d_muur * np.dot(r_speler, r_straal)
-    #d_muur = round(d_muur, 12)
+    d_muur = round(d_muur, 12)
     return (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok)
 
 
@@ -991,13 +956,25 @@ def sprite_loop_teller():
 global angle
 angle=0
 def nearest_octant(ang):      #if (angle%(np.pi/8)>0.5):
-    if (ang<0):
-        res= 8+int(angle/(np.pi/8)+0.5)
-    else:
-        res=int(angle/(np.pi/8)+0.5)
-    if res==8:
-        res=0
-    return res  # (((round(((ang)/np.pi)/0.5))/8)*(2*np.pi)) % (2*np.pi)
+    #voor
+    if (ang > -(np.pi/8)) and (ang < (np.pi*113)/900):               #  22.5= (np.pi/8)   22.6= (np.pi*113)/900
+        return 0;                                   #67.5= (3*np.pi)/8               112.5= (5*np.pi)/8
+    if (ang>= (np.pi/8)) and (ang < (3*np.pi)/8):                #157.5= (7*np.pi)/8
+        return 7;                                                 #157.4= (np.pi*787)/900
+    if (ang >= (3*np.pi)/8) and (ang < (5*np.pi)/8):
+        return 6;
+    if (ang >= (5*np.pi)/8) and (ang < (7*np.pi)/8):
+        return 5;
+
+    #back
+    if (ang <= -(7*np.pi)/8) or (ang>= (7*np.pi)/8):
+        return 4;
+    if (ang >= -(np.pi*787)/900) and (ang < -(5*np.pi)/8):
+        return 3;
+    if (ang >= -(5*np.pi)/8) and (ang < -(3*np.pi)/8):
+        return 2;
+    if (ang >= -(3*np.pi)/8) and (ang <= -(np.pi/8)):
+        return 1;
 
 
 def clerk_sprite_selector(): #fhook
@@ -1021,6 +998,7 @@ def clerk_sprite_selector(): #fhook
         return sprite_achter[t]
     elif (rounded_angle == 1):  # rechtsachter       rounded_angle==(-1/4)*np.pi rounded_angle>np.pi*(-3/8) and rounded_angle<np.pi*(-1/8)
         return sprite_rechts_achter[t]
+
 
 #clerk_string=clerk_sprite_selector()  #foplosser
 
@@ -1110,7 +1088,6 @@ def hud():
                       dstrect=(1090, 30, heart_breedtes[aantal], heart_hoogte))
     else:
         print("game over")
-        levelfailed("Levens zijn op!")
         # game_over = True
 
     # money
@@ -1319,16 +1296,6 @@ def check_if_object_scanned(scanobject_x, scanobject_y):
         render_pizza_in_world = False
         return True
 
-def player_hit_by_clerk():
-    global player_hit
-    global p_speler
-    clerk_x, clerk_y = clerk_positie(kaart_gekozen)
-    d_clerk = math.sqrt((p_speler[0] - clerk_x) ** 2 + (p_speler[1] - clerk_y) ** 2)
-    if d_clerk <= 0.5:
-        player_hit = True
-        p_speler = np.array([9.5, 15.5])
-
-
 
 #start deel Feniks
 def noord(clerk_x):
@@ -1428,9 +1395,9 @@ def check_if_level_completed():
     #print(p_speler[1])
     #print(p_kassa_by_level_y[kaart_gekozen - 1])
     #print(d_kassa)
-    if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0 and d_kassa <= 1.5:
+    if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0 and d_kassa <= 2.5:
         exit_allowed = True
-        exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
+        exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
         message = f'Druk op "e" om het level te voltooien.'
         exit_message = sdl2.ext.renderer.Texture(renderer, exit_message_font.render_text(message))
         renderer.copy(exit_message, dstrect=(400, 400, exit_message.size[0], exit_message.size[1]))
@@ -1590,7 +1557,7 @@ def main():
         render_fps(fps, renderer, window)
 
         hud()
-        player_hit_by_clerk()
+
         if kaart_genomen == True:
             kaart_weergeven()
 
@@ -1613,7 +1580,7 @@ def main():
 if __name__ == '__main__':
     # comments met #sv naast wegdoen als je wilt kijken naar snakeviz
     # profiler = cProfile.Profile() # sv
-    # profiler.enable() # svh
+    # profiler.enable() # sv
     main()
     # profiler.disable() # sv
     # stats = pstats.Stats(profiler) # sv
