@@ -711,14 +711,14 @@ def verwerk_input(delta):
         moet_afsluiten = True
 
 def vibrator():
-    ser = serial.Serial('COM7', 9600, timeout=1)  # open serial port
+    ser = serial.Serial('COM9', 9600, timeout=1)  # open serial port
     ser.write(b'v')
     time.sleep(1)
     ser.write(b'0')
     ser.close()
 
 def buzzer():
-    ser = serial.Serial('COM7', 9600, timeout=1)  # open serial port
+    ser = serial.Serial('COM9', 9600, timeout=1)  # open serial port  (com7 desktop Feniks,COM9 laptop Feniks)
     ser.write(b'b')
     time.sleep(1)
     ser.write(b'0')
@@ -924,7 +924,7 @@ def scannergun():
     renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture_breedte, crosshair_texture_hoogte),
                   dstrect=(580, 450, crosshair_texture_breedte, crosshair_texture_hoogte))
     if laser_shot == True:
-        playsound("resources/Scanner_beep_3.mp3")
+        #playsound("resources/Scanner_beep_3.mp3")
         buzzer()
         renderer.copy(laser_texture, srcrect=(0, 0, laser_texture_breedte, laser_texture_hoogte),
                       dstrect=(581, 470, laser_texture_breedte, laser_texture_hoogte))
