@@ -693,32 +693,33 @@ def verwerk_input(delta):
         pd = p_speler + (r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
-        else:
-            buzzer()
+
     if key_states[sdl2.SDL_SCANCODE_A]:  # komt overeen met D
         pd = p_speler + rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
-        else:
-            buzzer()
+
     if key_states[sdl2.SDL_SCANCODE_D]:
         pd = p_speler + rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
-        else:
-            buzzer()
     if key_states[sdl2.SDL_SCANCODE_S]:
         pd = p_speler + rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
-        else:
-            buzzer()
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
 
+def vibrator():
+    ser = serial.Serial('COM7', 9600, timeout=1)  # open serial port
+    ser.write(b'v')
+    time.sleep(1)
+    ser.write(b'0')
+    ser.close()
+
 def buzzer():
     ser = serial.Serial('COM7', 9600, timeout=1)  # open serial port
-    ser.write(b'1')
+    ser.write(b'b')
     time.sleep(1)
     ser.write(b'0')
     ser.close()
@@ -924,6 +925,7 @@ def scannergun():
                   dstrect=(580, 450, crosshair_texture_breedte, crosshair_texture_hoogte))
     if laser_shot == True:
         playsound("resources/Scanner_beep_3.mp3")
+        buzzer()
         renderer.copy(laser_texture, srcrect=(0, 0, laser_texture_breedte, laser_texture_hoogte),
                       dstrect=(581, 470, laser_texture_breedte, laser_texture_hoogte))
 
@@ -1089,6 +1091,7 @@ def hud():
     # hearts
     if player_hit == True:
         total_hearts_present -= 1
+        vibrator()
         player_hit = False
     global aantal
     if total_hearts_present:
