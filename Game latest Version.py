@@ -5,7 +5,7 @@ import sdl2
 import serial
 import numpy as np
 import sdl2.ext
-
+COM_POORT='COM7'
 from levels import *
 from playsound import playsound
 persistantfile = "save.pkl"
@@ -711,14 +711,14 @@ def verwerk_input(delta):
         moet_afsluiten = True
 
 def vibrator():
-    ser = serial.Serial('COM8', 9600, timeout=1)  # open serial port
+    ser = serial.Serial(COM_POORT, 9600, timeout=1)  # open serial port
     ser.write(b'v')
     time.sleep(1)
     ser.write(b'0')
     ser.close()
 
 def buzzer():
-    ser = serial.Serial('COM8', 9600, timeout=1)  # open serial port  (com7 desktop Feniks,COM9 laptop Feniks)
+    ser = serial.Serial(COM_POORT, 9600, timeout=1)  # open serial port  (com7 desktop Feniks,COM9 laptop Feniks)
     ser.write(b'b')
     time.sleep(1)
     ser.write(b'0')
