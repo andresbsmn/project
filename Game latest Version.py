@@ -711,18 +711,12 @@ def verwerk_input(delta):
         moet_afsluiten = True
 
 def vibrator():
-    ser = serial.Serial(COM_POORT, 9600, timeout=1)  # open serial port
-    ser.write(b'v')
-    time.sleep(1)
-    ser.write(b'0')
-    ser.close()
+    with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+        ser.write(b'v')
 
 def buzzer():
-    ser = serial.Serial(COM_POORT, 9600, timeout=1)  # open serial port  (com7 desktop Feniks,COM9 laptop Feniks)
-    ser.write(b'b')
-    time.sleep(1)
-    ser.write(b'0')
-    ser.close()
+    with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+        ser.write(b'b')
 
 def bereken_r_straal(r_speler, kolom):
 
@@ -1091,7 +1085,6 @@ def hud():
     # hearts
     if player_hit == True:
         total_hearts_present -= 1
-        vibrator()
         player_hit = False
     global aantal
     if total_hearts_present:
@@ -1312,6 +1305,7 @@ def player_hit_by_clerk():
     d_clerk = math.sqrt((p_speler[0] - clerk_x) ** 2 + (p_speler[1] - clerk_y) ** 2)
     if d_clerk <= 0.5:
         player_hit = True
+        vibrator()
         p_speler = np.array([9.5, 15.5])
 
 def noord(clerk_x):
