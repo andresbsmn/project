@@ -16,13 +16,13 @@ keuzealgemaakt = False
 level = 0
 testboolean = True
 # Constanten
-#BREEDTE = 1200
-#HOOGTE = 900
+BREEDTE = 1200
+HOOGTE = 900
 # var aanmaken
 
 #from raycaster import *
 #from create_resources import *
-from CONSTANTEN import *
+#from CONSTANTEN import *
 
 # Globale variabelen
 win_flags = sdl2.SDL_WINDOW_RESIZABLE #kan window resizen
@@ -1496,7 +1496,7 @@ def main():
     window = sdl2.ext.Window("Project Ingenieursbeleving 2", size=(BREEDTE, HOOGTE))
 
     window.show()
-#ppppppppppppppppppppppttttttttt
+
     # Begin met het uitlezen van input van de muis en vraag om relatieve coordinaten
     sdl2.SDL_SetRelativeMouseMode(True)
     levens_of_ledjes() #test

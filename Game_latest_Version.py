@@ -111,6 +111,7 @@ kleuren = [
     sdl2.ext.Color(128, 128, 128),  # 5 = Grijs
     sdl2.ext.Color(192, 192, 192),  # 6 = Licht grijs
     sdl2.ext.Color(255, 255, 255),  # 7 = Wit
+    sdl2.ext.Color(252, 210, 153)    #8 = oranje
 ]
 
 #groottes van alle texturen, sprites... (zodat .size minder tot niet gebruikt)
@@ -169,31 +170,32 @@ def loadornew():
         renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])  # witte achtergrond
         renderer.copy(shop_afbeelding, dstrect=(start_shopx, start_shopy, breedte_shop, hoogte_shop))
         # start knoppen
-        renderer.draw_rect((start_shopx, start_shopy - 250, breedte_shop, 100), kleuren[0])
+        renderer.draw_rect((start_shopx, start_shopy - 250, breedte_shop, 100), kleuren[8])
         renderer.copy(sdl2.ext.renderer.Texture(renderer, font.render_text("new game")),
                       dstrect=(start_shopx, start_shopy - 250, breedte_shop, 100))
-        renderer.draw_rect((start_shopx, start_shopy-100, breedte_shop, 100), kleuren[0])
+        renderer.draw_rect((start_shopx, start_shopy-100, breedte_shop, 100), kleuren[1])
         renderer.copy(sdl2.ext.renderer.Texture(renderer, font.render_text("load game")),
                       dstrect=(start_shopx, start_shopy-100, breedte_shop, 100))
         events = sdl2.ext.get_events()
         for event in events:
+            key = event.key.keysym.sym
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
-                key = event.key.keysym.sym
+                #key = event.key.keysym.sym
                 if key == sdl2.SDLK_ESCAPE:
                     quit()
             elif event.type == sdl2.SDL_MOUSEMOTION:
                 motion = event.motion
-
-            elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
+            if key ==sdl2.SDLK_z or key==sdl2.SDLK_s or event.type == sdl2.SDL_MOUSEBUTTONDOWN:  #hier stond elif
                 button = event.button.button
-                if button == sdl2.SDL_BUTTON_LEFT:
+                if  key ==sdl2.SDLK_z or  key==sdl2.SDLK_s or button == sdl2.SDL_BUTTON_LEFT:
 
                     # kijkt of er op  timer knop is geklikt
-                    if start_shopx < motion.x < start_shopx + breedte_shop:
-                        if start_shopy - 150 > motion.y > start_shopy - 250:  # new game knop
+                    if key ==sdl2.SDLK_z or key ==sdl2.SDLK_s or start_shopx < motion.x < start_shopx + breedte_shop :
+                        motion = event.motion #ttttt
+                        if key ==sdl2.SDLK_z or start_shopy - 150 > motion.y > start_shopy - 250:  # new game knop
                             startscherm("new_game")
                             stoppen = True
-                        if  start_shopy-100< motion.y < start_shopy :
+                        if  key==sdl2.SDLK_s or start_shopy-100< motion.y < start_shopy  :
                             startscherm("load_game")
                             stoppen = True
 
@@ -275,7 +277,7 @@ def startscherm(keuze):
     shop_afbeelding = factory.from_image(resources.get_path("shop.jpg"))
     errormessage = ""
 
-    message = f' welkom bij onze winkel!!! \n om te starten klik "s" \n navigeren kan met de muis of met de pijltjes'
+    message = f' welkom bij onze winkel!!! \n om te starten klik op de capacitive touch 2 keer \n navigeren tussen levels kan met de groen en blauwe knop \n tijd aanpassen kan met oranje en rode knop'
     keuze = ''
     if not levelup:
         gameinfo = f'gekozen map level {level} \n je hebt {deadline_min} min en {deadline_sec} seconden'
@@ -311,31 +313,32 @@ def startscherm(keuze):
         # einde knoppen level-selectie
 
         # start knoppen timer
-        renderer.draw_rect((BREEDTE / 8, (1 / 2) * HOOGTE, 50, 50), kleuren[0])
+        renderer.draw_rect((BREEDTE / 8, (1 / 2) * HOOGTE, 50, 50), kleuren[8])
         renderer.copy(sdl2.ext.renderer.Texture(renderer, font.render_text("+")),
                       dstrect=(BREEDTE / 8, (1 / 2) * HOOGTE, 50, 50))
-        renderer.draw_rect((BREEDTE / 8, (2 / 3) * HOOGTE, 50, 50), kleuren[0])
+        renderer.draw_rect((BREEDTE / 8, (2 / 3) * HOOGTE, 50, 50), kleuren[1])
         renderer.copy(sdl2.ext.renderer.Texture(renderer, font.render_text("-")),
                       dstrect=(BREEDTE / 8, (2 / 3) * HOOGTE, 50, 50))
         if errormessage:  # lege string wordt gezien als een false, errormessage krijgt pas waarde bij een error
             message = f'{errormessage}'
         events = sdl2.ext.get_events()
         for event in events:
+
             if event.type == sdl2.SDL_MOUSEMOTION:
                 motion = event.motion
 
-            elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
+            elif event.type == sdl2.SDL_MOUSEBUTTONDOWN or event.type==sdl2.SDL_KEYDOWN:
+                key = event.key.keysym.sym
                 button = event.button.button
-                if button == sdl2.SDL_BUTTON_LEFT:
+                if key== sdl2.SDLK_z or key== sdl2.SDLK_s or button == sdl2.SDL_BUTTON_LEFT :
                     # kijkt of er op  timer knop is geklikt
-                    if BREEDTE / 8 < motion.x < ((BREEDTE / 8) + 50):
+                    if key== sdl2.SDLK_z or key== sdl2.SDLK_s or BREEDTE / 8 < motion.x < ((BREEDTE / 8) + 50) :
                         geklikt = False
                         change = 0
-                        if 0.5 * HOOGTE + 50 > motion.y > 0.5 * HOOGTE:  # + knop
+                        if key== sdl2.SDLK_z or 0.5 * HOOGTE + 50 > motion.y > 0.5 * HOOGTE :  # + knop
                             geklikt = True
                             change = 10
-                        if (2 / 3) * HOOGTE < motion.y < (2 / 3) * HOOGTE + 50 and (
-                                deadline_sec > 5 or deadline_min >= 1):
+                        if key== (sdl2.SDLK_s or (2 / 3) * HOOGTE < motion.y < (2 / 3) * HOOGTE + 50)  and (deadline_sec > 5 or deadline_min >= 1):
                             geklikt = True
                             change = -10
                         if geklikt:
@@ -367,20 +370,24 @@ def startscherm(keuze):
 
 
 
-            elif event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
+            if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                # levels met pijltjes
-                if key == 1073741904:  # 1073741904 = linker pijltje; 1073741903 = rechter pijltje
+                # levels met pijltjes, aangepast, levels met q en d voor controller
+                if key == sdl2.SDLK_q:#1073741904:  # 1073741904 = linker pijltje; 1073741903 = rechter pijltje
                     level -= 1
                     if level < 0:
                         level = 3
-                if key == 1073741903:  # 1073741904 = linker pijltje; 1073741903 = rechter pijltje
+                    kaart_gekozen = level
+                    world_map = maps[kaart_gekozen]
+                if key == sdl2.SDLK_d:#1073741903:  # 1073741904 = linker pijltje; 1073741903 = rechter pijltje
                     level += 1
                     if level > 3:
                         level = 0
+                    kaart_gekozen = level
+                    world_map = maps[kaart_gekozen]
                 elif key == sdl2.SDLK_ESCAPE:
                     quit()
-                elif key == sdl2.SDLK_s:
+                elif key == sdl2.SDLK_p:
                     keuze = "start"
                     message = f'starting game...'
                     moet_afsluiten = True  # jump naar main achter de lus
@@ -471,7 +478,7 @@ def exit_level_action():
 
     message_lives = f'Levens over.'
 
-    message_return = f'Druk op "m" om verder te gaan. '
+    message_return = f'Druk op "de touch module" om verder te gaan. '
 
     heartsprite1 = factory.from_image(resources.get_path("heart1.png"))
     heartsprite2 = factory.from_image(resources.get_path("heart2.png"))
@@ -485,7 +492,7 @@ def exit_level_action():
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                if key == sdl2.SDLK_m:
+                if key == sdl2.SDLK_p:
                     renderer.clear()
                     sdl2.ext.quit()
                     startscherm("level_up")
@@ -551,7 +558,7 @@ def levelfailed(reden):
 
     font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[3])
     errormessage = ""
-    message = f'Game Over, {reden} \n druk op "r" op opnieuw te proberen'
+    message = f'Game Over, {reden} \n druk op de oranje knop (vooruit) op opnieuw te proberen'
     while True:
         renderer.clear()
         renderer.fill((0, 0, BREEDTE, HOOGTE), kleuren[7])
@@ -563,7 +570,7 @@ def levelfailed(reden):
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                if key == sdl2.SDLK_r:
+                if key == sdl2.SDLK_z or key == sdl2.SDLK_r:
                     sdl2.ext.quit()
                     main()
                 if key == sdl2.SDLK_ESCAPE:
@@ -624,6 +631,7 @@ def verwerk_input(delta):
     global p_speler
     global laser_shot
     global exit_level
+    global s_pressed
     exit_level = False
     # Handelt alle input events af die zich voorgedaan hebben sinds de vorige
     # keer dat we de sdl2.ext.get_events() functie hebben opgeroepen
@@ -641,28 +649,35 @@ def verwerk_input(delta):
 
         elif event.type == sdl2.SDL_KEYDOWN:
             key = event.key.keysym.sym
-
-            if key == sdl2.SDLK_e and exit_allowed == True:
+            if key == sdl2.SDLK_t:
+                laser_shot = True
+                continue #
+            if key == sdl2.SDLK_z and exit_allowed == True:
                 playsound("resources/Cash_register.mp3")
                 exit_level = True
 
             if key == sdl2.SDLK_ESCAPE:
                 moet_afsluiten = True
-            break
+                break
 
         # Analoog aan SDL_KEYDOWN. Dit event wordt afgeleverd wanneer de
         # gebruiker een muisknop indrukt
-        elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
-            button = event.button.button
-            if button == sdl2.SDL_BUTTON_LEFT:
-                # ...
-                laser_shot = True
-                continue
-            if button == sdl2.SDL_BUTTON_RIGHT:
-                save("save")
+        #elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
+
+            # button = event.button.button #deze 5 lijntjes is voor linkermuisknop schieten, tijdelijk vervangen door x
+            # if button == sdl2.SDL_BUTTON_LEFT:
+            #     # ...
+            #     laser_shot = True
+            #     continue
+
+            #if key == sdl2.SDLK_t:
+            #    laser_shot = True
+            #    continue
+            #if button == sdl2.SDL_BUTTON_RIGHT:ttttttt
+            #    save("save")
         # Een SDL_MOUSEWHEEL event wordt afgeleverd wanneer de gebruiker
         # aan het muiswiel draait.
-        elif event.type == sdl2.SDL_MOUSEWHEEL:
+        elif event.type == sdl2.SDL_MOUSEWHEEL :
                 # ...
 
                 continue
@@ -689,24 +704,26 @@ def verwerk_input(delta):
     # beweeg vooruit...
     stapverkleiner = 0.05
     # querty
+    if key_states[sdl2.SDL_SCANCODE_P]:
+        save("save")
     if key_states[sdl2.SDL_SCANCODE_W]:  # komt overeen met Z
         pd = p_speler + (r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
-
     if key_states[sdl2.SDL_SCANCODE_A]:  # komt overeen met D
         pd = p_speler + rotatie((3 / 2) * math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
-
     if key_states[sdl2.SDL_SCANCODE_D]:
         pd = p_speler + rotatie(math.pi / 2, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
     if key_states[sdl2.SDL_SCANCODE_S]:
+        s_pressed = True;
         pd = p_speler + rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
+
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
 
@@ -1418,6 +1435,8 @@ def collect_gsm():
 
 
 def main():
+    global s_pressed
+    s_pressed = False
     global fps_font
     global tijd_verstrekentot
     global keuzealgemaakt
@@ -1459,7 +1478,6 @@ def main():
 
     # Begin met het uitlezen van input van de muis en vraag om relatieve coordinaten
     sdl2.SDL_SetRelativeMouseMode(True)
-
     # Maak een renderer aan zodat we in ons venster kunnen renderen
     global renderer
     renderer = sdl2.ext.Renderer(window)
