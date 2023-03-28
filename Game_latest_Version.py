@@ -5,7 +5,7 @@ import sdl2
 import serial
 import numpy as np
 import sdl2.ext
-COM_POORT='COM7'
+COM_POORT='COM18'
 from levels import *
 from playsound import playsound
 persistantfile = "save.pkl"
@@ -651,6 +651,7 @@ def verwerk_input(delta):
             key = event.key.keysym.sym
             if key == sdl2.SDLK_t:
                 laser_shot = True
+                buzzer()
                 continue #
             if key == sdl2.SDLK_z and exit_allowed == True:
                 playsound("resources/Cash_register.mp3")
@@ -935,8 +936,7 @@ def scannergun():
     renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture_breedte, crosshair_texture_hoogte),
                   dstrect=(580, 450, crosshair_texture_breedte, crosshair_texture_hoogte))
     if laser_shot == True:
-        #playsound("resources/Scanner_beep_3.mp3")eee
-        buzzer()
+        playsound("resources/Scanner_beep_3.mp3")
         renderer.copy(laser_texture, srcrect=(0, 0, laser_texture_breedte, laser_texture_hoogte),
                       dstrect=(581, 470, laser_texture_breedte, laser_texture_hoogte))
 
@@ -956,7 +956,6 @@ def scannergun():
             laser_shot = False
         else:
             laser_shot = False
-
 
 # Initialiseer timer
 timer_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size = 20, color=kleuren[7])
