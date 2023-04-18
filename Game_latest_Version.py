@@ -7,7 +7,7 @@ import serial
 #als optimalisatie voor frame rate, kan 9600 hoger
 import numpy as np
 import sdl2.ext
-COM_POORT='COM13'
+COM_POORT='COM14'
 from levels import *
 from playsound import playsound
 persistantfile = "save.pkl"
@@ -751,17 +751,17 @@ def bereken_r_straal(r_speler, kolom):
 def heart_display():
     print(total_hearts_present)
     if total_hearts_present == 3:
-        ser = serial.Serial('COM6', 9600, timeout=1)
-        ser.write(b'3')
-    elif total_hearts_present == 2:
-        ser = serial.Serial('COM6', 9600, timeout=1)
-        ser.write(b'2')
-    elif total_hearts_present == 1:
-        ser = serial.Serial('COM6', 9600, timeout=1)
-        ser.write(b'1')
-    else:
-        ser = serial.Serial('COM6', 9600, timeout=1)
+        ser = serial.Serial(COM_POORT, 9600, timeout=1)
         ser.write(b'0')
+    elif total_hearts_present == 2:
+        ser = serial.Serial(COM_POORT, 9600, timeout=1)
+        ser.write(b'1')
+    elif total_hearts_present == 1:
+        ser = serial.Serial(COM_POORT, 9600, timeout=1)
+        ser.write(b'2')
+    else:
+        ser = serial.Serial(COM_POORT, 9600, timeout=1)
+        ser.write(b'3')
 
 def raycast(p_speler, r_straal):
     global r_speler
