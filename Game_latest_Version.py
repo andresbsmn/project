@@ -729,6 +729,19 @@ def verwerk_input(delta):
 
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
+    #camera draaien
+    if key_states[sdl2.SDL_scancode_L]:
+        #naar links kijken
+        beweging = -5
+        rotatie_beweging = (beweging * math.pi / 2) / 50
+        r_speler = rotatie(rotatie_beweging, r_speler)
+        r_cameravlak = rotatie((math.pi / 2), r_speler)
+    if key_states[sdl2.SDL_SCANCODE_R]:
+        #naar rechts kijken
+        beweging = 5
+        rotatie_beweging = (beweging * math.pi / 2) / 50
+        r_speler = rotatie(rotatie_beweging, r_speler)
+        r_cameravlak = rotatie((math.pi / 2), r_speler)
 
 def vibrator():
     with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
