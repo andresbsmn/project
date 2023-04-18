@@ -741,7 +741,7 @@ def verwerk_input(delta):
         if wall_collission(pd):
             p_speler = pd
     if key_states[sdl2.SDL_SCANCODE_S]:
-        s_pressed = True;
+        s_pressed = True
         pd = p_speler + rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd

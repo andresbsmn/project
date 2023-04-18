@@ -4,7 +4,7 @@ import pickle
 import sdl2
 import serial
 
-#als optimalisatie voor frame rate, kan 9600 hoger
+#als optimalisatie voor frame rate, kan 9600 hogerlr
 import numpy as np
 import sdl2.ext
 COM_POORT='COM14'
@@ -722,7 +722,7 @@ def verwerk_input(delta):
         if wall_collission(pd):
             p_speler = pd
     if key_states[sdl2.SDL_SCANCODE_S]:
-        s_pressed = True;
+        s_pressed = True
         pd = p_speler + rotatie(math.pi, r_speler / (r_speler[0] ** 2 + r_speler[1] ** 2)) * stapverkleiner
         if wall_collission(pd):
             p_speler = pd
@@ -730,7 +730,7 @@ def verwerk_input(delta):
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         moet_afsluiten = True
     #camera draaien
-    if key_states[sdl2.SDL_scancode_L]:
+    if key_states[sdl2.SDL_SCANCODE_L]:
         #naar links kijken
         beweging = -5
         rotatie_beweging = (beweging * math.pi / 2) / 50
@@ -771,10 +771,56 @@ def heart_display():
         ser.write(b'1')
     elif total_hearts_present == 1:
         ser = serial.Serial(COM_POORT, 9600, timeout=1)
-        ser.write(b'2')
+        ser.write(b'2')#rllll
     else:
         ser = serial.Serial(COM_POORT, 9600, timeout=1)
         ser.write(b'3')
+
+def collection_array():
+    tot = 0
+    if pizza_collected == True:
+        tot += 1
+    if broccoli_collected == True:
+        tot += 1
+    if egg_collected == True:
+        tot += 1
+    if apple_collected == True:
+        tot += 1
+    if tot == 0:
+        if kaart_genomen == False:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'4')
+        else:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'9')
+    if tot == 1:
+        if kaart_genomen == False:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'5')
+        else:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'a')
+    if tot == 2:
+        if kaart_genomen == False:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'6')
+        else:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'z')
+    if tot == 3:
+        if kaart_genomen == False:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'7')
+        else:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'e')
+    if tot == 4:
+        if kaart_genomen == False:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'8')
+        else:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'r')
 
 def raycast(p_speler, r_straal):
     global r_speler
@@ -972,16 +1018,20 @@ def scannergun():
         # functional scanner
         if d_pizza_kolom_speler <= 1:
             pizza_collected = check_if_object_scanned(tuple_pizza[0] + (tuple_pizza[1] / 2), 450, tuple_pizza[1])
+            collection_array()
             laser_shot = False
         if d_apple_kolom_speler <= 1:
             apple_collected = check_if_object_scanned(tuple_apple[0] + (tuple_apple[1] / 2), 450, tuple_apple[1])
+            collection_array()
             laser_shot = False
         if d_broccoli_kolom_speler <= 1:
             broccoli_collected = check_if_object_scanned(tuple_broccoli[0] + (tuple_broccoli[1] / 2), 450,
                                                          tuple_broccoli[1])
+            collection_array()
             laser_shot = False
         if d_egg_kolom_speler <= 1:
             egg_collected = check_if_object_scanned(tuple_egg[0] + (tuple_egg[1] / 2), 450, tuple_egg[1])
+            collection_array()
             laser_shot = False
         else:
             laser_shot = False
@@ -1465,6 +1515,7 @@ def collect_gsm():
 
 def main():
     heart_display()
+    collection_array()
     global s_pressed
     s_pressed = False
     global fps_font
