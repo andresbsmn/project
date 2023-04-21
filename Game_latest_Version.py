@@ -45,9 +45,9 @@ clerk_dead=False
 resources = sdl2.ext.Resources(__file__, "textures")
 
 total_money_present = 0
-money1_aantal=0
-money2_aantal =0
-money3_aantal=0
+money1_aantal = 0
+money2_aantal = 0
+money3_aantal = 0
 money4_aantal = 0
 money1_collected = False
 money2_collected = False
