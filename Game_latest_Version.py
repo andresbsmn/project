@@ -18,7 +18,7 @@ testboolean = True
 BREEDTE = 1200
 HOOGTE = 900
 # var aanmaken
-global s_gestuurd_afsluit = False
+s_gestuurd_afsluit = False
 
 #
 # Globale variabelen
@@ -726,17 +726,24 @@ def verwerk_input(delta):
     #camera draaien
     if key_states[sdl2.SDL_SCANCODE_L]:
         #naar links kijken
-        beweging = -5
+        beweging = -getcijfer()
         rotatie_beweging = (beweging * math.pi / 2) / 50
         r_speler = rotatie(rotatie_beweging, r_speler)
         r_cameravlak = rotatie((math.pi / 2), r_speler)
     if key_states[sdl2.SDL_SCANCODE_R]:
         #naar rechts kijken
-        beweging = 5
+        beweging = getcijfer()
         rotatie_beweging = (beweging * math.pi / 2) / 50
         r_speler = rotatie(rotatie_beweging, r_speler)
         r_cameravlak = rotatie((math.pi / 2), r_speler)
-
+def getcijfer():
+    while True:
+        events = sdl2.ext.get_events()
+        for event in events:
+            if event.type == sdl2.SDL_KEYDOWN:
+                if event.key.keysym.sym >= sdl2.SDLK_0 and event.key.keysym.sym <= sdl2.SDLK_9:
+                    cijfer = event.key.keysym.sym - sdl2.SDLK_0
+                    return cijfer
 def vibrator():
     with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
         ser.write(b'v')
