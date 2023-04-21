@@ -1649,7 +1649,7 @@ def main():
         window.refresh()
     # Sluit SDL2 af
     with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
-        ser.write(b's') #sluit gyro af
+        ser.write(b's') #stop gyro
     sdl2.ext.quit()
 
 
