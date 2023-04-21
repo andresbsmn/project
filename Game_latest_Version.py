@@ -18,7 +18,7 @@ testboolean = True
 BREEDTE = 1200
 HOOGTE = 900
 # var aanmaken
-
+global s_gestuurd_afsluit = False
 
 #
 # Globale variabelen
@@ -1515,6 +1515,7 @@ def main():
     global fps_font
     global tijd_verstrekentot
     global keuzealgemaakt
+    global s_gestuurd_afsluit
     if not keuzealgemaakt:
         save("load")
         keuzealgemaakt = True
@@ -1648,8 +1649,10 @@ def main():
         # na renderen frame venster verversen
         window.refresh()
     # Sluit SDL2 af
-    with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
-        ser.write(b's') #stop gyro
+    if(not s_gestuurd_afsluit):
+        s_gestuurd_afsluit = True
+        with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+            ser.write(b's') #stop gyro
     sdl2.ext.quit()
 
 
