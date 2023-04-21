@@ -245,6 +245,7 @@ def startscherm(keuze):
     global kaart_gekozen
     global levelup
     global level,money1_aantal,money2_aantal,money3_aantal,money4_aantal
+
     if keuze == "new_game":
         resetwaarden = {'p_speler': np.array([9.5, 15.5]), 'r_speler': np.array([0, 1]), 'pizza_collected': False,
                         'apple_collected': False, 'egg_collected': False,
@@ -260,9 +261,6 @@ def startscherm(keuze):
         save("save")
         testarray = np.array([0, 1])
         globals().update(resetwaarden)
-
-
-
     kaart_gekozen = level
     world_map = maps[kaart_gekozen]
     if keuze == "load_game":
@@ -609,8 +607,6 @@ def save(option):
         print('save failed')
         pass
 
-
-
 def rotatie(alfa, vector):
     rotatie_matrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
     return np.dot(rotatie_matrix, vector)
@@ -623,8 +619,6 @@ def wall_collission(pd):
         return False
     else:
         return True
-
-
 
 def verwerk_input(delta):
     global moet_afsluiten
@@ -1654,9 +1648,13 @@ def main():
         # na renderen frame venster verversen
         window.refresh()
     # Sluit SDL2 af
+    with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+        ser.write(b's') #sluit gyro af
     sdl2.ext.quit()
 
 
 if __name__ == '__main__':
+    with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+        ser.write(b's')#start gyro
     main()
 
