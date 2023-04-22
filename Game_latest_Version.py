@@ -5,10 +5,9 @@ import sdl2
 import serial
 
 #als optimalisatie voor frame rate, kan 9600 hogerlr
-import numpy as np
 import sdl2.ext
 COM_POORT='com3'
-from levels import *
+from ouder_versies.levels import *
 from playsound import playsound
 persistantfile = "save.pkl"
 keuzealgemaakt = False

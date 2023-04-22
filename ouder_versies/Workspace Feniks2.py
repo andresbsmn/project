@@ -1,14 +1,11 @@
-import cProfile
 import math
 import time
 
 import sdl2
-import snakeviz
 
-import numpy as np
 import sdl2.ext
 
-from levels import *
+from ouder_versies.levels import *
 from playsound import playsound
 
 # Constanten
@@ -665,7 +662,7 @@ def scannergun():
     renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture.size[0], crosshair_texture.size[1]),
                   dstrect=(580, 577, crosshair_texture.size[0], crosshair_texture.size[1]))
     if laser_shot == True:
-        playsound("resources/Scanner_beep_3.mp3")
+        playsound("../resources/Scanner_beep_3.mp3")
         renderer.copy(laser_texture, srcrect=(0, 0, laser_texture.size[0], laser_texture.size[1]),
                       dstrect=(581, 598, laser_texture.size[0], laser_texture.size[1]))
         laser_shot = False
