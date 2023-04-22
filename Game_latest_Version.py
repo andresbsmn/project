@@ -54,7 +54,7 @@ money2_collected = False
 money3_collected = False
 money4_collected = False
 moneysprite = ""
-
+#taking_money = false
 # coordinaten sprites
 pizza_x_coordinaten, pizza_y_coordinaten =         [4, 1.5, 15.5, 6.5],    [5.5, 14.5, 13.5, 3.5]  #
 apple_x_coordinaten, apple_y_coordinaten =         [6.5, 10, 16, 2],    [12.5, 11, 9, 7]  #
@@ -651,6 +651,10 @@ def verwerk_input(delta):
 
         elif event.type == sdl2.SDL_KEYDOWN:
             key = event.key.keysym.sym
+            if key == sdl2.SDLK_k:
+                #taking_money = true
+                munt_collected()#
+                continue
             if key == sdl2.SDLK_t:
                 laser_shot = True
                 buzzer()
@@ -1619,7 +1623,7 @@ def main():
             clerk_sprite = factory.from_image(resources.get_path(clerk_string))
         volgorde_sprite_renderer()
         scannergun()
-        munt_collected()
+        #munt_collected()
 
 
 

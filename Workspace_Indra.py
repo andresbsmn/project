@@ -629,7 +629,7 @@ def buzzer():
        # s_pressed = False
 
 def levens_of_ledjes():
-    ser = serial.Serial('COM13', 9800, timeout=1) #
+    ser = serial.Serial('COM14', 9800, timeout=1) #
     ser.write(bytes(b'h3'))  # send a byte
     ser.close()
 
