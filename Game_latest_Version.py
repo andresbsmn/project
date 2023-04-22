@@ -18,7 +18,7 @@ testboolean = True
 BREEDTE = 1200
 HOOGTE = 900
 # var aanmaken
-
+s_gestuurd_afsluit = False
 
 #
 # Globale variabelen
@@ -45,9 +45,9 @@ clerk_dead=False
 resources = sdl2.ext.Resources(__file__, "textures")
 
 total_money_present = 0
-money1_aantal=0
-money2_aantal =0
-money3_aantal=0
+money1_aantal = 0
+money2_aantal = 0
+money3_aantal = 0
 money4_aantal = 0
 money1_collected = False
 money2_collected = False
@@ -245,6 +245,7 @@ def startscherm(keuze):
     global kaart_gekozen
     global levelup
     global level,money1_aantal,money2_aantal,money3_aantal,money4_aantal
+
     if keuze == "new_game":
         resetwaarden = {'p_speler': np.array([9.5, 15.5]), 'r_speler': np.array([0, 1]), 'pizza_collected': False,
                         'apple_collected': False, 'egg_collected': False,
@@ -260,9 +261,6 @@ def startscherm(keuze):
         save("save")
         testarray = np.array([0, 1])
         globals().update(resetwaarden)
-
-
-
     kaart_gekozen = level
     world_map = maps[kaart_gekozen]
     if keuze == "load_game":
@@ -609,8 +607,6 @@ def save(option):
         print('save failed')
         pass
 
-
-
 def rotatie(alfa, vector):
     rotatie_matrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
     return np.dot(rotatie_matrix, vector)
@@ -623,8 +619,6 @@ def wall_collission(pd):
         return False
     else:
         return True
-
-
 
 def verwerk_input(delta):
     global moet_afsluiten
@@ -736,17 +730,24 @@ def verwerk_input(delta):
     #camera draaien
     if key_states[sdl2.SDL_SCANCODE_L]:
         #naar links kijken
-        beweging = -5
+        beweging = -getcijfer()
         rotatie_beweging = (beweging * math.pi / 2) / 50
         r_speler = rotatie(rotatie_beweging, r_speler)
         r_cameravlak = rotatie((math.pi / 2), r_speler)
     if key_states[sdl2.SDL_SCANCODE_R]:
         #naar rechts kijken
-        beweging = 5
+        beweging = getcijfer()
         rotatie_beweging = (beweging * math.pi / 2) / 50
         r_speler = rotatie(rotatie_beweging, r_speler)
         r_cameravlak = rotatie((math.pi / 2), r_speler)
-
+def getcijfer():
+    while True:
+        events = sdl2.ext.get_events()
+        for event in events:
+            if event.type == sdl2.SDL_KEYDOWN:
+                if event.key.keysym.sym >= sdl2.SDLK_0 and event.key.keysym.sym <= sdl2.SDLK_9:
+                    cijfer = event.key.keysym.sym - sdl2.SDLK_0
+                    return cijfer
 def vibrator():
     with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
         ser.write(b'v')
@@ -1525,6 +1526,7 @@ def main():
     global fps_font
     global tijd_verstrekentot
     global keuzealgemaakt
+    global s_gestuurd_afsluit
     if not keuzealgemaakt:
         save("load")
         keuzealgemaakt = True
@@ -1658,9 +1660,15 @@ def main():
         # na renderen frame venster verversen
         window.refresh()
     # Sluit SDL2 af
+    if(not s_gestuurd_afsluit):
+        s_gestuurd_afsluit = True
+        with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+            ser.write(b's') #stop gyro
     sdl2.ext.quit()
 
 
 if __name__ == '__main__':
+    with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+        ser.write(b's')#start gyro
     main()
 
