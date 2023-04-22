@@ -1,17 +1,14 @@
 #f
 
-import cProfile
 import math
 import time
 import pickle
 import sdl2
 import serial
-import snakeviz
 
-import numpy as np
 import sdl2.ext
 
-from levels import *
+from ouder_versies.levels import *
 from playsound import playsound
 persistantfile = "save.pkl"
 keuzealgemaakt = False
@@ -889,7 +886,7 @@ def scannergun():
     renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture_breedte, crosshair_texture_hoogte),
                   dstrect=(580, 450, crosshair_texture_breedte, crosshair_texture_hoogte))  # 580, 577,
     if laser_shot == True:
-        playsound("resources/Scanner_beep_3.mp3")
+        playsound("../resources/Scanner_beep_3.mp3")
         renderer.copy(laser_texture, srcrect=(0, 0, laser_texture_breedte, laser_texture_hoogte),
                       dstrect=(581, 470, laser_texture_breedte, laser_texture_hoogte))  # 581, 598
 
