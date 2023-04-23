@@ -6,7 +6,7 @@ import serial
 
 #als optimalisatie voor frame rate, kan 9600 hogerlr
 import sdl2.ext
-COM_POORT='com3'
+COM_POORT='com14'
 from ouder_versies.levels import *
 from playsound import playsound
 persistantfile = "save.pkl"
@@ -53,7 +53,7 @@ money2_collected = False
 money3_collected = False
 money4_collected = False
 moneysprite = ""
-#taking_money = false
+
 # coordinaten sprites
 pizza_x_coordinaten, pizza_y_coordinaten =         [4, 1.5, 15.5, 6.5],    [5.5, 14.5, 13.5, 3.5]  #
 apple_x_coordinaten, apple_y_coordinaten =         [6.5, 10, 16, 2],    [12.5, 11, 9, 7]  #
@@ -645,8 +645,8 @@ def verwerk_input(delta):
         elif event.type == sdl2.SDL_KEYDOWN:
             key = event.key.keysym.sym
             if key == sdl2.SDLK_k:
-                #taking_money = true
-                munt_collected()#
+                # taking_money = true
+                munt_collected()  #
                 continue
             if key == sdl2.SDLK_t:
                 laser_shot = True
@@ -1348,7 +1348,7 @@ def money_collector(tuple, afstand_tot_money):
     # tuple bevat: beginpunt x, breedte sprite scherm, hoogte sprite scherm en sprite rendered (boolean)
     collect_money = False
     beginpunt_money = tuple[0]
-    if afstand_tot_money <= 0.5 and beginpunt_money != 0:
+    if afstand_tot_money <= 0.8 and beginpunt_money != 0:
         #collect_money(money_rendered, money_collected)
         collect_money = True
     return(collect_money)
