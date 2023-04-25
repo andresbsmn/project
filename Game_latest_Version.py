@@ -771,9 +771,14 @@ def buzzer():
         print('vibreer')
 
 def bereken_r_straal(r_speler, kolom):
-    r_straal = d_camera * r_speler + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak
-    r_straal = r_straal/np.linalg.norm(r_straal)
-    return r_straal
+
+    r_straal_kolom_x = d_camera * r_speler[0] + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak[0]
+    r_straal_kolom_y = d_camera * r_speler[1] + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak[1]
+
+    r_straal_kolom_norm = math.sqrt(r_straal_kolom_x ** 2 + r_straal_kolom_y ** 2)
+    r_straal_x = r_straal_kolom_x / r_straal_kolom_norm
+    r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
+    return [r_straal_x, r_straal_y]
 
 def heart_display():
     # print(total_hearts_present)
@@ -868,7 +873,10 @@ def raycast(p_speler, r_straal):
 
     while True:
         if d_horizontaal + x * delta_h <= d_verticaal + y * delta_v:
-            i_horizontaal_x = p_speler + (d_horizontaal + x * delta_h) * r_straal
+            i_horizontaal_x = []
+            i_horizontaal_x.append(p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0])
+            i_horizontaal_x.append(p_speler[1] + (d_horizontaal + x * delta_h) * r_straal[1])
+
 
             # rijen = len(matrix) => hoogte
             # kolommen = len(matrix[0]) => width
@@ -878,7 +886,8 @@ def raycast(p_speler, r_straal):
             elif i_horizontaal_x[1] == len(world_map[0]):
                 i_horizontaal_x[1] = len(world_map[0]) - 0.5
 
-            i_horizontaal_x_rounded_int = (i_horizontaal_x + 0.0005).astype(int)
+            # i_horizontaal_x_rounded_int = (i_horizontaal_x + 0.0005).astype(int)
+            i_horizontaal_x_rounded_int = [int(x + 0.0005) for x in i_horizontaal_x]
             x += 1
             is_horizontaal = True
 
@@ -888,31 +897,32 @@ def raycast(p_speler, r_straal):
                         (i_horizontaal_x[0] - p_speler[0]) ** 2 + (i_horizontaal_x[1] - p_speler[1]) ** 2)
                     is_texture = True
                     blok = world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]
-                    textuurcoordinaten_X_zondermaalbreedtetextuur = (i_horizontaal_x - i_horizontaal_x_rounded_int)
+                    textuurcoordinaten_X_zondermaalbreedtetextuur = ([i_horizontaal_x[0] - i_horizontaal_x_rounded_int[0],i_horizontaal_x[1] - i_horizontaal_x_rounded_int[1]])
                     break
 
 
-
-
             elif r_straal[0] < 0:
-                if world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])]:
+                if world_map[(i_horizontaal_x_rounded_int[0]-1, i_horizontaal_x_rounded_int[1])]:
                     d_muur = math.sqrt(
                         (i_horizontaal_x[0] - p_speler[0]) ** 2 + (i_horizontaal_x[1] - p_speler[1]) ** 2)
                     is_texture = True
-                    textuurcoordinaten_X_zondermaalbreedtetextuur = (i_horizontaal_x - i_horizontaal_x_rounded_int)
-                    blok = world_map[(i_horizontaal_x_rounded_int[0] - 1), i_horizontaal_x_rounded_int[1]]
+                    textuurcoordinaten_X_zondermaalbreedtetextuur = ([i_horizontaal_x[0] - i_horizontaal_x_rounded_int[0],i_horizontaal_x[1] - i_horizontaal_x_rounded_int[1]])
+                    blok = world_map[(i_horizontaal_x_rounded_int[0]-1), i_horizontaal_x_rounded_int[1]]
                     break
 
 
         else:
-            i_verticaal_y = p_speler + (d_verticaal + y * delta_v) * r_straal
+            i_verticaal_y = []
+            i_verticaal_y.append(p_speler[0] + (d_verticaal + y * delta_v) * r_straal[0])
+            i_verticaal_y.append(p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1])
 
             if i_verticaal_y[0] == len(world_map):
                 i_verticaal_y[0] = len(world_map) - 0.5
             elif i_verticaal_y[1] == len(world_map[0]):
                 i_verticaal_y[1] = len(world_map[0]) - 0.5
 
-            i_verticaal_y_rounded_int = (i_verticaal_y + 0.0005).astype(int)
+            # i_verticaal_y_rounded_int = (i_verticaal_y + 0.0005).astype(int)
+            i_verticaal_y_rounded_int = [int(x + 0.0005) for x in i_verticaal_y]
 
             is_horizontaal = False
             y += 1
@@ -920,7 +930,7 @@ def raycast(p_speler, r_straal):
                 if world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])]:
                     d_muur = math.sqrt((i_verticaal_y[0] - p_speler[0]) ** 2 + (i_verticaal_y[1] - p_speler[1]) ** 2)
                     is_texture = True
-                    textuurcoordinaten_X_zondermaalbreedtetextuur = (1 - (i_verticaal_y - i_verticaal_y_rounded_int))
+                    textuurcoordinaten_X_zondermaalbreedtetextuur =([1 - (i_verticaal_y[0] - i_verticaal_y_rounded_int[0]),1 - (i_verticaal_y[1] - i_verticaal_y_rounded_int[1])])
                     blok = world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])]
                     break
 
@@ -930,11 +940,15 @@ def raycast(p_speler, r_straal):
                 if world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]:
                     d_muur = math.sqrt((i_verticaal_y[0] - p_speler[0]) ** 2 + (i_verticaal_y[1] - p_speler[1]) ** 2)
                     is_texture = True
-                    textuurcoordinaten_X_zondermaalbreedtetextuur = (1 - (i_verticaal_y - i_verticaal_y_rounded_int))
+                    textuurcoordinaten_X_zondermaalbreedtetextuur = ([1 - (i_verticaal_y[0] - i_verticaal_y_rounded_int[0]),1 - (i_verticaal_y[1] - i_verticaal_y_rounded_int[1])])
                     blok = world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]
                     break
 
-    d_muur = d_muur * np.dot(r_speler, r_straal)
+    dot_product = 0
+    for i in range(len(r_speler)):
+        dot_product += r_speler[i] * r_straal[i]
+    d_muur *= dot_product
+    # d_muur = d_muur * np.dot(r_speler, r_straal)
 
     return (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok)
 
@@ -972,7 +986,7 @@ def render_wall(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoor
     hoogte_t = textures_hoogtes[blok]
     breedte_t = textures_breedtes[blok] - 1
 
-    textuurcoordinaten_X = textuurcoordinaten_X_zondermaalbreedtetextuur * breedte_t
+    textuurcoordinaten_X = [x * breedte_t for x in textuurcoordinaten_X_zondermaalbreedtetextuur]
     hoogte = (HOOGTE) * 1 / (d_muur + 0.00001)
 
     if hoogte >= HOOGTE:
@@ -1328,7 +1342,6 @@ def volgorde_sprite_renderer():
 
 def munt_collected():
     global money1_collected, money1_rendered, money2_collected, money2_rendered, money3_collected, money3_rendered, money4_collected, money4_rendered
-
     if money1_rendered == True:
         if tuple_munt1[3] == True:
             collected = money_collector(tuple_munt1, d_munt1_kolom_speler)
@@ -1674,8 +1687,8 @@ def main():
         renderer.present()
         # na renderen frame venster verversen
         window.refresh()
-
-    if(not s_gestuurd_afsluit):#zet sensor uit
+    # Sluit SDL2 af
+    if(not s_gestuurd_afsluit):
         s_gestuurd_afsluit = True
         try:
             with serial.Serial(COM_POORT, 9600, timeout=1) as ser:

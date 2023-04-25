@@ -211,7 +211,6 @@ def loadornew():
     renderer.clear()
     sdl2.ext.quit()
 
-
 def reset_startwaarden():
     global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_money_present, total_hearts_present, money1_collected, money2_collected, money3_collected, money4_collected, money1_rendered, money2_rendered, money3_rendered, money4_rendered, money1_aantal, money2_aantal, money3_aantal, money4_aantal, kaart_genomen
 
@@ -237,8 +236,6 @@ def reset_startwaarden():
     money4_aantal = 0
     kaart_genomen = False
     renderer.clear
-
-
 
 def startscherm(keuze):
     global world_map
@@ -493,7 +490,7 @@ def exit_level_action():
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                if key == sdl2.SDLK_p:
+                if key == sdl2.SDLK_z:
                     renderer.clear()
                     sdl2.ext.quit()
                     startscherm("level_up")
@@ -658,7 +655,7 @@ def verwerk_input(delta):
                 buzzer()
                 continue #
             if key == sdl2.SDLK_z and exit_allowed == True:
-                playsound("resources/Cash_register.mp3")
+                #playsound("resources/Cash_register.mp3")
                 exit_level = True
 
             if key == sdl2.SDLK_ESCAPE:
@@ -1056,22 +1053,22 @@ def scannergun():
         if d_pizza_kolom_speler <= 1:
             pizza_collected = check_if_object_scanned(tuple_pizza[0] + (tuple_pizza[1] / 2), 450, tuple_pizza[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_apple_kolom_speler <= 1:
             apple_collected = check_if_object_scanned(tuple_apple[0] + (tuple_apple[1] / 2), 450, tuple_apple[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_broccoli_kolom_speler <= 1:
             broccoli_collected = check_if_object_scanned(tuple_broccoli[0] + (tuple_broccoli[1] / 2), 450,
                                                          tuple_broccoli[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_egg_kolom_speler <= 1:
             egg_collected = check_if_object_scanned(tuple_egg[0] + (tuple_egg[1] / 2), 450, tuple_egg[1])
             collection_array()
-            laser_shot = False
-        else:
-            laser_shot = False
+            # laser_shot = False
+        # else:
+        laser_shot = False
 
 # Initialiseer timer
 timer_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size = 20, color=kleuren[7])
@@ -1426,10 +1423,10 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
 
 # checking if we hit an object with our scanner
 def check_if_object_scanned(scanobject_x, scanobject_y, breedte):
-    if scanobject_x-(breedte/2) <= 600 <= scanobject_x+(breedte/2) and 450 <= scanobject_y <= 495:
-        return True
-    else:
-        return False
+    return scanobject_x-(breedte/2) <= 600 <= scanobject_x+(breedte/2) and 450 <= scanobject_y <= 495
+    #     return True
+    # else:
+    #     return False
 
 def player_hit_by_clerk():
     global player_hit
@@ -1696,9 +1693,10 @@ def main():
         s_gestuurd_afsluit = True
         try:
             with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
-                ser.write(b's') #stop gyro
+                ser.write(b's')
         except:
             print('gyro zou stoppen')
+    # Sluit SDL2 af
     sdl2.ext.quit()
 
 
