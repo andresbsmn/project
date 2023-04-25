@@ -1,9 +1,12 @@
+import cProfile
 import math
+import pstats
 import time
 import pickle
 import sdl2
 import serial
-
+import snakeviz
+from numba import jit
 #als optimalisatie voor frame rate, kan 9600 hogerlr
 import sdl2.ext
 controller_aangesloten = True
@@ -873,9 +876,9 @@ def raycast(p_speler, r_straal):
 
     while True:
         if d_horizontaal + x * delta_h <= d_verticaal + y * delta_v:
-            i_horizontaal_x = []
-            i_horizontaal_x.append(p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0])
-            i_horizontaal_x.append(p_speler[1] + (d_horizontaal + x * delta_h) * r_straal[1])
+            i_horizontaal_x = [p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0],p_speler[1] + (d_horizontaal + x * delta_h) * r_straal[1]]
+            # i_horizontaal_x.append(p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0])
+            # i_horizontaal_x.append(p_speler[1] + (d_horizontaal + x * delta_h) * r_straal[1])
 
 
             # rijen = len(matrix) => hoogte
@@ -912,9 +915,9 @@ def raycast(p_speler, r_straal):
 
 
         else:
-            i_verticaal_y = []
-            i_verticaal_y.append(p_speler[0] + (d_verticaal + y * delta_v) * r_straal[0])
-            i_verticaal_y.append(p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1])
+            i_verticaal_y = [p_speler[0] + (d_verticaal + y * delta_v) * r_straal[0],p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1]]
+            # i_verticaal_y.append(p_speler[0] + (d_verticaal + y * delta_v) * r_straal[0])
+            # i_verticaal_y.append(p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1])
 
             if i_verticaal_y[0] == len(world_map):
                 i_verticaal_y[0] = len(world_map) - 0.5
@@ -976,7 +979,6 @@ def create_textures():
     ]
     return list_wall
 
-
 def render_wall(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur,
                 blok, list_wall_create):
     global is_horizontaal
@@ -1010,9 +1012,12 @@ def render_wall(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoor
             renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte_textuur / 100, hoogte_textuur),
                           dstrect=(scherm_x, scherm_y, 1, hoogte))
         else:
-            textuur_y = ((hoogte - HOOGTE) / 2) * (hoogte_textuur / hoogte)
             hoogte_textuur_volledig_scherm = HOOGTE * (hoogte_textuur / hoogte)
-            renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte_textuur / 100, hoogte_textuur_volledig_scherm),
+            # textuur_y = ((hoogte - HOOGTE) / 2) * (hoogte_textuur / hoogte)
+            # renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte_textuur / 100, hoogte_textuur_volledig_scherm),
+            #               dstrect=(scherm_x, scherm_y, 1, HOOGTE))
+
+            renderer.copy(muur, srcrect=(textuur_x, ((hoogte - HOOGTE) / 2) * (hoogte_textuur / hoogte), breedte_textuur / 100, hoogte_textuur_volledig_scherm),
                           dstrect=(scherm_x, scherm_y, 1, HOOGTE))
 
     else:
@@ -1413,7 +1418,6 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
             kolom = kolom_texture_scherm + int(beginpunt_sprite_x)
             kolom_texture = (kolom_texture_scherm / breedte_sprite_scherm) * breedte_sprite_wereld
             if(kolom < BREEDTE) and (kolom>=0):
-
                 if z_buffer[kolom] >= d_object_kolom_speler:
                     renderer.copy(sprite, srcrect=(kolom_texture, 0, 1, hoogte_sprite_wereld),dstrect=(kolom, (HOOGTE / 2) - (hoogte_sprite_scherm / 2), 1, hoogte_sprite_scherm))
                     sprite_rendered = True
@@ -1619,6 +1623,7 @@ def main():
     fps = 0
 
     # Blijf frames renderen tot we het signaal krijgen dat we moeten afsluiten
+    profiler.enable()
     while not moet_afsluiten:
 
         # Onthoud de huidige tijd
@@ -1699,15 +1704,18 @@ def main():
     # Sluit SDL2 af
     sdl2.ext.quit()
 
-
+profiler = cProfile.Profile()
 if __name__ == '__main__':
-    print("starten programma")
-    try:
-        with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
-            ser.write(b's')  # start gyro
-    except:
-        print(COM_POORT + ' niet gevonden' + ' gyro zou starten')
-        controller_aangesloten = False
-    print("naar main gaan")
+    # print("starten programma")
+    # try:
+    #     with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+    #         ser.write(b's')  # start gyro
+    # except:
+    #     print(COM_POORT + ' niet gevonden' + ' gyro zou starten')
+    #     controller_aangesloten = False
+    # print("naar main gaan")
     main()
+    profiler.disable()
+    stats = pstats.Stats(profiler)
+    stats.dump_stats('data.prof')
 
