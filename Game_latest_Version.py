@@ -1678,14 +1678,15 @@ def main():
         renderer.present()
         # na renderen frame venster verversen
         window.refresh()
-    # Sluit SDL2 af
-    if(not s_gestuurd_afsluit):
+
+    if(not s_gestuurd_afsluit):#zet sensor uit
         s_gestuurd_afsluit = True
         try:
             with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
-                ser.write(b's') #stop gyro
+                ser.write(b's')
         except:
             print('gyro zou stoppen')
+    # Sluit SDL2 af
     sdl2.ext.quit()
 
 
