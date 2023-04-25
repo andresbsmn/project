@@ -771,14 +771,9 @@ def buzzer():
         print('vibreer')
 
 def bereken_r_straal(r_speler, kolom):
-
-    r_straal_kolom_x = d_camera * r_speler[0] + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak[0]
-    r_straal_kolom_y = d_camera * r_speler[1] + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak[1]
-
-    r_straal_kolom_norm = math.sqrt(r_straal_kolom_x ** 2 + r_straal_kolom_y ** 2)
-    r_straal_x = r_straal_kolom_x / r_straal_kolom_norm
-    r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
-    return np.array([r_straal_x, r_straal_y])
+    r_straal = d_camera * r_speler + (-1 + (2 * kolom) / BREEDTE) * r_cameravlak
+    r_straal = r_straal/np.linalg.norm(r_straal)
+    return r_straal
 
 def heart_display():
     # print(total_hearts_present)
@@ -809,42 +804,42 @@ def collection_array():
     if apple_collected == True:
         tot += 1
 
-    if tot == 0:
-        try:
+    try:
+        if tot == 0:
             if kaart_genomen == False:
                 ser = serial.Serial(COM_POORT, 9600, timeout=1)
                 ser.write(b'4')
             else:
                 ser = serial.Serial(COM_POORT, 9600, timeout=1)
                 ser.write(b'9')
-            if tot == 1:
-                if kaart_genomen == False:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'5')
-                else:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'a')
-            if tot == 2:
-                if kaart_genomen == False:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'6')
-                else:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'z')
-            if tot == 3:
-                if kaart_genomen == False:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'7')
-                else:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'e')
-            if tot == 4:
-                if kaart_genomen == False:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'8')
-                else:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'r')
+        elif tot == 1:
+            if kaart_genomen == False:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'5')
+            else:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'a')
+        elif tot == 2:
+            if kaart_genomen == False:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'6')
+            else:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'z')
+        elif tot == 3:
+            if kaart_genomen == False:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'7')
+            else:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'e')
+        elif tot == 4:
+            if kaart_genomen == False:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'8')
+            else:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'r')
         except:
             print('kaart genomen')
 
