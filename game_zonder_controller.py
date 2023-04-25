@@ -7,7 +7,7 @@ import serial
 #als optimalisatie voor frame rate, kan 9600 hogerlr
 import sdl2.ext
 controller_aangesloten = True
-COM_POORT = 'deur'
+COM_POORT = 'COM8'
 
 from levels import *
 from playsound import playsound
@@ -649,6 +649,10 @@ def verwerk_input(delta):
 
         elif event.type == sdl2.SDL_KEYDOWN:
             key = event.key.keysym.sym
+            if key == sdl2.SDLK_k:
+                # taking_money = true
+                munt_collected()  #
+                continue
             if key == sdl2.SDLK_t:
                 laser_shot = True
                 buzzer()
@@ -741,22 +745,19 @@ def verwerk_input(delta):
         r_speler = rotatie(rotatie_beweging, r_speler)
         r_cameravlak = rotatie((math.pi / 2), r_speler)
 def getcijfer():
-    print('in getcijfer')
     while True:
         events = sdl2.ext.get_events()
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:
-                if (event.key.keysym.sym >= sdl2.SDLK_0 and event.key.keysym.sym <= sdl2.SDLK_9) or (event.key.keysym.sym <= sdl2.SDLK_KP_0 and event.key.keysym.sym >= sdl2.SDLK_KP_1):
+                if (event.key.keysym.sym >= sdl2.SDLK_0 and event.key.keysym.sym <= sdl2.SDLK_9) or (
+                        event.key.keysym.sym <= sdl2.SDLK_KP_0 and event.key.keysym.sym >= sdl2.SDLK_KP_1):
                     if event.key.keysym.sym <= sdl2.SDLK_9:
                         cijfer = event.key.keysym.sym - sdl2.SDLK_0
-                        print(cijfer)
                         return cijfer
-                    else:#https://wiki.libsdl.org/SDL2/SDLKeycodeLookup nul is grootste cijfer en 1 laagste
+                    else:  # https://wiki.libsdl.org/SDL2/SDLKeycodeLookup nul is grootste cijfer en 1 laagste
                         cijfer = event.key.keysym.sym - sdl2.SDLK_KP_1 + 1
-                        print('voor if lus: ',cijfer)
-                        if(event.key.keysym.sym == sdl2.SDLK_KP_0):
+                        if (event.key.keysym.sym == sdl2.SDLK_KP_0):
                             cijfer = 0
-                        print(cijfer)
                         return cijfer
 def vibrator():
     try:
@@ -1038,7 +1039,6 @@ def scannergun():
     renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture_breedte, crosshair_texture_hoogte),
                   dstrect=(580, 450, crosshair_texture_breedte, crosshair_texture_hoogte))
     if laser_shot == True:
-        playsound("resources/Scanner_beep_3.mp3")
         renderer.copy(laser_texture, srcrect=(0, 0, laser_texture_breedte, laser_texture_hoogte),
                       dstrect=(581, 470, laser_texture_breedte, laser_texture_hoogte))
 
@@ -1364,7 +1364,7 @@ def money_collector(tuple, afstand_tot_money):
     # tuple bevat: beginpunt x, breedte sprite scherm, hoogte sprite scherm en sprite rendered (boolean)
     collect_money = False
     beginpunt_money = tuple[0]
-    if afstand_tot_money <= 0.5 and beginpunt_money != 0:
+    if afstand_tot_money <= 0.8 and beginpunt_money != 0:
         #collect_money(money_rendered, money_collected)
         collect_money = True
     return(collect_money)
@@ -1647,7 +1647,7 @@ def main():
             clerk_sprite = factory.from_image(resources.get_path(clerk_string))
         volgorde_sprite_renderer()
         scannergun()
-        munt_collected()
+        #munt_collected()
 
 
 

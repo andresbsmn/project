@@ -6,7 +6,9 @@ import serial
 
 #als optimalisatie voor frame rate, kan 9600 hogerlr
 import sdl2.ext
-COM_POORT='com14'
+controller_aangesloten = True
+COM_POORT = 'COM8'
+
 from levels import *
 from playsound import playsound
 persistantfile = "save.pkl"
@@ -592,12 +594,15 @@ def save(option):
         print("saven \n")
 
     elif option == "load":
-        infile = open(persistantfile,'rb')
-        teladen = pickle.load(infile)
-        infile.close()
-        globals().update(teladen)
-        if total_money_present >= 4:
-            total_money_present = 0
+        try:
+            infile = open(persistantfile,'rb')
+            teladen = pickle.load(infile)
+            infile.close()
+            globals().update(teladen)
+            if total_money_present >= 4:
+                total_money_present = 0
+        except:
+            print('niet kunnen loaden :(')
         print("laden \n")
     else:
         print('save failed')
@@ -752,12 +757,18 @@ def getcijfer():
                             cijfer = 0
                         return cijfer
 def vibrator():
-    with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
-        ser.write(b'v')
+    try:
+        with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+            ser.write(b'v')
+    except:
+        print('vibreer')
 
 def buzzer():
-    with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
-        ser.write(b'b')
+    try:
+        with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+            ser.write(b'b')
+    except:
+        print('vibreer')
 
 def bereken_r_straal(r_speler, kolom):
 
@@ -770,19 +781,22 @@ def bereken_r_straal(r_speler, kolom):
     return np.array([r_straal_x, r_straal_y])
 
 def heart_display():
-    print(total_hearts_present)
-    if total_hearts_present == 3:
-        ser = serial.Serial(COM_POORT, 9600, timeout=1)
-        ser.write(b'0')
-    elif total_hearts_present == 2:
-        ser = serial.Serial(COM_POORT, 9600, timeout=1)
-        ser.write(b'1')
-    elif total_hearts_present == 1:
-        ser = serial.Serial(COM_POORT, 9600, timeout=1)
-        ser.write(b'2')#rllll
-    else:
-        ser = serial.Serial(COM_POORT, 9600, timeout=1)
-        ser.write(b'3')
+    # print(total_hearts_present)
+    try:
+        if total_hearts_present == 3:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'0')
+        elif total_hearts_present == 2:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'1')
+        elif total_hearts_present == 1:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'2')#rllll
+        else:
+            ser = serial.Serial(COM_POORT, 9600, timeout=1)
+            ser.write(b'3')
+    except:
+        print('hartjes = ', total_hearts_present)
 
 def collection_array():
     tot = 0
@@ -796,40 +810,43 @@ def collection_array():
         tot += 1
 
     if tot == 0:
-        if kaart_genomen == False:
-            ser = serial.Serial(COM_POORT, 9600, timeout=1)
-            ser.write(b'4')
-        else:
-            ser = serial.Serial(COM_POORT, 9600, timeout=1)
-            ser.write(b'9')
-    if tot == 1:
-        if kaart_genomen == False:
-            ser = serial.Serial(COM_POORT, 9600, timeout=1)
-            ser.write(b'5')
-        else:
-            ser = serial.Serial(COM_POORT, 9600, timeout=1)
-            ser.write(b'a')
-    if tot == 2:
-        if kaart_genomen == False:
-            ser = serial.Serial(COM_POORT, 9600, timeout=1)
-            ser.write(b'6')
-        else:
-            ser = serial.Serial(COM_POORT, 9600, timeout=1)
-            ser.write(b'z')
-    if tot == 3:
-        if kaart_genomen == False:
-            ser = serial.Serial(COM_POORT, 9600, timeout=1)
-            ser.write(b'7')
-        else:
-            ser = serial.Serial(COM_POORT, 9600, timeout=1)
-            ser.write(b'e')
-    if tot == 4:
-        if kaart_genomen == False:
-            ser = serial.Serial(COM_POORT, 9600, timeout=1)
-            ser.write(b'8')
-        else:
-            ser = serial.Serial(COM_POORT, 9600, timeout=1)
-            ser.write(b'r')
+        try:
+            if kaart_genomen == False:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'4')
+            else:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'9')
+            if tot == 1:
+                if kaart_genomen == False:
+                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                    ser.write(b'5')
+                else:
+                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                    ser.write(b'a')
+            if tot == 2:
+                if kaart_genomen == False:
+                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                    ser.write(b'6')
+                else:
+                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                    ser.write(b'z')
+            if tot == 3:
+                if kaart_genomen == False:
+                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                    ser.write(b'7')
+                else:
+                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                    ser.write(b'e')
+            if tot == 4:
+                if kaart_genomen == False:
+                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                    ser.write(b'8')
+                else:
+                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                    ser.write(b'r')
+        except:
+            print('kaart genomen')
 
 def raycast(p_speler, r_straal):
     global r_speler
@@ -1020,7 +1037,6 @@ def scannergun():
     renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture_breedte, crosshair_texture_hoogte),
                   dstrect=(580, 450, crosshair_texture_breedte, crosshair_texture_hoogte))
     if laser_shot == True:
-        playsound("resources/Scanner_beep_3.mp3")
         renderer.copy(laser_texture, srcrect=(0, 0, laser_texture_breedte, laser_texture_hoogte),
                       dstrect=(581, 470, laser_texture_breedte, laser_texture_hoogte))
 
@@ -1028,22 +1044,22 @@ def scannergun():
         if d_pizza_kolom_speler <= 1:
             pizza_collected = check_if_object_scanned(tuple_pizza[0] + (tuple_pizza[1] / 2), 450, tuple_pizza[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_apple_kolom_speler <= 1:
             apple_collected = check_if_object_scanned(tuple_apple[0] + (tuple_apple[1] / 2), 450, tuple_apple[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_broccoli_kolom_speler <= 1:
             broccoli_collected = check_if_object_scanned(tuple_broccoli[0] + (tuple_broccoli[1] / 2), 450,
                                                          tuple_broccoli[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_egg_kolom_speler <= 1:
             egg_collected = check_if_object_scanned(tuple_egg[0] + (tuple_egg[1] / 2), 450, tuple_egg[1])
             collection_array()
-            laser_shot = False
-        else:
-            laser_shot = False
+            # laser_shot = False
+        # else:
+        laser_shot = False
 
 # Initialiseer timer
 timer_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size = 20, color=kleuren[7])
@@ -1312,11 +1328,12 @@ def volgorde_sprite_renderer():
             if d_gsm_kolom_speler <= 0.5 and begintpunt_gsm != 0:
                 collect_gsm()
         if kaart_gekozen!=0:
-            if list_afstanden[i]== d_clerk_kolom_speler:
+            if list_afstanden[i] == d_clerk_kolom_speler:
                 tuple_clerk = sprite_renderer(clerk_x, clerk_y, clerk_sprite,6, z_buffer,d_clerk_kolom_speler, 5, True)
 
 def munt_collected():
     global money1_collected, money1_rendered, money2_collected, money2_rendered, money3_collected, money3_rendered, money4_collected, money4_rendered
+
     if money1_rendered == True:
         if tuple_munt1[3] == True:
             collected = money_collector(tuple_munt1, d_munt1_kolom_speler)
@@ -1388,7 +1405,6 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
             kolom = kolom_texture_scherm + int(beginpunt_sprite_x)
             kolom_texture = (kolom_texture_scherm / breedte_sprite_scherm) * breedte_sprite_wereld
             if(kolom < BREEDTE) and (kolom>=0):
-
                 if z_buffer[kolom] >= d_object_kolom_speler:
                     renderer.copy(sprite, srcrect=(kolom_texture, 0, 1, hoogte_sprite_wereld),dstrect=(kolom, (HOOGTE / 2) - (hoogte_sprite_scherm / 2), 1, hoogte_sprite_scherm))
                     sprite_rendered = True
@@ -1398,10 +1414,10 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
 
 # checking if we hit an object with our scanner
 def check_if_object_scanned(scanobject_x, scanobject_y, breedte):
-    if scanobject_x-(breedte/2) <= 600 <= scanobject_x+(breedte/2) and 450 <= scanobject_y <= 495:
-        return True
-    else:
-        return False
+    return scanobject_x-(breedte/2) <= 600 <= scanobject_x+(breedte/2) and 450 <= scanobject_y <= 495
+    #     return True
+    # else:
+    #     return False
 
 def player_hit_by_clerk():
     global player_hit
@@ -1663,16 +1679,26 @@ def main():
         renderer.present()
         # na renderen frame venster verversen
         window.refresh()
-    # Sluit SDL2 af
-    if(not s_gestuurd_afsluit):
+
+    if(not s_gestuurd_afsluit):#zet sensor uit
         s_gestuurd_afsluit = True
-        with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
-            ser.write(b's') #stop gyro
+        try:
+            with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+                ser.write(b's')
+        except:
+            print('gyro zou stoppen')
+    # Sluit SDL2 af
     sdl2.ext.quit()
 
 
 if __name__ == '__main__':
-    with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
-        ser.write(b's')#start gyro
+    print("starten programma")
+    try:
+        with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+            ser.write(b's')  # start gyro
+    except:
+        print(COM_POORT + ' niet gevonden' + ' gyro zou starten')
+        controller_aangesloten = False
+    print("naar main gaan")
     main()
 
