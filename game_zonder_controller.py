@@ -9,7 +9,7 @@ import sdl2.ext
 controller_aangesloten = True
 COM_POORT = 'deur'
 
-from ouder_versies.levels import *
+from levels import *
 from playsound import playsound
 persistantfile = "save.pkl"
 keuzealgemaakt = False

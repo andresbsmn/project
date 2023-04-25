@@ -7,7 +7,7 @@ import serial
 #als optimalisatie voor frame rate, kan 9600 hogerlr
 import sdl2.ext
 COM_POORT='com14'
-from ouder_versies.levels import *
+from levels import *
 from playsound import playsound
 persistantfile = "save.pkl"
 keuzealgemaakt = False
@@ -209,7 +209,6 @@ def loadornew():
     renderer.clear()
     sdl2.ext.quit()
 
-
 def reset_startwaarden():
     global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_money_present, total_hearts_present, money1_collected, money2_collected, money3_collected, money4_collected, money1_rendered, money2_rendered, money3_rendered, money4_rendered, money1_aantal, money2_aantal, money3_aantal, money4_aantal, kaart_genomen
 
@@ -235,8 +234,6 @@ def reset_startwaarden():
     money4_aantal = 0
     kaart_genomen = False
     renderer.clear
-
-
 
 def startscherm(keuze):
     global world_map
