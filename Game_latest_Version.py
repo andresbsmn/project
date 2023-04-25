@@ -1036,7 +1036,6 @@ def scannergun():
     renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture_breedte, crosshair_texture_hoogte),
                   dstrect=(580, 450, crosshair_texture_breedte, crosshair_texture_hoogte))
     if laser_shot == True:
-        playsound("resources/Scanner_beep_3.mp3")
         renderer.copy(laser_texture, srcrect=(0, 0, laser_texture_breedte, laser_texture_hoogte),
                       dstrect=(581, 470, laser_texture_breedte, laser_texture_hoogte))
 
