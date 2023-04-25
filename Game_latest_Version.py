@@ -488,7 +488,7 @@ def exit_level_action():
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                if key == sdl2.SDLK_p:
+                if key == sdl2.SDLK_z:
                     renderer.clear()
                     sdl2.ext.quit()
                     startscherm("level_up")
@@ -644,13 +644,13 @@ def verwerk_input(delta):
             if key == sdl2.SDLK_k:
                 # taking_money = true
                 munt_collected()  #
-                continue
+                #continue
             if key == sdl2.SDLK_t:
                 laser_shot = True
                 buzzer()
-                continue #
+                #continue #
             if key == sdl2.SDLK_z and exit_allowed == True:
-                playsound("resources/Cash_register.mp3")
+                #playsound("resources/Cash_register.mp3")
                 exit_level = True
 
             if key == sdl2.SDLK_ESCAPE:
@@ -794,6 +794,7 @@ def collection_array():
         tot += 1
     if apple_collected == True:
         tot += 1
+
     if tot == 0:
         if kaart_genomen == False:
             ser = serial.Serial(COM_POORT, 9600, timeout=1)
