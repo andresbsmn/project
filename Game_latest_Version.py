@@ -1332,6 +1332,7 @@ def volgorde_sprite_renderer():
 
 def munt_collected():
     global money1_collected, money1_rendered, money2_collected, money2_rendered, money3_collected, money3_rendered, money4_collected, money4_rendered
+
     if money1_rendered == True:
         if tuple_munt1[3] == True:
             collected = money_collector(tuple_munt1, d_munt1_kolom_speler)
@@ -1403,7 +1404,6 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
             kolom = kolom_texture_scherm + int(beginpunt_sprite_x)
             kolom_texture = (kolom_texture_scherm / breedte_sprite_scherm) * breedte_sprite_wereld
             if(kolom < BREEDTE) and (kolom>=0):
-
                 if z_buffer[kolom] >= d_object_kolom_speler:
                     renderer.copy(sprite, srcrect=(kolom_texture, 0, 1, hoogte_sprite_wereld),dstrect=(kolom, (HOOGTE / 2) - (hoogte_sprite_scherm / 2), 1, hoogte_sprite_scherm))
                     sprite_rendered = True
@@ -1413,10 +1413,10 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
 
 # checking if we hit an object with our scanner
 def check_if_object_scanned(scanobject_x, scanobject_y, breedte):
-    if scanobject_x-(breedte/2) <= 600 <= scanobject_x+(breedte/2) and 450 <= scanobject_y <= 495:
-        return True
-    else:
-        return False
+    return scanobject_x-(breedte/2) <= 600 <= scanobject_x+(breedte/2) and 450 <= scanobject_y <= 495
+    #     return True
+    # else:
+    #     return False
 
 def player_hit_by_clerk():
     global player_hit
