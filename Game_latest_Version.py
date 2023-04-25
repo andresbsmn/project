@@ -840,8 +840,8 @@ def collection_array():
             else:
                 ser = serial.Serial(COM_POORT, 9600, timeout=1)
                 ser.write(b'r')
-        except:
-            print('kaart genomen')
+    except:
+        print('kaart genomen')
 
 def raycast(p_speler, r_straal):
     global r_speler
