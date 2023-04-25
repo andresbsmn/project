@@ -1043,22 +1043,22 @@ def scannergun():
         if d_pizza_kolom_speler <= 1:
             pizza_collected = check_if_object_scanned(tuple_pizza[0] + (tuple_pizza[1] / 2), 450, tuple_pizza[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_apple_kolom_speler <= 1:
             apple_collected = check_if_object_scanned(tuple_apple[0] + (tuple_apple[1] / 2), 450, tuple_apple[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_broccoli_kolom_speler <= 1:
             broccoli_collected = check_if_object_scanned(tuple_broccoli[0] + (tuple_broccoli[1] / 2), 450,
                                                          tuple_broccoli[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_egg_kolom_speler <= 1:
             egg_collected = check_if_object_scanned(tuple_egg[0] + (tuple_egg[1] / 2), 450, tuple_egg[1])
             collection_array()
-            laser_shot = False
-        else:
-            laser_shot = False
+            # laser_shot = False
+        # else:
+        laser_shot = False
 
 # Initialiseer timer
 timer_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size = 20, color=kleuren[7])
