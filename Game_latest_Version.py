@@ -4,10 +4,10 @@ import pickle
 import sdl2
 import serial
 
-#als optimalisatie voor frame rate, kan 9600 hogerlr
+#als optimalisatie voor frame rate, kan 9600 hogerlr'r"r'r'r(r'r§l"
 import sdl2.ext
 controller_aangesloten = True
-COM_POORT = 'COM8'
+COM_POORT = 'COM14'
 
 from levels import *
 from playsound import playsound
@@ -476,7 +476,7 @@ def exit_level_action():
 
     message_lives = f'Levens over.'
 
-    message_return = f'Druk op "de touch module" om verder te gaan. '
+    message_return = f'Druk op "achteruitknop" om verder te gaan. '
 
     heartsprite1 = factory.from_image(resources.get_path("heart1.png"))
     heartsprite2 = factory.from_image(resources.get_path("heart2.png"))
@@ -490,7 +490,7 @@ def exit_level_action():
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                if key == sdl2.SDLK_z:
+                if key == sdl2.SDLK_s:
                     renderer.clear()
                     sdl2.ext.quit()
                     startscherm("level_up")
