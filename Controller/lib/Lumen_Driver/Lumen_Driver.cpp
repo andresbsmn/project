@@ -13,7 +13,7 @@ void light_ini(){
 
 void shoot(){
   Keyboard.press('t');
-  delay(100);
+  delay(10);
   Keyboard.release('t'); //xxxx
 }
 
@@ -23,7 +23,7 @@ void light(){
   if(veml.readLux()>50.0){
       digitalWrite(pinLed, HIGH);
       shoot();
-      delay(1000);
+      delay(100);
   }
   else{
     digitalWrite(pinLed, LOW);

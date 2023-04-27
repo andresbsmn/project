@@ -1,12 +1,12 @@
 
 #include "Buig_Driver.h"
-
+bool hoog = false;
+bool midden = false;
+bool laag = false;
 void buigsensor(){
-  bool hoog = false;
-  bool midden = false;
-  bool laag = false;
+  
   int flexValue = analogRead(pinFlex);
-  if(flexValue==1023){
+  if(flexValue>1010){
     hoog = true;
   }
   else if(flexValue > 700){
@@ -25,4 +25,3 @@ void buigsensor(){
   }
 
 }
-
