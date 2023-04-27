@@ -25,25 +25,13 @@ void LED_driver::write_value(uint8_t val){
                     break;
       case 6: 
                 ioe->set_output_reg(0x88); // 2 items (gsm)
-                delay(1000);
-                ioe->set_output_reg(0x80);
-                delay(1000);
                 break;
       case 7: 
                 ioe->set_output_reg(0xC8); // 3 items (gsm)
-                delay(1000);
-                ioe->set_output_reg(0xC5);
-                delay(1000);
                 break;
       case 8: ioe->set_output_reg(0xE8); // 4 items (gsm)
-                delay(1000);
-                ioe->set_output_reg(0xE5);
-                delay(1000);
                 break;
       case 9: ioe->set_output_reg(0xFF); // 5 items (gsm)
-                delay(1000);
-                ioe->set_output_reg(0xF5);
-                delay(1000);
                 break;
     default: break;
     }
