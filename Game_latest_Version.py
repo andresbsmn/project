@@ -1555,7 +1555,7 @@ def main():
     s_pressed = False
     global fps_font
     global tijd_verstrekentot
-    global keuzealgemaaktçrçrç
+    global keuzealgemaakt
     global s_gestuurd_afsluit
     if not keuzealgemaakt:
         save("load")
