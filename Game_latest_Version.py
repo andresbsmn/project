@@ -650,7 +650,7 @@ def verwerk_input(delta):
                 laser_shot = True
                 buzzer()
                 #continue #
-            if key == sdl2.SDLK_z and exit_allowed == True:
+            if key == sdl2.SDLK_q and exit_allowed == True:
                 #playsound("resources/Cash_register.mp3")
                 exit_level = True
 
@@ -1554,7 +1554,7 @@ def main():
     s_pressed = False
     global fps_font
     global tijd_verstrekentot
-    global keuzealgemaakt
+    global keuzealgemaaktçrçrç
     global s_gestuurd_afsluit
     if not keuzealgemaakt:
         save("load")
