@@ -651,6 +651,7 @@ def verwerk_input(delta):
                 buzzer()
                 #continue #
             if key == sdl2.SDLK_q and exit_allowed == True:
+                #q is links drukken
                 #playsound("resources/Cash_register.mp3")
                 exit_level = True
 
