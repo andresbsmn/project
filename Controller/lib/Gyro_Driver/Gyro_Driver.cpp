@@ -22,17 +22,17 @@ void Schrijfrichting(char richting, char hoeveel){
     if(richting == 'l'){
         //stuur links
         Keyboard.press('l');
-        delay(100);
+        delay(75);
         Keyboard.release('l');
     }
     if(richting == 'r'){
         //stuur rechts
         Keyboard.press('r');
-        delay(100);
+        delay(75);
         Keyboard.release('r');
     }
         Keyboard.press(hoeveel);
-        delay(100);
+        delay(75);
         Keyboard.release(hoeveel);
     }
 
