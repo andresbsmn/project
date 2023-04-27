@@ -1,15 +1,18 @@
+import cProfile
 import math
+import pstats
 import time
 import pickle
 import sdl2
 import serial
-
+import snakeviz
+from numba import jit
 #als optimalisatie voor frame rate, kan 9600 hogerlr
 import sdl2.ext
 controller_aangesloten = True
-COM_POORT = 'deur'
+COM_POORT = 'COM8'
 
-from ouder_versies.levels import *
+from levels import *
 from playsound import playsound
 persistantfile = "save.pkl"
 keuzealgemaakt = False
@@ -211,7 +214,6 @@ def loadornew():
     renderer.clear()
     sdl2.ext.quit()
 
-
 def reset_startwaarden():
     global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_money_present, total_hearts_present, money1_collected, money2_collected, money3_collected, money4_collected, money1_rendered, money2_rendered, money3_rendered, money4_rendered, money1_aantal, money2_aantal, money3_aantal, money4_aantal, kaart_genomen
 
@@ -237,8 +239,6 @@ def reset_startwaarden():
     money4_aantal = 0
     kaart_genomen = False
     renderer.clear
-
-
 
 def startscherm(keuze):
     global world_map
@@ -493,7 +493,7 @@ def exit_level_action():
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                if key == sdl2.SDLK_p:
+                if key == sdl2.SDLK_z:
                     renderer.clear()
                     sdl2.ext.quit()
                     startscherm("level_up")
@@ -649,12 +649,16 @@ def verwerk_input(delta):
 
         elif event.type == sdl2.SDL_KEYDOWN:
             key = event.key.keysym.sym
+            if key == sdl2.SDLK_k:
+                # taking_money = true
+                munt_collected()  #
+                continue
             if key == sdl2.SDLK_t:
                 laser_shot = True
                 buzzer()
                 continue #
             if key == sdl2.SDLK_z and exit_allowed == True:
-                playsound("resources/Cash_register.mp3")
+                #playsound("resources/Cash_register.mp3")
                 exit_level = True
 
             if key == sdl2.SDLK_ESCAPE:
@@ -741,22 +745,19 @@ def verwerk_input(delta):
         r_speler = rotatie(rotatie_beweging, r_speler)
         r_cameravlak = rotatie((math.pi / 2), r_speler)
 def getcijfer():
-    print('in getcijfer')
     while True:
         events = sdl2.ext.get_events()
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:
-                if (event.key.keysym.sym >= sdl2.SDLK_0 and event.key.keysym.sym <= sdl2.SDLK_9) or (event.key.keysym.sym <= sdl2.SDLK_KP_0 and event.key.keysym.sym >= sdl2.SDLK_KP_1):
+                if (event.key.keysym.sym >= sdl2.SDLK_0 and event.key.keysym.sym <= sdl2.SDLK_9) or (
+                        event.key.keysym.sym <= sdl2.SDLK_KP_0 and event.key.keysym.sym >= sdl2.SDLK_KP_1):
                     if event.key.keysym.sym <= sdl2.SDLK_9:
                         cijfer = event.key.keysym.sym - sdl2.SDLK_0
-                        print(cijfer)
                         return cijfer
-                    else:#https://wiki.libsdl.org/SDL2/SDLKeycodeLookup nul is grootste cijfer en 1 laagste
+                    else:  # https://wiki.libsdl.org/SDL2/SDLKeycodeLookup nul is grootste cijfer en 1 laagste
                         cijfer = event.key.keysym.sym - sdl2.SDLK_KP_1 + 1
-                        print('voor if lus: ',cijfer)
-                        if(event.key.keysym.sym == sdl2.SDLK_KP_0):
+                        if (event.key.keysym.sym == sdl2.SDLK_KP_0):
                             cijfer = 0
-                        print(cijfer)
                         return cijfer
 def vibrator():
     try:
@@ -780,7 +781,7 @@ def bereken_r_straal(r_speler, kolom):
     r_straal_kolom_norm = math.sqrt(r_straal_kolom_x ** 2 + r_straal_kolom_y ** 2)
     r_straal_x = r_straal_kolom_x / r_straal_kolom_norm
     r_straal_y = r_straal_kolom_y / r_straal_kolom_norm
-    return np.array([r_straal_x, r_straal_y])
+    return [r_straal_x, r_straal_y]
 
 def heart_display():
     # print(total_hearts_present)
@@ -810,44 +811,45 @@ def collection_array():
         tot += 1
     if apple_collected == True:
         tot += 1
-    if tot == 0:
-        try:
+
+    try:
+        if tot == 0:
             if kaart_genomen == False:
                 ser = serial.Serial(COM_POORT, 9600, timeout=1)
                 ser.write(b'4')
             else:
                 ser = serial.Serial(COM_POORT, 9600, timeout=1)
                 ser.write(b'9')
-            if tot == 1:
-                if kaart_genomen == False:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'5')
-                else:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'a')
-            if tot == 2:
-                if kaart_genomen == False:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'6')
-                else:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'z')
-            if tot == 3:
-                if kaart_genomen == False:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'7')
-                else:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'e')
-            if tot == 4:
-                if kaart_genomen == False:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'8')
-                else:
-                    ser = serial.Serial(COM_POORT, 9600, timeout=1)
-                    ser.write(b'r')
-        except:
-            print('kaart genomen')
+        elif tot == 1:
+            if kaart_genomen == False:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'5')
+            else:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'a')
+        elif tot == 2:
+            if kaart_genomen == False:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'6')
+            else:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'z')
+        elif tot == 3:
+            if kaart_genomen == False:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'7')
+            else:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'e')
+        elif tot == 4:
+            if kaart_genomen == False:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'8')
+            else:
+                ser = serial.Serial(COM_POORT, 9600, timeout=1)
+                ser.write(b'r')
+    except:
+        print('kaart genomen')
 
 def raycast(p_speler, r_straal):
     global r_speler
@@ -874,7 +876,10 @@ def raycast(p_speler, r_straal):
 
     while True:
         if d_horizontaal + x * delta_h <= d_verticaal + y * delta_v:
-            i_horizontaal_x = p_speler + (d_horizontaal + x * delta_h) * r_straal
+            i_horizontaal_x = [p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0],p_speler[1] + (d_horizontaal + x * delta_h) * r_straal[1]]
+            # i_horizontaal_x.append(p_speler[0] + (d_horizontaal + x * delta_h) * r_straal[0])
+            # i_horizontaal_x.append(p_speler[1] + (d_horizontaal + x * delta_h) * r_straal[1])
+
 
             # rijen = len(matrix) => hoogte
             # kolommen = len(matrix[0]) => width
@@ -884,7 +889,8 @@ def raycast(p_speler, r_straal):
             elif i_horizontaal_x[1] == len(world_map[0]):
                 i_horizontaal_x[1] = len(world_map[0]) - 0.5
 
-            i_horizontaal_x_rounded_int = (i_horizontaal_x + 0.0005).astype(int)
+            # i_horizontaal_x_rounded_int = (i_horizontaal_x + 0.0005).astype(int)
+            i_horizontaal_x_rounded_int = [int(x + 0.0005) for x in i_horizontaal_x]
             x += 1
             is_horizontaal = True
 
@@ -894,31 +900,32 @@ def raycast(p_speler, r_straal):
                         (i_horizontaal_x[0] - p_speler[0]) ** 2 + (i_horizontaal_x[1] - p_speler[1]) ** 2)
                     is_texture = True
                     blok = world_map[i_horizontaal_x_rounded_int[0], (i_horizontaal_x_rounded_int[1])]
-                    textuurcoordinaten_X_zondermaalbreedtetextuur = (i_horizontaal_x - i_horizontaal_x_rounded_int)
+                    textuurcoordinaten_X_zondermaalbreedtetextuur = ([i_horizontaal_x[0] - i_horizontaal_x_rounded_int[0],i_horizontaal_x[1] - i_horizontaal_x_rounded_int[1]])
                     break
 
 
-
-
             elif r_straal[0] < 0:
-                if world_map[(i_horizontaal_x_rounded_int[0] - 1, i_horizontaal_x_rounded_int[1])]:
+                if world_map[(i_horizontaal_x_rounded_int[0]-1, i_horizontaal_x_rounded_int[1])]:
                     d_muur = math.sqrt(
                         (i_horizontaal_x[0] - p_speler[0]) ** 2 + (i_horizontaal_x[1] - p_speler[1]) ** 2)
                     is_texture = True
-                    textuurcoordinaten_X_zondermaalbreedtetextuur = (i_horizontaal_x - i_horizontaal_x_rounded_int)
-                    blok = world_map[(i_horizontaal_x_rounded_int[0] - 1), i_horizontaal_x_rounded_int[1]]
+                    textuurcoordinaten_X_zondermaalbreedtetextuur = ([i_horizontaal_x[0] - i_horizontaal_x_rounded_int[0],i_horizontaal_x[1] - i_horizontaal_x_rounded_int[1]])
+                    blok = world_map[(i_horizontaal_x_rounded_int[0]-1), i_horizontaal_x_rounded_int[1]]
                     break
 
 
         else:
-            i_verticaal_y = p_speler + (d_verticaal + y * delta_v) * r_straal
+            i_verticaal_y = [p_speler[0] + (d_verticaal + y * delta_v) * r_straal[0],p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1]]
+            # i_verticaal_y.append(p_speler[0] + (d_verticaal + y * delta_v) * r_straal[0])
+            # i_verticaal_y.append(p_speler[1] + (d_verticaal + y * delta_v) * r_straal[1])
 
             if i_verticaal_y[0] == len(world_map):
                 i_verticaal_y[0] = len(world_map) - 0.5
             elif i_verticaal_y[1] == len(world_map[0]):
                 i_verticaal_y[1] = len(world_map[0]) - 0.5
 
-            i_verticaal_y_rounded_int = (i_verticaal_y + 0.0005).astype(int)
+            # i_verticaal_y_rounded_int = (i_verticaal_y + 0.0005).astype(int)
+            i_verticaal_y_rounded_int = [int(x + 0.0005) for x in i_verticaal_y]
 
             is_horizontaal = False
             y += 1
@@ -926,7 +933,7 @@ def raycast(p_speler, r_straal):
                 if world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])]:
                     d_muur = math.sqrt((i_verticaal_y[0] - p_speler[0]) ** 2 + (i_verticaal_y[1] - p_speler[1]) ** 2)
                     is_texture = True
-                    textuurcoordinaten_X_zondermaalbreedtetextuur = (1 - (i_verticaal_y - i_verticaal_y_rounded_int))
+                    textuurcoordinaten_X_zondermaalbreedtetextuur =([1 - (i_verticaal_y[0] - i_verticaal_y_rounded_int[0]),1 - (i_verticaal_y[1] - i_verticaal_y_rounded_int[1])])
                     blok = world_map[(i_verticaal_y_rounded_int[0]), (i_verticaal_y_rounded_int[1])]
                     break
 
@@ -936,11 +943,15 @@ def raycast(p_speler, r_straal):
                 if world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]:
                     d_muur = math.sqrt((i_verticaal_y[0] - p_speler[0]) ** 2 + (i_verticaal_y[1] - p_speler[1]) ** 2)
                     is_texture = True
-                    textuurcoordinaten_X_zondermaalbreedtetextuur = (1 - (i_verticaal_y - i_verticaal_y_rounded_int))
+                    textuurcoordinaten_X_zondermaalbreedtetextuur = ([1 - (i_verticaal_y[0] - i_verticaal_y_rounded_int[0]),1 - (i_verticaal_y[1] - i_verticaal_y_rounded_int[1])])
                     blok = world_map[i_verticaal_y_rounded_int[0], (i_verticaal_y_rounded_int[1] - 1)]
                     break
 
-    d_muur = d_muur * np.dot(r_speler, r_straal)
+    dot_product = 0
+    for i in range(len(r_speler)):
+        dot_product += r_speler[i] * r_straal[i]
+    d_muur *= dot_product
+    # d_muur = d_muur * np.dot(r_speler, r_straal)
 
     return (d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur, blok)
 
@@ -968,7 +979,6 @@ def create_textures():
     ]
     return list_wall
 
-
 def render_wall(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoordinaten_X_zondermaalbreedtetextuur,
                 blok, list_wall_create):
     global is_horizontaal
@@ -978,7 +988,7 @@ def render_wall(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoor
     hoogte_t = textures_hoogtes[blok]
     breedte_t = textures_breedtes[blok] - 1
 
-    textuurcoordinaten_X = textuurcoordinaten_X_zondermaalbreedtetextuur * breedte_t
+    textuurcoordinaten_X = [x * breedte_t for x in textuurcoordinaten_X_zondermaalbreedtetextuur]
     hoogte = (HOOGTE) * 1 / (d_muur + 0.00001)
 
     if hoogte >= HOOGTE:
@@ -1002,9 +1012,12 @@ def render_wall(renderer, window, kolom, d_muur, k_muur, is_texture, textuurcoor
             renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte_textuur / 100, hoogte_textuur),
                           dstrect=(scherm_x, scherm_y, 1, hoogte))
         else:
-            textuur_y = ((hoogte - HOOGTE) / 2) * (hoogte_textuur / hoogte)
             hoogte_textuur_volledig_scherm = HOOGTE * (hoogte_textuur / hoogte)
-            renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte_textuur / 100, hoogte_textuur_volledig_scherm),
+            # textuur_y = ((hoogte - HOOGTE) / 2) * (hoogte_textuur / hoogte)
+            # renderer.copy(muur, srcrect=(textuur_x, textuur_y, breedte_textuur / 100, hoogte_textuur_volledig_scherm),
+            #               dstrect=(scherm_x, scherm_y, 1, HOOGTE))
+
+            renderer.copy(muur, srcrect=(textuur_x, ((hoogte - HOOGTE) / 2) * (hoogte_textuur / hoogte), breedte_textuur / 100, hoogte_textuur_volledig_scherm),
                           dstrect=(scherm_x, scherm_y, 1, HOOGTE))
 
     else:
@@ -1038,7 +1051,6 @@ def scannergun():
     renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture_breedte, crosshair_texture_hoogte),
                   dstrect=(580, 450, crosshair_texture_breedte, crosshair_texture_hoogte))
     if laser_shot == True:
-        playsound("resources/Scanner_beep_3.mp3")
         renderer.copy(laser_texture, srcrect=(0, 0, laser_texture_breedte, laser_texture_hoogte),
                       dstrect=(581, 470, laser_texture_breedte, laser_texture_hoogte))
 
@@ -1046,22 +1058,22 @@ def scannergun():
         if d_pizza_kolom_speler <= 1:
             pizza_collected = check_if_object_scanned(tuple_pizza[0] + (tuple_pizza[1] / 2), 450, tuple_pizza[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_apple_kolom_speler <= 1:
             apple_collected = check_if_object_scanned(tuple_apple[0] + (tuple_apple[1] / 2), 450, tuple_apple[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_broccoli_kolom_speler <= 1:
             broccoli_collected = check_if_object_scanned(tuple_broccoli[0] + (tuple_broccoli[1] / 2), 450,
                                                          tuple_broccoli[1])
             collection_array()
-            laser_shot = False
+            # laser_shot = False
         if d_egg_kolom_speler <= 1:
             egg_collected = check_if_object_scanned(tuple_egg[0] + (tuple_egg[1] / 2), 450, tuple_egg[1])
             collection_array()
-            laser_shot = False
-        else:
-            laser_shot = False
+            # laser_shot = False
+        # else:
+        laser_shot = False
 
 # Initialiseer timer
 timer_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size = 20, color=kleuren[7])
@@ -1364,7 +1376,7 @@ def money_collector(tuple, afstand_tot_money):
     # tuple bevat: beginpunt x, breedte sprite scherm, hoogte sprite scherm en sprite rendered (boolean)
     collect_money = False
     beginpunt_money = tuple[0]
-    if afstand_tot_money <= 0.5 and beginpunt_money != 0:
+    if afstand_tot_money <= 0.8 and beginpunt_money != 0:
         #collect_money(money_rendered, money_collected)
         collect_money = True
     return(collect_money)
@@ -1406,7 +1418,6 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
             kolom = kolom_texture_scherm + int(beginpunt_sprite_x)
             kolom_texture = (kolom_texture_scherm / breedte_sprite_scherm) * breedte_sprite_wereld
             if(kolom < BREEDTE) and (kolom>=0):
-
                 if z_buffer[kolom] >= d_object_kolom_speler:
                     renderer.copy(sprite, srcrect=(kolom_texture, 0, 1, hoogte_sprite_wereld),dstrect=(kolom, (HOOGTE / 2) - (hoogte_sprite_scherm / 2), 1, hoogte_sprite_scherm))
                     sprite_rendered = True
@@ -1416,10 +1427,10 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
 
 # checking if we hit an object with our scanner
 def check_if_object_scanned(scanobject_x, scanobject_y, breedte):
-    if scanobject_x-(breedte/2) <= 600 <= scanobject_x+(breedte/2) and 450 <= scanobject_y <= 495:
-        return True
-    else:
-        return False
+    return scanobject_x-(breedte/2) <= 600 <= scanobject_x+(breedte/2) and 450 <= scanobject_y <= 495
+    #     return True
+    # else:
+    #     return False
 
 def player_hit_by_clerk():
     global player_hit
@@ -1612,6 +1623,7 @@ def main():
     fps = 0
 
     # Blijf frames renderen tot we het signaal krijgen dat we moeten afsluiten
+    profiler.enable()
     while not moet_afsluiten:
 
         # Onthoud de huidige tijd
@@ -1647,7 +1659,7 @@ def main():
             clerk_sprite = factory.from_image(resources.get_path(clerk_string))
         volgorde_sprite_renderer()
         scannergun()
-        munt_collected()
+        #munt_collected()
 
 
 
@@ -1686,20 +1698,24 @@ def main():
         s_gestuurd_afsluit = True
         try:
             with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
-                ser.write(b's') #stop gyro
+                ser.write(b's')
         except:
             print('gyro zou stoppen')
+    # Sluit SDL2 af
     sdl2.ext.quit()
 
-
+profiler = cProfile.Profile()
 if __name__ == '__main__':
-    print("starten programma")
-    try:
-        with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
-            ser.write(b's')  # start gyro
-    except:
-        print(COM_POORT + ' niet gevonden' + ' gyro zou starten')
-        controller_aangesloten = False
-    print("naar main gaan")
+    # print("starten programma")
+    # try:
+    #     with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
+    #         ser.write(b's')  # start gyro
+    # except:
+    #     print(COM_POORT + ' niet gevonden' + ' gyro zou starten')
+    #     controller_aangesloten = False
+    # print("naar main gaan")
     main()
+    profiler.disable()
+    stats = pstats.Stats(profiler)
+    stats.dump_stats('data.prof')
 
