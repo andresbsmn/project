@@ -11,7 +11,7 @@ void gyro_ini(){
     mpu.setHighPassFilter(MPU6050_HIGHPASS_0_63_HZ);
     mpu.setMotionDetectionThreshold(2);
     mpu.setMotionDetectionDuration(20);
-    mpu.setInterruptPinLatch(true);	// Keep it latched.  Will turn off when reinitialized.
+    mpu.setInterruptPinLatch(true);	// Keep it latched.  Will turn off when reinitialized.pppppppppppppppppppppppppppp
     mpu.setInterruptPinPolarity(true);
     mpu.setMotionInterrupt(true);
 }
@@ -22,17 +22,17 @@ void Schrijfrichting(char richting, char hoeveel){
     if(richting == 'l'){
         //stuur links
         Keyboard.press('l');
-        delay(50);
+        delay(100);
         Keyboard.release('l');
     }
     if(richting == 'r'){
         //stuur rechts
         Keyboard.press('r');
-        delay(50);
+        delay(100);
         Keyboard.release('r');
     }
         Keyboard.press(hoeveel);
-        delay(50);
+        delay(100);
         Keyboard.release(hoeveel);
     }
 
@@ -40,7 +40,7 @@ void gyro(){//pos y-as is rechts g.gyro.y
     // if(mpu.getMotionInterruptStatus()) {}
         sensors_event_t a, g, temp;
         mpu.getEvent(&a, &g, &temp);
-        int hoeveel = round((a.gyro.y));//max values +-250=> 9*(gyrowaarde/250)  = gyrowaarde/28; 5 experimentele waarde
+        int hoeveel = round((a.gyro.y));//max values +-250=> 9*(gyrowaarde/250)  = gyrowaarde/28; 5 experimentele waardepppppppppppppppppppppppppppppppppppppppppppppppppppp
         if(hoeveel>=10){hoeveel = 9;}
         char hoeveel_char = intToChar(hoeveel);
         if(a.gyro.y>dode_hoek){
