@@ -568,12 +568,8 @@ def levelfailed(reden):
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                if key == sdl2.SDLK_z or key == sdl2.SDLK_r:
+                if key == sdl2.SDLK_q or key == sdl2.SDLK_r:
                     sdl2.ext.quit()
-                    main()
-                if key == sdl2.SDLK_ESCAPE:
-                    quit()
-
         text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
         renderer.copy(text, dstrect=(int((BREEDTE - text.size[0]) / 2), 20, text.size[0], text.size[1]))
         renderer.present()
@@ -1537,7 +1533,7 @@ def check_if_level_completed():
     if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0 and d_kassa <= 1.5:
         exit_allowed = True
         exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
-        message = f'Druk op "e" om het level te voltooien.'
+        message = f'Druk op "links" om het level te voltooien.'
         exit_message = sdl2.ext.renderer.Texture(renderer, exit_message_font.render_text(message))
         renderer.copy(exit_message, dstrect=(400, 400, exit_message.size[0], exit_message.size[1]))
     else:
@@ -1547,6 +1543,7 @@ def check_if_level_completed():
 def collect_gsm():
     global kaart_genomen
     kaart_genomen = True
+    collection_array()
 
 
 def main():
