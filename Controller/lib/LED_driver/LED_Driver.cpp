@@ -19,9 +19,7 @@ void LED_driver::write_value(uint8_t val){
         case 4: ioe->set_output_reg(0xF5); break; // 4 items (zonder gsm)
         case 5: 
                     ioe->set_output_reg(0x08);    // 1 item (gsm)
-                    delay(1000);
-                    ioe->set_output_reg(0x00);
-                    delay(1000);
+                   
                     break;
       case 6: 
                 ioe->set_output_reg(0x88); // 2 items (gsm)
