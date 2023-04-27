@@ -1543,6 +1543,7 @@ def check_if_level_completed():
 def collect_gsm():
     global kaart_genomen
     kaart_genomen = True
+
     collection_array()
 
 
