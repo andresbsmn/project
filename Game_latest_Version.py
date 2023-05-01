@@ -391,12 +391,12 @@ def startscherm(keuze):
                     keuze = "start"
                     message = f'starting game...'
                     moet_afsluiten = True  # jump naar main achter de lus
-                elif key == sdl2.SDLK_l:
-                    message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven \n klik op "s" om de game te starten'
-                    keuze = "level"
-                elif key == sdl2.SDLK_t:
-                    message = f'kies een tijd door te scrollen'
-                    keuze = "timer"
+                # elif key == sdl2.SDLK_l:
+                #     message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven \n klik op "s" om de game te starten'
+                #     keuze = "level"
+                # elif key == sdl2.SDLK_t:
+                #     message = f'kies een tijd door te scrollen'
+                #     keuze = "timer"
                 elif keuze == "level":
                     if key >= 48 and key <= 57:
                         try:
