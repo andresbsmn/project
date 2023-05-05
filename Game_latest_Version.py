@@ -185,6 +185,7 @@ def loadornew():
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 #key = event.key.keysym.sym
                 if key == sdl2.SDLK_ESCAPE:
+                    s_gestuurd_afsluit = False
                     quit()
             elif event.type == sdl2.SDL_MOUSEMOTION:
                 motion = event.motion
@@ -384,17 +385,18 @@ def startscherm(keuze):
                     kaart_gekozen = level
                     world_map = maps[kaart_gekozen]
                 elif key == sdl2.SDLK_ESCAPE:
+                    s_gestuurd_afsluit = False
                     quit()
                 elif key == sdl2.SDLK_p:
                     keuze = "start"
                     message = f'starting game...'
                     moet_afsluiten = True  # jump naar main achter de lus
-                elif key == sdl2.SDLK_l:
-                    message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven \n klik op "s" om de game te starten'
-                    keuze = "level"
-                elif key == sdl2.SDLK_t:
-                    message = f'kies een tijd door te scrollen'
-                    keuze = "timer"
+                # elif key == sdl2.SDLK_l:
+                #     message = f'kies een map door een getal van 1 t.e.m. {aantal_mappen} in te geven \n klik op "s" om de game te starten'
+                #     keuze = "level"
+                # elif key == sdl2.SDLK_t:
+                #     message = f'kies een tijd door te scrollen'
+                #     keuze = "timer"
                 elif keuze == "level":
                     if key >= 48 and key <= 57:
                         try:
@@ -495,6 +497,7 @@ def exit_level_action():
                     sdl2.ext.quit()
                     startscherm("level_up")
                 if key == sdl2.SDLK_ESCAPE:
+                    s_gestuurd_afsluit = False
                     quit()
 
         if personal_records[kaart_gekozen] > tijd_verstrekentot or personal_records[kaart_gekozen] == 0:
@@ -568,12 +571,8 @@ def levelfailed(reden):
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
-                if key == sdl2.SDLK_z or key == sdl2.SDLK_r:
+                if key == sdl2.SDLK_q or key == sdl2.SDLK_r:
                     sdl2.ext.quit()
-                    main()
-                if key == sdl2.SDLK_ESCAPE:
-                    quit()
-
         text = sdl2.ext.renderer.Texture(renderer, font.render_text(message))
         renderer.copy(text, dstrect=(int((BREEDTE - text.size[0]) / 2), 20, text.size[0], text.size[1]))
         renderer.present()
@@ -654,11 +653,13 @@ def verwerk_input(delta):
                 laser_shot = True
                 buzzer()
                 #continue #
-            if key == sdl2.SDLK_z and exit_allowed == True:
+            if key == sdl2.SDLK_q and exit_allowed == True:
+                #q is links drukken
                 #playsound("resources/Cash_register.mp3")
                 exit_level = True
 
             if key == sdl2.SDLK_ESCAPE:
+                s_gestuurd_afsluit = False
                 moet_afsluiten = True
                 break
 #
@@ -727,6 +728,7 @@ def verwerk_input(delta):
             p_speler = pd
 
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
+        s_gestuurd_afsluit = False
         moet_afsluiten = True
     #camera draaien
     if key_states[sdl2.SDL_SCANCODE_L]:
@@ -1537,7 +1539,7 @@ def check_if_level_completed():
     if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0 and d_kassa <= 1.5:
         exit_allowed = True
         exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
-        message = f'Druk op "e" om het level te voltooien.'
+        message = f'Druk op "links" om het level te voltooien.'
         exit_message = sdl2.ext.renderer.Texture(renderer, exit_message_font.render_text(message))
         renderer.copy(exit_message, dstrect=(400, 400, exit_message.size[0], exit_message.size[1]))
     else:
@@ -1548,12 +1550,15 @@ def collect_gsm():
     global kaart_genomen
     kaart_genomen = True
 
+    collection_array()
+
 
 def main():
     heart_display()
     collection_array()
     global s_pressed
     s_pressed = False
+    #
     global fps_font
     global tijd_verstrekentot
     global keuzealgemaakt
