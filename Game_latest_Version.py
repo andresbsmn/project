@@ -4,7 +4,7 @@ import pickle
 import sdl2
 import serial
 
-#als optimalisatie voor frame rate, kan 9600 hogerlr'r"r'r'r(r'r§l"
+#als optimalisatie voor frame rate, kan 9600 hogerl
 import sdl2.ext
 controller_aangesloten = True
 COM_POORT = 'COM14'
@@ -27,6 +27,8 @@ win_flags = sdl2.SDL_WINDOW_RESIZABLE #kan window resizen
 global is_horizontaal
 global renderer
 global list_wall_create
+angle=0
+r_clerk=np.array([0,0])
 laser_shot = False
 kaart_genomen = False
 
@@ -1116,38 +1118,65 @@ def sprite_loop_teller():
     else:
         teller=0
     return teller
-global angle
-angle=0
+
 def nearest_octant(ang):
-    if (ang<0):
-        res= 8+int(angle/(np.pi/8)+0.5)
-    else:
-        res=int(angle/(np.pi/8)+0.5)
-    if res==8:
-        res=0
-    return res
+    if (ang < 0):
+        ang += 2 * math.pi
+
+    angNPC = math.atan2(r_clerk[1], r_clerk[0])
+    if (angNPC < 0):
+        angNPC += 2 * math.pi
+    angDif = angNPC - ang
+    if (angDif < 0):
+        angDif += 2 * math.pi
+    if (angDif >= 15 * math.pi / 8 or angDif < math.pi / 8):
+        direction = 0
+    elif (math.pi / 8 <= angDif < 3 * math.pi / 8):
+        direction = 1
+    elif (3 * math.pi / 8 <= angDif < 5 * math.pi / 8):
+        direction = 2
+    elif (5 * math.pi / 8 <= angDif < 7 * math.pi / 8):
+        direction = 3
+    elif (7 * math.pi / 8 <= angDif < 9 * math.pi / 8):
+        direction = 4
+    elif (9 * math.pi / 8 <= angDif < 11 * math.pi / 8):
+        direction = 5
+    elif (11 * math.pi / 8 <= angDif < 13 * math.pi / 8):
+        direction = 6
+    elif (13 * math.pi / 8 <= angDif < 15 * math.pi / 8):
+        direction = 7
+
+    return direction
 
 def clerk_sprite_selector():
     global angle
-    rounded_angle=nearest_octant(angle)
-
-    t=sprite_loop_teller()
+    rounded_angle = nearest_octant(angle)
+    #print(rounded_angle)
+    t = sprite_loop_teller()
     if (rounded_angle == 0):  # rechts       rounded_angle==0   rounded_angle>=np.pi*(-1/8) and rounded_angle<=np.pi*(1/8)
-        return sprite_rechts[t]
-    elif (rounded_angle == 7):  # rechtsvoor     rounded_angle==(1/4)*np.pi  rounded_angle>np.pi*(1/8) and rounded_angle<np.pi*(3/8)
-        return sprite_rechts_voor[t]
-    elif (rounded_angle == 6):  # voor     rounded_angle==(1/2)*np.pi rounded_angle>=np.pi*(3/8) and rounded_angle<=np.pi*(5/8)
-        return sprite_voor[t]
-    elif (rounded_angle == 5):  # linksvoor  rounded_angle==(3/4)*np.pi rounded_angle>np.pi*(5/8) and rounded_angle<np.pi*(7/8)
-        return sprite_links_voor[t]
-    elif (rounded_angle == 4):  # links      (rounded_angle==np.pi) or (rounded_angle==-np.pi) (rounded_angle>=-np.pi and rounded_angle<=np.pi*(-7/8)) or (rounded_angle>=np.pi*(7/8) and rounded_angle<=np.pi)
-        return sprite_links[t]
-    elif (rounded_angle == 3):  # linksachter       rounded_angle==(-3/4)*np.pi    rounded_angle>np.pi*(-7/8) and rounded_angle<np.pi*(-5/8)
-        return sprite_links_achter[t]
-    elif (rounded_angle == 2):  # achter             rounded_angle==(-1/2)*np.pi       rounded_angle>=np.pi*(-5/8) and rounded_angle<=np.pi*(-3/8)
+        #print("back")
         return sprite_achter[t]
-    elif (rounded_angle == 1):  # rechtsachter       rounded_angle==(-1/4)*np.pi rounded_angle>np.pi*(-3/8) and rounded_angle<np.pi*(-1/8)
+    elif (rounded_angle == 1):  # rechtsvoor     rounded_angle==(1/4)*np.pi  rounded_angle>np.pi*(1/8) and rounded_angle<np.pi*(3/8)
+        #print("back right")
         return sprite_rechts_achter[t]
+    elif ( rounded_angle == 2):  # voor     rounded_angle==(1/2)*np.pi rounded_angle>=np.pi*(3/8) and rounded_angle<=np.pi*(5/8)
+        #print("right")
+        return sprite_rechts[t]
+    elif (rounded_angle == 3):  # linksvoor  rounded_angle==(3/4)*np.pi rounded_angle>np.pi*(5/8) and rounded_angle<np.pi*(7/8)
+        #print("front right")
+        return sprite_rechts_voor[t]
+    elif (rounded_angle == 4):  # links      (rounded_angle==np.pi) or (rounded_angle==-np.pi) (rounded_angle>=-np.pi and rounded_angle<=np.pi*(-7/8)) or (rounded_angle>=np.pi*(7/8) and rounded_angle<=np.pi)
+        #print("front")
+        return sprite_voor[t]
+    elif (rounded_angle == 5):  # linksachter       rounded_angle==(-3/4)*np.pi    rounded_angle>np.pi*(-7/8) and rounded_angle<np.pi*(-5/8)
+        #print("front left")
+        return sprite_links_voor[t]
+    elif (rounded_angle == 6):  # achter             rounded_angle==(-1/2)*np.pi       rounded_angle>=np.pi*(-5/8) and rounded_angle<=np.pi*(-3/8)
+        #print("left")
+        return sprite_links[t]
+    elif (rounded_angle == 7):  # rechtsachter       rounded_angle==(-1/4)*np.pi rounded_angle>np.pi*(-3/8) and rounded_angle<np.pi*(-1/8)
+        #print("back left")
+        return sprite_links_achter[t]
 
 def create_sprites_hud():
     hud_texture = factory.from_image(resources.get_path("hud.png"))
@@ -1443,19 +1472,27 @@ def player_hit_by_clerk():
         p_speler = np.array([9.5, 15.5])
 
 def noord(clerk_x):
+    global r_clerk
     clerk_x-=0.05
+    r_clerk = [-1, 0]
     return round(clerk_x,2)
 
 def oost(clerk_y):
+    global r_clerk
     clerk_y+=0.05
+    r_clerk = [0, 1]
     return round(clerk_y,2)
 
 def west(clerk_y):
+    global r_clerk
     clerk_y-=0.05
+    r_clerk = [0, -1]
     return round(clerk_y,2)
 
 def zuid(clerk_x):
+    global r_clerk
     clerk_x+=0.05
+    r_clerk = [1, 0]
     return round(clerk_x,2)
 
 #start waarden npc map 2
