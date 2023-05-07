@@ -1434,7 +1434,7 @@ def sprite_renderer(sprite_x, sprite_y, sprite, nummber_sprite, z_buffer, d_obje
     if (sprite_bew==True):
         angle=float(math.atan2(p_sprite_y_nieuw,p_sprite_x_nieuw))
 
-    if (a >= -1) and (a <= 1) and (v_cameracoordinaten >= 0):
+    if (-1<=a <= 1) and (v_cameracoordinaten >= 0):  #(a >= -1) and  (a <= 1)   veranderd naar  (-1<=a <= 1)
         kolom_midden_sprite = (((a + 1) / 2) * BREEDTE)
         hoogte_sprite_wereld = sprite_hoogtes[nummber_sprite]
         breedte_sprite_wereld = sprite_breedtes[nummber_sprite]
