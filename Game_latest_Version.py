@@ -703,7 +703,7 @@ def verwerk_input(delta):
 
     # Polling-gebaseerde input. Dit gebruiken we bij voorkeur om bv het ingedrukt
     # houden van toetsen zo accuraat mogelijk te detecteren
-    key_states = sdl2.SDL_GetKeyboardState(None)
+    key_states = sdl2.SDL_GetKeyboardState(None) # This function doesn't take into account whether shift has been pressed or not.
 
     # if key_states[sdl2.SDL_SCANCODE_UP] or key_states[sdl2.SDL_SCANCODE_W]:
     # beweeg vooruit...
@@ -732,34 +732,55 @@ def verwerk_input(delta):
     if key_states[sdl2.SDL_SCANCODE_ESCAPE]:
         s_gestuurd_afsluit = False
         moet_afsluiten = True
-    #camera draaien
+    #camera draaien, 3 mogelijke snelheden, voor rechts: r & é  voor links: l ( !
+    # https://wiki.libsdl.org/SDL2/SDLKeycodeLookup
+    # naar links kijken
     if key_states[sdl2.SDL_SCANCODE_L]:
-        #naar links kijken
-        beweging = -1 * getcijfer()
+        beweging = -1 * 2
         rotatie_beweging = (beweging * math.pi / 2) / 50
         r_speler = rotatie(rotatie_beweging, r_speler)
         r_cameravlak = rotatie((math.pi / 2), r_speler)
+    if key_states[sdl2.SDL_SCANCODE_5]:#(
+        beweging = -1 * 5
+        rotatie_beweging = (beweging * math.pi / 2) / 50
+        r_speler = rotatie(rotatie_beweging, r_speler)
+        r_cameravlak = rotatie((math.pi / 2), r_speler)
+    if key_states[sdl2.SDL_SCANCODE_8]:#!
+        beweging = -1 * 7
+        rotatie_beweging = (beweging * math.pi / 2) / 50
+        r_speler = rotatie(rotatie_beweging, r_speler)
+        r_cameravlak = rotatie((math.pi / 2), r_speler)
+    #naar rechts kijken
     if key_states[sdl2.SDL_SCANCODE_R]:
-        #naar rechts kijken
-        beweging = getcijfer()
+        beweging = 2
         rotatie_beweging = (beweging * math.pi / 2) / 50
         r_speler = rotatie(rotatie_beweging, r_speler)
         r_cameravlak = rotatie((math.pi / 2), r_speler)
-def getcijfer():
-    while True:
-        events = sdl2.ext.get_events()
-        for event in events:
-            if event.type == sdl2.SDL_KEYDOWN:
-                if (event.key.keysym.sym >= sdl2.SDLK_0 and event.key.keysym.sym <= sdl2.SDLK_9) or (
-                        event.key.keysym.sym <= sdl2.SDLK_KP_0 and event.key.keysym.sym >= sdl2.SDLK_KP_1):
-                    if event.key.keysym.sym <= sdl2.SDLK_9:
-                        cijfer = event.key.keysym.sym - sdl2.SDLK_0
-                        return cijfer
-                    else:  # https://wiki.libsdl.org/SDL2/SDLKeycodeLookup nul is grootste cijfer en 1 laagste
-                        cijfer = event.key.keysym.sym - sdl2.SDLK_KP_1 + 1
-                        if (event.key.keysym.sym == sdl2.SDLK_KP_0):
-                            cijfer = 0
-                        return cijfer
+    if key_states[sdl2.SDL_SCANCODE_1]:#&
+        beweging = 5
+        rotatie_beweging = (beweging * math.pi / 2) / 50
+        r_speler = rotatie(rotatie_beweging, r_speler)
+        r_cameravlak = rotatie((math.pi / 2), r_speler)
+    if key_states[sdl2.SDL_SCANCODE_2]:#é
+        beweging = 7
+        rotatie_beweging = (beweging * math.pi / 2) / 50
+        r_speler = rotatie(rotatie_beweging, r_speler)
+        r_cameravlak = rotatie((math.pi / 2), r_speler)
+# def getcijfer():
+#     while True:
+#         events = sdl2.ext.get_events()
+#         for event in events:
+#             if event.type == sdl2.SDL_KEYDOWN:
+#                 if (event.key.keysym.sym >= sdl2.SDLK_0 and event.key.keysym.sym <= sdl2.SDLK_9) or (
+#                         event.key.keysym.sym <= sdl2.SDLK_KP_0 and event.key.keysym.sym >= sdl2.SDLK_KP_1):
+#                     if event.key.keysym.sym <= sdl2.SDLK_9:
+#                         cijfer = event.key.keysym.sym - sdl2.SDLK_0
+#                         return cijfer
+#                     else:  # https://wiki.libsdl.org/SDL2/SDLKeycodeLookup nul is grootste cijfer en 1 laagste
+#                         cijfer = event.key.keysym.sym - sdl2.SDLK_KP_1 + 1
+#                         if (event.key.keysym.sym == sdl2.SDLK_KP_0):
+#                             cijfer = 0
+#                         return cijfer
 def vibrator():
     try:
         with serial.Serial(COM_POORT, 9600, timeout=1) as ser:
