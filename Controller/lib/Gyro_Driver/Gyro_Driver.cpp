@@ -18,56 +18,53 @@ void gyro_ini(){
 
 
 
-void Schrijfrichting(char richting, char hoeveel){
-    if(richting == 'l'){
-        //stuur links
-        Keyboard.press('l');
-        delay(75);
-        Keyboard.release('l');
-    }
-    if(richting == 'r'){
-        //stuur rechts
-        Keyboard.press('r');
-        delay(75);
-        Keyboard.release('r');
-    }
-        Keyboard.press(hoeveel);
-        delay(75);
-        Keyboard.release(hoeveel);
+void Schrijfrichting(char richting){
+      Keyboard.press(richting);
+      delay(75);
+      Keyboard.release(richting)
+//    if(richting == 'l'){
+//        //stuur links
+//        Keyboard.press('l');
+//        delay(75);
+//        Keyboard.release('l');
+//    }
+//    if(richting == 'r'){
+//        //stuur rechts
+//        Keyboard.press('r');
+//        delay(75);
+//        Keyboard.release('r');
+//    }
     }
 
 void gyro(){//pos y-as is rechts g.gyro.y
     // if(mpu.getMotionInterruptStatus()) {}
         sensors_event_t a, g, temp;
         mpu.getEvent(&a, &g, &temp);
-        int hoeveel = round((a.gyro.y));//max values +-250=> 9*(gyrowaarde/250)  = gyrowaarde/28; 5 experimentele waardepppppppppppppppppppppppppppppppppppppppppppppppppppp
-        if(hoeveel>=10){hoeveel = 9;}
+        int hoeveel = round((a.gyro.y));
+        if(hoeveel<0){hoeveel = -hoeveel;}//zodat het pos blijft
         char hoeveel_char = intToChar(hoeveel);
         if(a.gyro.y>dode_hoek){
-            Schrijfrichting('r',hoeveel_char);
-            // SerialUSB.print(a.gyro.y);
+            if(hoeveel<2){
+                Schrijfrichting('r');
+            }
+            else if(hoeveel < 5){
+                schrijfrichting('&');
+            }
+            else{
+                schrijfrichting('é')
+            }
         }
         if(a.gyro.y<-dode_hoek){
-            Schrijfrichting('l',hoeveel_char);
-            // SerialUSB.print(a.gyro.y);
+            if(hoeveel<2){
+            Schrijfrichting('l');
+            }
+            else if(hoeveel < 5){
+                schrijfrichting('(');
+            }
+            else{
+                schrijfrichting('!')
+            }
         }
     
 }
-int intToChar(int hoeveel){
-    if(hoeveel<0){hoeveel = -hoeveel;}
-    char hoeveel_char = '?';
-        switch (hoeveel){//https://stackoverflow.com/a/4629196
-            case 0:hoeveel_char = '0'; break;
-            case 1:hoeveel_char = '1'; break;
-            case 2:hoeveel_char = '2';break;
-            case 3:hoeveel_char = '3';break;
-            case 4:hoeveel_char = '4';break;
-            case 5:hoeveel_char = '5';break;
-            case 6:hoeveel_char = '6';break;
-            case 7:hoeveel_char = '7';break;
-            case 8:hoeveel_char = '8';break;
-            case 9:hoeveel_char = '9';break;
-            default:hoeveel_char = '?';break;
-        }
-        return hoeveel_char;
-}
+
