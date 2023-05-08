@@ -1570,7 +1570,7 @@ def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geen loop want geen 
             r_clerk = [-1, -1]
             clerk_y1=west(clerk_y1)
             return clerk_x1,clerk_y1
-        elif (clerk_x1 < 6.5) and (clerk_y1 ==5.5):  #E
+        elif (clerk_x1 < 6.5) and (clerk_y1 ==5.5):  #Ee
             r_clerk = [1, -1]
             clerk_x1=zuid(clerk_x1)
             return clerk_x1, clerk_y1
