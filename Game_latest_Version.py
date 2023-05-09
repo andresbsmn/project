@@ -1528,8 +1528,9 @@ clerk_y3=9.5
 clerk_check=True
 
 def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geen loop want geen vijand.   clerk_x1,clerk_y1,clerk_x2,clerk_y2,clerk_x3,clerk_y3
+    global r_clerk
     if (kaart_gekozen == 1):  # loop map 2    nekeer 4.5 naar 4.7 hedaan
-        global clerk_x1, clerk_y1, clerk_check, r_clerk
+        global clerk_x1, clerk_y1, clerk_check
         if (clerk_x1 > 7.5) and (clerk_y1 == 4.0):  # A
             r_clerk = [-1, 1]
             clerk_x1 = noord(clerk_x1)
@@ -1566,9 +1567,9 @@ def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geen loop want geen 
             clerk_check = True
             return clerk_x1, clerk_y1
 
-    if (kaart_gekozen==2):  #loop map 3
-        global clerk_x2, clerk_y2,r_clerk
-        if (clerk_x2!=5.0) and (clerk_y2==6.0):
+    if(kaart_gekozen==2):  #loop map 3
+        global clerk_x2, clerk_y2
+        if(clerk_x2!=5.0) and (clerk_y2==6.0):
             r_clerk = [-1, 1]
             clerk_x2=noord(clerk_x2)
             return clerk_x2,clerk_y2
@@ -1585,8 +1586,8 @@ def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geen loop want geen 
             clerk_y2=oost(clerk_y2)
             return clerk_x2,clerk_y2
 
-    if (kaart_gekozen==3): #loop map 4
-        global clerk_x3, clerk_y3,r_clerk
+    if(kaart_gekozen==3): #loop map 4
+        global clerk_x3, clerk_y3
         if (clerk_x3 !=2.0) and (clerk_y3 ==9.5):
             r_clerk = [-1, 1]
             clerk_x3=noord(clerk_x3)
