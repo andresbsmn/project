@@ -217,7 +217,7 @@ def loadornew():
 def reset_startwaarden():
     global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_money_present, total_hearts_present, money1_collected, money2_collected, money3_collected, money4_collected, money1_rendered, money2_rendered, money3_rendered, money4_rendered, money1_aantal, money2_aantal, money3_aantal, money4_aantal, kaart_genomen
 
-    r_speler = np.array([0, 1])
+    r_speler = np.array([0, 1])#rérérérélélé
     p_speler = np.array([9.5, 15.5])
     pizza_collected = False
     apple_collected = False
@@ -479,18 +479,18 @@ def exit_level_action():
     message_you_had = f'Je had nog:'
 
     message_lives = f'Levens over.'
-
-    message_return = f'Druk op "achteruitknop" om verder te gaan. '
+    message_return = f'Druk op "rood" om verder te gaan. '
 
     heartsprite1 = factory.from_image(resources.get_path("heart1.png"))
     heartsprite2 = factory.from_image(resources.get_path("heart2.png"))
     heartsprite3 = factory.from_image(resources.get_path("heart3.png"))
+
     heartsprites = [heartsprite1, heartsprite2, heartsprite3]
     while True:
         renderer.clear()
         renderer.copy(achtergrond, dstrect=(0, 0, 1200, 900))
         font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=30, color=kleuren[7])
-        events = sdl2.ext.get_events()
+        events = sdl2.ext.get_events()#gpppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
         for event in events:
             if event.type == sdl2.SDL_KEYDOWN:  # nummers gaan van 48(=0) tot 57(=9)
                 key = event.key.keysym.sym
@@ -536,7 +536,7 @@ def exit_level_action():
         renderer.copy(text_lives, dstrect=((251, 482, text_lives.size[0], 31)))
 
         text_return = sdl2.ext.renderer.Texture(renderer, font.render_text(message_return))
-        renderer.copy(text_return, dstrect=((71, 691, text_return.size[0], 31)))
+        renderer.copy(text_return, dstrect=((31, 691, text_return.size[0], 31)))
         renderer.present()
 
 
@@ -761,7 +761,7 @@ def verwerk_input(delta):
         rotatie_beweging = (beweging * math.pi / 2) / 50
         r_speler = rotatie(rotatie_beweging, r_speler)
         r_cameravlak = rotatie((math.pi / 2), r_speler)
-    if key_states[sdl2.SDL_SCANCODE_2]:#é
+    if key_states[sdl2.SDL_SCANCODE_X]:
         beweging = 7
         rotatie_beweging = (beweging * math.pi / 2) / 50
         r_speler = rotatie(rotatie_beweging, r_speler)
@@ -1685,7 +1685,7 @@ def main():
 
     # Blijf frames renderen tot we het signaal krijgen dat we moeten afsluiten
     while not moet_afsluiten:
-
+#trétttt
         # Onthoud de huidige tijd
         start_time = time.time()
 

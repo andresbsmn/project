@@ -5,8 +5,9 @@
 #include <Adafruit_MPU6050.h>
 const int dode_hoek = 2;
 void gyro_ini();
-void Schrijfrichting();
+void Schrijfrichting(char richting);
 void gyro();
-int intToChar(int hoeveel);
+
+//int intToChar(int hoeveel);
 
 #endif
