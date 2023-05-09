@@ -6,6 +6,15 @@ void button_ini(){
     pinMode(pinButtonLeft, INPUT_PULLUP);
     pinMode(pinButtonRight, INPUT_PULLUP);
     
+    pinMode(pinLEDA, OUTPUT);
+    pinMode(pinLEDB,  OUTPUT);
+    pinMode(pinLEDC,  OUTPUT);
+    pinMode(pinLEDD,  OUTPUT);
+    digitalWrite(pinLEDA,HIGH);
+    digitalWrite(pinLEDB,HIGH);
+    digitalWrite(pinLEDC,HIGH);
+    digitalWrite(pinLEDD,HIGH);
+    
 }
 
 void move(int pinButton, char character){
