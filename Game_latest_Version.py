@@ -1590,21 +1590,18 @@ def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geen loop want geen 
 
 
 def check_if_level_completed():
+
     global pizza_collected, broccoli_collected, egg_collected, apple_collected, total_money_present, total_hearts_present, p_kassa_by_level_x, p_kassa_by_level_y, kaart_gekozen, exit_allowed
     d_kassa = math.sqrt((p_speler[0] - p_kassa_by_level_x[kaart_gekozen]) ** 2 + (p_speler[1] - p_kassa_by_level_y[kaart_gekozen]) ** 2)
-    exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
-    message = ''
-    if d_kassa <= 1.5:
-        if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0:
-            exit_allowed = True
-            message = f'Druk op "links" om het level te voltooien.'
-        else:
-            message = f'je hebt nog niet alle doelstellingen bereikt.'
-            exit_allowed = False
-    # if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0:
-    #     message = f'ga naar kassa'
+
+    if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0 and d_kassa <= 1.5:
+        exit_allowed = True
+        exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
+        message = f'Druk op "links" om het level te voltooien.'
         exit_message = sdl2.ext.renderer.Texture(renderer, exit_message_font.render_text(message))
         renderer.copy(exit_message, dstrect=(400, 400, exit_message.size[0], exit_message.size[1]))
+    else:
+        exit_allowed = False
 
 
 def collect_gsm():
