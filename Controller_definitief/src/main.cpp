@@ -19,20 +19,19 @@
 Segmentdriver segment1(0x3A); //segment objectl
 LED_driver LED(0x3B); //led object
 bool gamegestart = false;
+
 void setup() {
-  // put your setup code here, to run once:
-  LED.init(); //LED operaties starten
+  
+  LED.init();//LED operaties starten
   segment1.init();  //segment operaties initialiseren
   vibrate_begin(); //vibrator functies starten
   buzzer_begin(); //buzzer functies starten
-  serialUSB_begin(); //vanaf nu leest serialusb alles in
+  serialUSB_begin(); 
   button_ini();
   capacitive_ini();
   gyro_ini();
   light_ini();
   Keyboard.begin();
-  // code andres pinMode(pinButton,INPUT_PULLUP);
-  //code andres Keyboard.begin();
 }
 
 void loop() {
@@ -60,15 +59,13 @@ void loop() {
     } 
   }
 
-
-  
   move(pinButtonForward, 'w');  //forward  15
   move(pinButtonBackward, 's'); //
   move(pinButtonLeft, 'a'); //
   move(pinButtonRight, 'd');  //
-  save();
-
+  
   if(gamegestart){
+    save();
     light();
     gyro();
     buigsensor();
