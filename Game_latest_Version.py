@@ -580,9 +580,9 @@ def levelfailed(reden):
         renderer.present()
 
 def save(option):
-    global level,money1_aantal,money2_aantal,money3_aantal,money4_aantal
-    global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_hearts_present, total_money_present, level, tijd_verstrekentot, kaart_genomen
-
+    # global level,money1_aantal,money2_aantal,money3_aantal,money4_aantal
+    # global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_hearts_present, total_money_present, level, tijd_verstrekentot, kaart_genomen
+    # variables zijn sws al global
     if option == "save":
         tesaven_waarden = {'p_speler': p_speler, 'r_speler': r_speler, 'pizza_collected': pizza_collected,
                            'apple_collected': apple_collected, 'egg_collected': egg_collected, 'broccoli_collected': broccoli_collected,
