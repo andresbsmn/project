@@ -616,7 +616,7 @@ def save(option):
             print('niet kunnen loaden :(')
         print("laden \n")
     else:
-        print('save failed')
+        print('ongeldig')
         pass
 
 def rotatie(alfa, vector):
