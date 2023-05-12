@@ -597,7 +597,8 @@ def save(option):
                            'tijd_verstrekentot': tijd_verstrekentot,
                            'kaart_genomen': kaart_genomen,
                            'money1_collected': money1_collected, 'money2_collected': money2_collected, 'money3_collected': money3_collected, 'money4_collected': money4_collected,
-                           'money1_rendered': money1_rendered, 'money2_rendered': money2_rendered, 'money3_rendered': money3_rendered, 'money4_rendered': money4_rendered
+                           'money1_rendered': money1_rendered, 'money2_rendered': money2_rendered, 'money3_rendered': money3_rendered, 'money4_rendered': money4_rendered,
+                           'tijd_verstrekentot': tijd_verstrekentot
                         }
         outfile = open(persistantfile, 'wb')
         pickle.dump(tesaven_waarden, outfile)
@@ -610,8 +611,7 @@ def save(option):
             teladen = pickle.load(infile)
             infile.close()
             globals().update(teladen)
-            if total_money_present >= 4:
-                total_money_present = 0
+
         except:
             print('niet kunnen loaden :(')
         print("laden \n")
@@ -1654,11 +1654,11 @@ def main():
     global tijd_verstrekentot
     global keuzealgemaakt
     global s_gestuurd_afsluit
+    tijd_verstrekentot = 0
     if not keuzealgemaakt:
         save("load")
         keuzealgemaakt = True
         loadornew()
-    tijd_verstrekentot = 0
     fps_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[7])
 
     # Initialiseer de SDL2 bibliotheek
@@ -1718,7 +1718,7 @@ def main():
 
     # Blijf frames renderen tot we het signaal krijgen dat we moeten afsluiten
     while not moet_afsluiten:
-#trétttt
+        #trétttt
         # Onthoud de huidige tijd
         start_time = time.time()
 
