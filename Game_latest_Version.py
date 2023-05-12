@@ -217,7 +217,7 @@ def loadornew():
 def reset_startwaarden():
     global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_money_present, total_hearts_present, money1_collected, money2_collected, money3_collected, money4_collected, money1_rendered, money2_rendered, money3_rendered, money4_rendered, money1_aantal, money2_aantal, money3_aantal, money4_aantal, kaart_genomen
 
-    r_speler = np.array([0, 1])#rérérérélélé
+    r_speler = np.array([0, 1])
     p_speler = np.array([9.5, 15.5])
     pizza_collected = False
     apple_collected = False
@@ -454,8 +454,9 @@ def exit_level_action():
     # afbeelding erin
     resources = sdl2.ext.Resources(__file__, "resources")
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
-    achtergrond = factory.from_image(resources.get_path("kassa_ticket_res2.png"))
-
+    # achtergrond = factory.from_image(resources.get_path("kassa_ticket_res2.png"))
+    #tijdelijk andere png
+    achtergrond = factory.from_image(resources.get_path("rek.png"))
     message_it_took = f'Tijd die je nodig had:'
 
     time_needed_min = int(tijd_verstrekentot // 60)
@@ -584,10 +585,19 @@ def save(option):
     # global p_speler, r_speler, pizza_collected, apple_collected, egg_collected, broccoli_collected, total_hearts_present, total_money_present, level, tijd_verstrekentot, kaart_genomen
     # variables zijn sws al global
     if option == "save":
-        tesaven_waarden = {'p_speler': p_speler, 'r_speler': r_speler, 'pizza_collected': pizza_collected,
-                           'apple_collected': apple_collected, 'egg_collected': egg_collected, 'broccoli_collected': broccoli_collected,
-                           'total_hearts_present': total_hearts_present, 'money1_aantal': money1_aantal,'money2_aantal':money2_aantal,'money3_aantal':money3_aantal,'money4_aantal':money4_aantal,
-                           'level': level, 'tijd_verstrekentot': tijd_verstrekentot, 'kaart_genomen': kaart_genomen, 'money1_collected': money1_collected, 'money2_collected':money2_collected,'money3_collected': money3_collected, 'money4_collected':money4_collected, 'money1_rendered':money1_rendered, 'money2_rendered': money2_rendered, 'money3_rendered':money3_rendered, 'money4_rendered':money4_rendered
+        tesaven_waarden = {'p_speler': p_speler,
+                           'r_speler': r_speler,
+                           'pizza_collected': pizza_collected,
+                           'apple_collected': apple_collected,
+                           'egg_collected': egg_collected,
+                           'broccoli_collected': broccoli_collected,
+                           'total_hearts_present': total_hearts_present,
+                           'money1_aantal': money1_aantal, 'money2_aantal': money2_aantal, 'money3_aantal': money3_aantal, 'money4_aantal': money4_aantal,
+                           'level': level,
+                           'tijd_verstrekentot': tijd_verstrekentot,
+                           'kaart_genomen': kaart_genomen,
+                           'money1_collected': money1_collected, 'money2_collected': money2_collected, 'money3_collected': money3_collected, 'money4_collected': money4_collected,
+                           'money1_rendered': money1_rendered, 'money2_rendered': money2_rendered, 'money3_rendered': money3_rendered, 'money4_rendered': money4_rendered
                         }
         outfile = open(persistantfile, 'wb')
         pickle.dump(tesaven_waarden, outfile)
@@ -655,7 +665,7 @@ def verwerk_input(delta):
                 laser_shot = True
                 buzzer()
                 #continue #
-            if key == sdl2.SDLK_q and exit_allowed == True:
+            if key == sdl2.SDLK_q and check_if_level_completed():
                 #q is links drukken
                 #playsound("resources/Cash_register.mp3")
                 exit_level = True
@@ -1611,17 +1621,21 @@ def check_if_level_completed():
     d_kassa = math.sqrt((p_speler[0] - p_kassa_by_level_x[kaart_gekozen]) ** 2 + (p_speler[1] - p_kassa_by_level_y[kaart_gekozen]) ** 2)
     exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
     message = ''
+    print(pizza_collected , broccoli_collected , apple_collected , egg_collected , total_money_present, total_hearts_present)
     if d_kassa <= 1.5:
         if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0:
             exit_allowed = True
             message = f'Druk op "links" om het level te voltooien.'
+            # return True
         else:
             message = f'je hebt nog niet alle doelstellingen bereikt.'
             exit_allowed = False
+            # return False
     # if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0:
     #     message = f'ga naar kassa'
         exit_message = sdl2.ext.renderer.Texture(renderer, exit_message_font.render_text(message))
         renderer.copy(exit_message, dstrect=(400, 400, exit_message.size[0], exit_message.size[1]))
+        return exit_allowed
 
 
 def collect_gsm():
