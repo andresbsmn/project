@@ -1621,7 +1621,6 @@ def check_if_level_completed():
     d_kassa = math.sqrt((p_speler[0] - p_kassa_by_level_x[kaart_gekozen]) ** 2 + (p_speler[1] - p_kassa_by_level_y[kaart_gekozen]) ** 2)
     exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
     message = ''
-    print(pizza_collected , broccoli_collected , apple_collected , egg_collected , total_money_present, total_hearts_present)
     if d_kassa <= 1.5:
         if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0:
             exit_allowed = True
