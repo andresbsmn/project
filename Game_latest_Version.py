@@ -1528,80 +1528,100 @@ clerk_y3=9.5
 clerk_check=True
 
 def clerk_positie(kaart_gekozen):   #fhook      map 1 geeft geen loop want geen vijand.   clerk_x1,clerk_y1,clerk_x2,clerk_y2,clerk_x3,clerk_y3
-    if (kaart_gekozen==1): #loop map 2
-        global clerk_x1, clerk_y1,clerk_check
-        if (clerk_x1>7.5) and (clerk_y1 ==4.0) :  #A
-            clerk_x1=noord(clerk_x1)
-            clerk_check=True
-            return clerk_x1,clerk_y1
-        elif (clerk_x1 ==7.5) and (clerk_y1 <15.5) and (clerk_check==True): #B
-            clerk_y1=oost(clerk_y1)
+    global r_clerk
+    if (kaart_gekozen == 1):  # loop map 2    nekeer 4.5 naar 4.7 hedaan
+        global clerk_x1, clerk_y1, clerk_check
+        if (clerk_x1 > 7.5) and (clerk_y1 == 4.0):  # A
+            r_clerk = [-1, 1]
+            clerk_x1 = noord(clerk_x1)
+            clerk_check = True
             return clerk_x1, clerk_y1
-        elif (clerk_x1 > 4.5) and (clerk_y1 ==15.5):  #C
-            clerk_x1=noord(clerk_x1)
-            clerk_check=False
+        elif (clerk_x1 == 7.5) and (clerk_y1 < 15.5) and (clerk_check == True):  # B
+            r_clerk = [-1, 1]
+            clerk_y1 = oost(clerk_y1)
             return clerk_x1, clerk_y1
-        elif (clerk_x1 ==4.5) and (clerk_y1 > 5.5):  #D
-            clerk_y1=west(clerk_y1)
-            return clerk_x1,clerk_y1
-        elif (clerk_x1 < 6.5) and (clerk_y1 ==5.5):  #E
-            clerk_x1=zuid(clerk_x1)
+        elif (clerk_x1 > 4.7) and (clerk_y1 == 15.5):  # C  4.5 naar 4.7
+            r_clerk = [-1, 1]
+            clerk_x1 = noord(clerk_x1)
+            clerk_check = False
             return clerk_x1, clerk_y1
-        elif (clerk_x1 ==6.5) and (clerk_y1 >2.0):   #F
-            clerk_y1=west(clerk_y1)
+        elif (clerk_x1 == 4.7) and (clerk_y1 > 5.5):  # D 4.5 naar 4.7
+            r_clerk = [-1, -1]
+            clerk_y1 = west(clerk_y1)
             return clerk_x1, clerk_y1
-        elif (clerk_x1 <15.0) and (clerk_y1 ==2.0):  #G
-            clerk_x1=zuid(clerk_x1)
+        elif (clerk_x1 < 6.5) and (clerk_y1 == 5.5):  # Ee
+            r_clerk = [1, -1]
+            clerk_x1 = zuid(clerk_x1)
             return clerk_x1, clerk_y1
-        elif (clerk_x1 ==15.0) and (clerk_y1 <4.0):  #H
-            clerk_y1=oost(clerk_y1)
-            clerk_check=True
+        elif (clerk_x1 == 6.5) and (clerk_y1 > 2.0):  # F
+            r_clerk = [1, -1]
+            clerk_y1 = west(clerk_y1)
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 < 14.8) and (clerk_y1 == 2.0):  # G   15 to  14.8
+            r_clerk = [1, -1]
+            clerk_x1 = zuid(clerk_x1)
+            return clerk_x1, clerk_y1
+        elif (clerk_x1 == 14.8) and (clerk_y1 < 4.0):  # H  15 to 14.8
+            r_clerk = [1, 1]
+            clerk_y1 = oost(clerk_y1)
+            clerk_check = True
             return clerk_x1, clerk_y1
 
-    if (kaart_gekozen==2):  #loop map 3
+    if(kaart_gekozen==2):  #loop map 3
         global clerk_x2, clerk_y2
-        if (clerk_x2!=5.0) and (clerk_y2==6.0):
-                clerk_x2=noord(clerk_x2)
-                return clerk_x2,clerk_y2
+        if(clerk_x2!=5.0) and (clerk_y2==6.0):
+            r_clerk = [-1, 1]
+            clerk_x2=noord(clerk_x2)
+            return clerk_x2,clerk_y2
         elif (clerk_x2==5.0) and (clerk_y2!=2.0):
+            r_clerk = [-1, -1]
             clerk_y2=west(clerk_y2)
             return clerk_x2,clerk_y2
         elif (clerk_x2!=12.5) and (clerk_y2==2.0):
+            r_clerk = [1, -1]
             clerk_x2=zuid(clerk_x2)
             return clerk_x2,clerk_y2
         elif (clerk_x2==12.5) and (clerk_y2!=6.0):
+            r_clerk = [1, 1]
             clerk_y2=oost(clerk_y2)
             return clerk_x2,clerk_y2
 
-    if (kaart_gekozen==3): #loop map 4
+    if(kaart_gekozen==3): #loop map 4
         global clerk_x3, clerk_y3
         if (clerk_x3 !=2.0) and (clerk_y3 ==9.5):
+            r_clerk = [-1, 1]
             clerk_x3=noord(clerk_x3)
             return clerk_x3,clerk_y3
         elif (clerk_x3 ==2.0) and (clerk_y3 !=2.0):
+            r_clerk = [-1, -1]
             clerk_y3=west(clerk_y3)
             return clerk_x3, clerk_y3
         elif (clerk_x3 !=15.5) and (clerk_y3 ==2.0):
+            r_clerk = [1, -1]
             clerk_x3=zuid(clerk_x3)
             return clerk_x3, clerk_y3
         elif (clerk_x3 == 15.5) and (clerk_y3 !=9.5):
+            r_clerk = [1, 1]
             clerk_y3 = oost(clerk_y3)
             return clerk_x3, clerk_y3
 
 
 def check_if_level_completed():
-
     global pizza_collected, broccoli_collected, egg_collected, apple_collected, total_money_present, total_hearts_present, p_kassa_by_level_x, p_kassa_by_level_y, kaart_gekozen, exit_allowed
     d_kassa = math.sqrt((p_speler[0] - p_kassa_by_level_x[kaart_gekozen]) ** 2 + (p_speler[1] - p_kassa_by_level_y[kaart_gekozen]) ** 2)
-
-    if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0 and d_kassa <= 1.5:
-        exit_allowed = True
-        exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
-        message = f'Druk op "links" om het level te voltooien.'
+    exit_message_font = sdl2.ext.FontTTF(font='CourierPrime.ttf', size=20, color=kleuren[0])
+    message = ''
+    if d_kassa <= 1.5:
+        if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0:
+            exit_allowed = True
+            message = f'Druk op "links" om het level te voltooien.'
+        else:
+            message = f'je hebt nog niet alle doelstellingen bereikt.'
+            exit_allowed = False
+    # if pizza_collected is True and broccoli_collected is True and apple_collected is True and egg_collected is True and total_money_present == 4 and total_hearts_present !=0:
+    #     message = f'ga naar kassa'
         exit_message = sdl2.ext.renderer.Texture(renderer, exit_message_font.render_text(message))
         renderer.copy(exit_message, dstrect=(400, 400, exit_message.size[0], exit_message.size[1]))
-    else:
-        exit_allowed = False
 
 
 def collect_gsm():
