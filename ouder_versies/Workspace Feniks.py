@@ -1,9 +1,11 @@
 import math
 import time
 
+#from levels import * ( nieuw document met levels in apart)
 
 import numpy as np
 import sdl2.ext
+from playsound import playsound
 
 # Constanten
 BREEDTE = 800
@@ -12,10 +14,18 @@ HOOGTE = 600
 #ee
 # Globale variabelen
 #
+<<<<<<< Updated upstream:ouder_versies/Workspace Feniks.py
 p_npc_x=3.0
 p_npc_y=5.0
 npc_x_scale=1    #scale npcs mogelijkheid om big chungus of reuzen te maken van een smalle npc,kleine npc.
 npc_y_scale=1
+=======
+global is_horizontaal
+global laser_shot
+laser_shot = False
+tijd_verstrekentot = 0 #variabele aanmaken
+deadline = 10
+>>>>>>> Stashed changes:Workspace Indra.py
 # positie van de speler
 p_speler = np.array([5.0,5.0])
 
@@ -39,6 +49,7 @@ is_texture = False
 # de "wereldkaart". Dit is een 2d matrix waarin elke cel een type van muur voorstelt
 # Een 0 betekent dat op deze plaats in de game wereld geen muren aanwezig zijn
 
+#keuzenummber = int(input(f'kies een map door een gtal van 0 t.e.m. {aantal_mappen} in te geven'))
 
 
 world_map = np.array(
@@ -55,7 +66,7 @@ world_map = np.array(
      [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11]]
 )
 
-
+#world_map = maps[keuzenr]
 
 
 # Vooraf gedefinieerde kleuren
@@ -78,7 +89,7 @@ kleuren = [
 # @delta       Tijd in milliseconden sinds de vorige oproep van deze functie
 #
 def rotatie(alfa, vector):
-    #alfa moet in radialen!!!!
+    #alfa moet in radialen!!!!s
     rotatie_matrix = [[np.cos(alfa), -np.sin(alfa)], [np.sin(alfa), np.cos(alfa)]]
     return np.dot(rotatie_matrix, vector)
 def wall_collission(pd):
@@ -93,6 +104,7 @@ def verwerk_input(delta):
     global r_speler
     global r_cameravlak
     global p_speler
+    global laser_shot
 
     # Handelt alle input events af die zich voorgedaan hebben sinds de vorige
     # keer dat we de sdl2.ext.get_events() functie hebben opgeroepen
@@ -144,6 +156,7 @@ def verwerk_input(delta):
             button = event.button.button
             if button == sdl2.SDL_BUTTON_LEFT:
                 # ...
+                laser_shot = True
                 continue
         # Een SDL_MOUSEWHEEL event wordt afgeleverd wanneer de gebruiker
         # aan het muiswiel draait.
@@ -325,8 +338,15 @@ def raycast(p_speler, r_straal):
 
 
 def render_kolom(renderer, window, kolom, d_muur, k_muur, wall, is_texture, textuurcoordinaten_X):
+<<<<<<< Updated upstream:ouder_versies/Workspace Feniks.py
 
     hoogte = (HOOGTE/2) * 1/d_muur #200/d_muur#(HOOGTE/2) * 1/d_muur
+=======
+    global is_horizontaal
+    hoogte = (HOOGTE) * 1/(d_muur+0.00001) #200/d_muur#(HOOGTE/2) * 1/d_muur
+    #hoogte = (HOOGTE / 2) * 1 / d_muur
+
+>>>>>>> Stashed changes:Workspace Indra.py
     if hoogte >= HOOGTE: #hier stond 1/2 naar 1 gezet
         y1 = 0
     else:
@@ -336,7 +356,10 @@ def render_kolom(renderer, window, kolom, d_muur, k_muur, wall, is_texture, text
 
         breedte = wall.size[0]
         hoogte_ander = wall.size[1]
-        textuur_x = textuurcoordinaten_X[0]
+        if is_horizontaal == True:
+            textuur_x = textuurcoordinaten_X[1]
+        else:
+            textuur_x = textuurcoordinaten_X[0]
         textuur_y = 0
         scherm_x = kolom
         scherm_y = y1
@@ -391,9 +414,19 @@ def render_fps(fps, renderer, window):
     text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
     renderer.copy(text, dstrect=(int((window.size[0] - text.size[0]) / 2), 20, text.size[0], text.size[1]))
 
+def timer(delta, renderer, window, deadline):
+    global tijd_verstrekentot
+    tijd_deadline = deadline
+    tijd_verstrekentot += delta
+    message = f'je hebt nog {int(deadline - tijd_verstrekentot)} seconden'
+    if tijd_verstrekentot > tijd_deadline:
+        message = f'je tijd is op :('
+    text = sdl2.ext.renderer.Texture(renderer, fps_font.render_text(message))
+    renderer.copy(text,dstrect=(int((window.size[0] - text.size[0]) / 2), window.size[1] / 3, text.size[0], text.size[1]))
 
 def main():
     # Initialiseer de SDL2 bibliotheek
+    global laser_shot, laser_shot_rent
     sdl2.ext.init()
 
     # Maak een venster aan om de game te renderen
@@ -406,7 +439,7 @@ def main():
     # Maak een renderer aan zodat we in ons venster kunnen renderen
     renderer = sdl2.ext.Renderer(window)
 
-    resources = sdl2.ext.Resources(__file__, "textures")
+    resources = sdl2.ext.Resources(__file__, "resources")
     global factory
     factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
     global wall
@@ -453,17 +486,52 @@ def main():
         delta = end_time - start_time
 
         verwerk_input(delta)
-
+        timer(delta, renderer, window, deadline)
         # Teken gemiddelde fps van de laatste 20 frames
         fps_list.append(1/(time.time() - start_time))
         if len(fps_list) == 20:
             fps = np.average(fps_list)
             fps_list = []
         render_fps(fps, renderer, window)
+        #scanner gun
+        resources = sdl2.ext.Resources(__file__, "resources")
+        factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+        scannergun_texture = factory.from_image(resources.get_path("scanner.png"))
+        # print(scannergun_texture.size[0])
+        # print(scannergun_texture.size[1])
+
+        renderer.copy(scannergun_texture, srcrect=(0, 0, scannergun_texture.size[0], scannergun_texture.size[1]),
+                      dstrect=(299, 415, scannergun_texture.size[0], scannergun_texture.size[1]))
+
+        # crosshair
+        resources = sdl2.ext.Resources(__file__, "resources")
+        factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+        crosshair_texture = factory.from_image(resources.get_path("crosshair_white.png"))
+        # print(crosshair_texture.size[0])
+        # print(crosshair_texture.size[1])
+
+        renderer.copy(crosshair_texture, srcrect=(0, 0, crosshair_texture.size[0], crosshair_texture.size[1]),
+                      dstrect=(380, 277, crosshair_texture.size[0], crosshair_texture.size[1]))
+
+        if laser_shot == True:
+            # print("hit")
+            # scanner laser
+
+            playsound("Ondedrive/Documenten/GitHub/project/resources/Scanner_beep_3.mp3")
+            resources = sdl2.ext.Resources(__file__, "resources")
+            factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+            laser_texture = factory.from_image(resources.get_path("scanner_laser2.png"))
+            # print(laser_texture.size[0])
+            # print(laser_texture.size[1])
+
+            renderer.copy(laser_texture, srcrect=(0, 0, laser_texture.size[0], laser_texture.size[1]),
+                          dstrect=(381, 298, laser_texture.size[0], laser_texture.size[1]))
+            laser_shot = False
 
         # Verwissel de rendering context met de frame buffer
         renderer.present()
-
+        # na renderen frame venster verversen
+        window.refresh()
     # Sluit SDL2 af
     sdl2.ext.quit()
 
