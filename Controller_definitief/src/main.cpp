@@ -66,9 +66,10 @@ void loop() {
   move(pinButtonBackward, 's'); //
   move(pinButtonLeft, 'a'); //
   move(pinButtonRight, 'd');  //
-  save();
+
 
   if(gamegestart){
+    save();
     light();
     gyro();
     buigsensor();
