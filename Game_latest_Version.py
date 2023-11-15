@@ -1366,7 +1366,7 @@ def volgorde_sprite_renderer():
         list_afstanden = [d_pizza_kolom_speler, d_apple_kolom_speler, d_broccoli_kolom_speler, d_egg_kolom_speler,d_munt1_kolom_speler, d_munt2_kolom_speler, d_munt3_kolom_speler, d_munt4_kolom_speler,d_gsm_kolom_speler,d_clerk_kolom_speler]
     else:
         list_afstanden = [d_pizza_kolom_speler, d_apple_kolom_speler, d_broccoli_kolom_speler, d_egg_kolom_speler, d_munt1_kolom_speler, d_munt2_kolom_speler, d_munt3_kolom_speler, d_munt4_kolom_speler, d_gsm_kolom_speler]
-
+#pdkfkjsùq
     list_afstanden.sort()
     list_afstanden.reverse()
     for i in range(0, len(list_afstanden)):
